@@ -1,5 +1,5 @@
 /**
- * Wewin World — galerías de emotes y fanarts + lightbox (vanilla JS).
+ * WewinVT — galerías de emotes y fanarts + lightbox (vanilla JS).
  * Solo se carga en emotes.html.
  */
 
@@ -9,6 +9,17 @@
   var DATA = window.WEWIN || {};
   var emotes = DATA.emotes || [];
   var fanarts = DATA.fanarts || [];
+
+  /**
+   * Placeholder de 1px (SVG transparente) para el <img> del lightbox cuando
+   * está cerrado. Un src vacío haría que el navegador pidiera la propia
+   * página como imagen (tarea "imagen vacía" del documento de mejoras).
+   */
+  var PLACEHOLDER =
+    'data:image/svg+xml;charset=utf-8,' +
+    encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>'
+    );
 
   /* ------------------------------------------------------------------ */
   /* Render de las galerías                                              */
@@ -43,6 +54,24 @@
     }
 
     li.appendChild(button);
+
+    // Crédito del artista (solo si hay dato; sin "por @" vacío).
+    if (item.artista) {
+      var credit = document.createElement('p');
+      credit.className = 'tile-credit';
+      if (item.enlace) {
+        var link = document.createElement('a');
+        link.href = item.enlace;
+        link.target = '_blank';
+        link.rel = 'noreferrer';
+        link.textContent = 'por @' + item.artista;
+        credit.appendChild(link);
+      } else {
+        credit.textContent = 'por @' + item.artista;
+      }
+      li.appendChild(credit);
+    }
+
     return li;
   }
 
@@ -81,12 +110,29 @@
     return listName === 'emote' ? emotes : fanarts;
   }
 
+  /** Pinta la leyenda: autor como enlace si existe; si no, la descripción. */
   function renderLightbox() {
     var item = itemsFor(currentList)[currentIndex];
     lightboxImg.src = item.src;
     lightboxImg.alt = item.alt;
-    lightboxCaption.textContent =
-      item.alt + ' (' + (currentIndex + 1) + ' / ' + itemsFor(currentList).length + ')';
+    lightboxCaption.textContent = '';
+    if (item.artista) {
+      lightboxCaption.appendChild(document.createTextNode('por '));
+      if (item.enlace) {
+        var link = document.createElement('a');
+        link.href = item.enlace;
+        link.target = '_blank';
+        link.rel = 'noreferrer';
+        link.textContent = '@' + item.artista;
+        lightboxCaption.appendChild(link);
+      } else {
+        var name = document.createElement('strong');
+        name.textContent = '@' + item.artista;
+        lightboxCaption.appendChild(name);
+      }
+    } else {
+      lightboxCaption.textContent = item.alt;
+    }
   }
 
   function openLightbox(listName, index, trigger) {
@@ -103,7 +149,8 @@
   function closeLightbox() {
     lightbox.hidden = true;
     document.body.style.overflow = '';
-    lightboxImg.src = '';
+    lightboxImg.src = PLACEHOLDER;
+    lightboxImg.alt = '';
     document.removeEventListener('keydown', onKeydown);
     if (lastTrigger && document.contains(lastTrigger)) {
       lastTrigger.focus();
@@ -137,4 +184,7 @@
   nextButton.addEventListener('click', function () {
     step(1);
   });
+
+  // Estado inicial: el lightbox cerrado nunca carga la página como imagen.
+  lightboxImg.src = PLACEHOLDER;
 })();

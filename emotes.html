@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -9,8 +9,9 @@
       name="description"
       content="La galería de WewinVT: emotes del canal y fanarts hechos por la comunidad."
     />
-    <meta name="theme-color" content="#1a1b26" />
+    <meta name="theme-color" content="#17110F" />
     <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="canonical" href="https://wewinvt.com/emotes" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,6 +20,25 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/paleta-chocolate.css" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="WewinVT" />
+    <meta property="og:title" content="Emotes y fanarts | WewinVT" />
+    <meta
+      property="og:description"
+      content="El cast de emotes del canal y el mosaico de fanarts hechos por la comunidad de Wewin."
+    />
+    <meta property="og:image" content="https://wewinvt.com/img/og-wewin.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="es_MX" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Emotes y fanarts | WewinVT" />
+    <meta
+      name="twitter:description"
+      content="La galería de la comunidad de Wewin: emotes del canal y fanarts para celebrar los momentos del stream."
+    />
   </head>
   <body>
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -26,7 +46,7 @@
     <header class="site-header">
       <div class="shell nav-bar">
         <a class="brand" href="index.html">
-          <img src="fanarts%20y%20emotes/emotes/a%20sin%20fondo.png" alt="Logo de Wewin" width="32" height="32" />
+          <img src="img/emotes/risa.png" alt="Logo de Wewin" width="32" height="32" />
           WewinVT
         </a>
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Abrir o cerrar el menú">
@@ -39,8 +59,7 @@
         <nav class="nav-menu" id="nav-menu" aria-label="Navegación principal">
           <ul class="nav-list">
             <li><a class="nav-link" href="index.html">Inicio</a></li>
-            <li><a class="nav-link is-active" href="emotes.html" aria-current="page">Emotes y fanarts</a></li>
-            <li><a class="nav-link" href="cartas.html">Cartas</a></li>
+            <li><span class="nav-link is-active" aria-current="page">Emotes y fanarts</span></li>
           </ul>
         </nav>
       </div>
@@ -59,11 +78,16 @@
 
         <h2 class="eyebrow" data-animate>Emotes del canal</h2>
         <ul class="emote-grid" data-emote-list aria-label="Emotes de Wewin"></ul>
+        <p class="gallery-note" data-animate>
+          Emotes por <strong>@shinyvibes_art</strong> y <strong>@VtKairo</strong>.
+        </p>
 
         <h2 class="eyebrow" style="margin-top: var(--space-8)" data-animate>Fanarts de la comunidad</h2>
         <ul class="fanart-grid" data-fanart-list aria-label="Fanarts de Wewin"></ul>
         <p class="gallery-note" data-animate>
-          Todo el arte de esta página es cortesía de la comunidad de Wewin. ¡Gracias por tanto arte bonito! 🎨
+          ¿Hiciste un fanart de Wewin? Compártelo en el canal de fanarts del
+          <a href="https://discord.gg/C6X7KWMaZc" target="_blank" rel="noreferrer">Discord</a>
+          y puede aparecer aquí. 🎨
         </p>
       </section>
     </main>
@@ -71,17 +95,18 @@
     <footer class="site-footer">
       <div class="shell footer-bar">
         <span>© <span data-year>2026</span> wewinvt</span>
-        <ul aria-label="Navegación del pie de página">
-          <li><a href="index.html">Inicio</a></li>
-          <li><a href="emotes.html">Emotes y fanarts</a></li>
-          <li><a href="cartas.html">Cartas</a></li>
-        </ul>
+        <!-- TODO: confirmar el correo de contacto y descomentar: <a href="mailto:correo@wewinvt.com">Colaboraciones</a> -->
       </div>
     </footer>
 
     <!-- Lightbox compartido para emotes y fanarts -->
     <div class="lightbox" data-lightbox hidden role="dialog" aria-modal="true" aria-label="Vista previa de la imagen">
-      <img class="lb-img" data-lightbox-img src="" alt="" />
+      <img
+        class="lb-img"
+        data-lightbox-img
+        src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E"
+        alt=""
+      />
       <button class="lb-btn lb-prev" data-lightbox-prev type="button" aria-label="Imagen anterior">‹</button>
       <button class="lb-btn lb-next" data-lightbox-next type="button" aria-label="Imagen siguiente">›</button>
       <button class="lb-close" data-lightbox-close type="button" aria-label="Cerrar vista previa">✕</button>

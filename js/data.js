@@ -1,164 +1,270 @@
 /**
- * Wewin World — datos del sitio (vanilla JS, sin framework).
- * Las rutas apuntan a la carpeta "fanarts y emotes" de la raíz.
- * Los espacios de las rutas van codificados como %20 para funcionar
- * igual de bien en file:// como en GitHub Pages.
+ * WewinVT — datos del sitio (vanilla JS, sin framework).
+ * Las imágenes viven en img/ (nombres en minúsculas, sin espacios ni acentos).
+ * Las carpetas originales quedan en "fanarts y emotes/" como respaldo.
  */
 
 window.WEWIN = {
-  channel: 'wewinvt',
-  twitchUrl: 'https://www.twitch.tv/wewinvt',
+  channel: "wewinvt",
+  twitchUrl: "https://www.twitch.tv/wewinvt",
 
-  /** Emotes de la comunidad */
+  /**
+   * Horario de streams.
+   * TODO: si Wewin define un horario fijo de días/horas, usar la lista `dias`.
+   */
+  horario: {
+    zona: "hora de México",
+    dias: [
+      // { dia: 'Martes', hora: '20:00' },
+    ],
+    texto:
+      "Entre 5, 6 o 7 de la tarde (hora de México), todos los días. Si pasa de esa hora… probablemente ya no prendí. 🔌",
+  },
+
+  /** Emotes del canal */
   emotes: [
     {
-      src: 'fanarts%20y%20emotes/emotes/23_sin_titulo_20240527025407.png',
-      alt: 'Emote de Wewin con lentes oscuros: modo cool',
+      src: "img/emotes/lentes-oscuros.png",
+      alt: "Emote de Wewin con lentes oscuros: modo cool",
+      artista: "skyshinez_",
+      enlace: "https://www.instagram.com/skyshinez_/",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/23_sin_titulo_20240527104156.png',
-      alt: 'Emote de Wewin llorando de angustia',
+      src: "img/emotes/angustia.png",
+      alt: "Emote de Wewin llorando de angustia",
+      artista: "skyshinez_",
+      enlace: "https://www.instagram.com/skyshinez_/",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/23_sin_titulo_20240527110829.png',
-      alt: 'Emote de Wewin con mirada vacía de sorpresa',
+      src: "img/emotes/mirada-vacia.png",
+      alt: "Emote de Wewin con mirada vacía de sorpresa",
+      artista: "skyshinez_",
+      enlace: "https://www.instagram.com/skyshinez_/",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/23_sin_titulo_20240527120942.png',
-      alt: 'Emote de Wewin durmiendo plácidamente',
+      src: "img/emotes/durmiendo.png",
+      alt: "Emote de Wewin durmiendo plácidamente",
+      artista: "skyshinez_",
+      enlace: "https://www.instagram.com/skyshinez_/",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/23_sin_titulo_Restaurado2_20240529173507.png',
-      alt: 'Emote angelical de Wewin con halo y alitas',
+      src: "img/emotes/angel-halo.png",
+      alt: "Emote angelical de Wewin con halo y alitas",
+      artista: "skyshinez_",
+      enlace: "https://www.instagram.com/skyshinez_/",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/23_sin_titulo_Restaurado2_20240529194613.png',
-      alt: 'Emote de fiesta de Wewin con gafas de neón y confeti',
+      src: "img/emotes/fiesta-confeti.png",
+      alt: "Emote de fiesta de Wewin con gafas de neón y confeti",
+      artista: "skyshinez_",
+      enlace: "https://www.instagram.com/skyshinez_/",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/23_sin_titulo_Restaurado2_20240529202145.png',
-      alt: 'Emote de Wewin con ojitos brillantes de súplica',
+      src: "img/emotes/ojitos-suplica.png",
+      alt: "Emote de Wewin con ojitos brillantes de súplica",
+      artista: "skyshinez_",
+      enlace: "https://www.instagram.com/skyshinez_/",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/40_sin_titulo2_20250425015625.png',
-      alt: 'Emote de cariño: mano acariciando la cabeza de Wewin',
+      src: "img/emotes/headpat.png",
+      alt: "Emote de cariño: mano acariciando la cabeza de Wewin",
+      artista: "skyshinez_",
+      enlace: "https://www.instagram.com/skyshinez_/",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/41_sin_titulo19_20250425030523.png',
-      alt: 'Emote de Wewin mostrando una carta Uno invertida',
+      src: "img/emotes/uno-inversa.png",
+      alt: "Emote de Wewin mostrando una carta Uno invertida",
+      artista: "skyshinez_",
+      enlace: "https://www.instagram.com/skyshinez_/",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/41_sin_titulo2_20250423024700.png',
-      alt: 'Emote de Wewin con ojitos de súplica y lágrimas',
+      src: "img/emotes/ojitos-lagrimas.png",
+      alt: "Emote de Wewin con ojitos de súplica y lágrimas",
+      artista: "skyshinez_",
+      enlace: "https://www.instagram.com/skyshinez_/",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/41_sin_titulo7_20250425024237.png',
-      alt: 'Emote de Wewin investigando con una lupa',
+      src: "img/emotes/lupa.png",
+      alt: "Emote de Wewin investigando con una lupa",
+      artista: "skyshinez_",
+      enlace: "https://www.instagram.com/skyshinez_/",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/41_sin_titulo8_20250425012414.png',
-      alt: 'Emote de Wewin pensando con spinner sobre los ojos',
+      src: "img/emotes/spinner-pensando.png",
+      alt: "Emote de Wewin pensando con spinner sobre los ojos",
+      artista: "skyshinez_",
+      enlace: "https://www.instagram.com/skyshinez_/",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/57_sin_titulo2_20250425042521.png',
-      alt: 'Emote de Wewin asomándose tímidamente tras una pared',
+      src: "img/emotes/asomandose.png",
+      alt: "Emote de Wewin asomándose tímidamente tras una pared",
+      artista: "skyshinez_",
+      enlace: "https://www.instagram.com/skyshinez_/",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/a%20sin%20fondo.png',
-      alt: 'Emote de Wewin riendo con ganas',
+      src: "img/emotes/risa.png",
+      alt: "Emote de Wewin riendo con ganas",
+      artista: "vtkairo",
+      enlace: "https://www.twitch.tv/vtkairo",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/bonk%20sin%20fondo.png',
-      alt: 'Emote bonk: un bate golpeando a Wewin',
+      src: "img/emotes/bonk.png",
+      alt: "Emote bonk: un bate golpeando a Wewin",
+      artista: "vtkairo",
+      enlace: "https://www.twitch.tv/vtkairo",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/corazon-sin%20fondo.png',
-      alt: 'Emote de Wewin sonrojado con manitas y corazón',
+      src: "img/emotes/sonrojo-corazon.png",
+      alt: "Emote de Wewin sonrojado con manitas y corazón",
+      artista: "vtkairo",
+      enlace: "https://www.twitch.tv/vtkairo",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/GIF_20250425_020347_692.gif',
-      alt: 'Emote animado de Wewin: de pensar a sonrojo',
+      src: "img/emotes/pensar-sonrojo.gif",
+      alt: "Emote animado de Wewin: de pensar a sonrojo",
       gif: true,
+      artista: "skyshinez_",
+      enlace: "https://www.instagram.com/skyshinez_/",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/gran_corazon-sin%20fondo.png',
-      alt: 'Emote de Wewin mostrando un gran corazón',
+      src: "img/emotes/gran-corazon.png",
+      alt: "Emote de Wewin mostrando un gran corazón",
+      artista: "vtkairo",
+      enlace: "https://www.twitch.tv/vtkairo",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/hallowknig-removebg-preview.png',
-      alt: 'Emote de mini diablito con cuernos de Halloween',
+      src: "img/emotes/diablito-halloween.png",
+      alt: "Emote de mini diablito con cuernos de Halloween",
+      artista: "frozenyogurt02",
+      enlace: "https://www.twitch.tv/frozenyogurt02",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/hi-sin%20fondo.png',
-      alt: 'Emote de Wewin saludando (hi)',
+      src: "img/emotes/hola.png",
+      alt: "Emote de Wewin saludando (hi)",
+      artista: "vtkairo",
+      enlace: "https://www.twitch.tv/vtkairo",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/hollowem-removebg-preview__3_-removebg-preview__4_-removebg-preview.png',
-      alt: 'Emote del caballero hueco de Hollow Knight llorando',
+      src: "img/emotes/caballero-hueco.png",
+      alt: "Emote del caballero hueco de Hollow Knight llorando",
+      artista: "frozenyogurt02",
+      enlace: "https://www.twitch.tv/frozenyogurt02",
     },
     {
-      src: 'fanarts%20y%20emotes/emotes/waos-sin%20fondo.png',
-      alt: 'Emote de Wewin con una botella de WAOS',
+      src: "img/emotes/waos-botella.png",
+      alt: "Emote de Wewin con una botella de WAOS",
+      artista: "vtkairo",
+      enlace: "https://www.twitch.tv/vtkairo",
+    },
+    {
+      src: "img/emotes/abrazo.png",
+      alt: "Emote de Wewin de cuerpo completo con manitas y lentes enormes pidiendo un abrazo",
+      artista: "skyshinez_",
+      enlace: "https://www.instagram.com/skyshinez_/",
+    },
+    {
+      src: "img/emotes/gordinflon.gif",
+      alt: "Emote animado del Wewin gordinflón: flotando con la mayor calma posible",
+      gif: true,
+      artista: "skyshinez_",
+      enlace: "https://www.instagram.com/skyshinez_/",
     },
   ],
 
-  /** Fanarts hechos por la comunidad */
+  /**
+   * Fanarts hechos por la comunidad.
+   * TODO: completar artista y enlace de cada pieza (preguntar en el Discord de fanarts).
+   */
   fanarts: [
     {
-      src: 'fanarts%20y%20emotes/fanarts/asdsad.png',
-      alt: 'Fanart de Wewin dentro de un templo estilo Hollow Knight',
+      src: "img/fanarts/templo-hollow-knight.png",
+      alt: "Fanart de Wewin dentro de un templo estilo Hollow Knight",
+      artista: "darklobo117",
+      enlace: "https://www.twitch.tv/darklobo117",
     },
     {
-      src: 'fanarts%20y%20emotes/fanarts/cailoDIBUJO.png',
-      alt: 'Dibujo de tres personajes jugando criaturas en una escena nocturna',
+      src: "img/fanarts/criaturas-nocturnas.png",
+      alt: "Dibujo de tres personajes jugando criaturas en una escena nocturna",
+      artista: "vtkairo",
+      enlace: "https://www.twitch.tv/vtkairo",
     },
     {
-      src: 'fanarts%20y%20emotes/fanarts/fanart1.png',
+      src: "img/fanarts/pongan-bachata.png",
       alt: "Fanart: Wewin bailando con la frase «Pongan Bachata»",
+      artista: "ryonikku",
+      enlace: "https://www.twitch.tv/ryonikku",
     },
     {
-      src: 'fanarts%20y%20emotes/fanarts/fanart3.png',
-      alt: 'Cómic de la comunidad: conversación entre amigos',
+      src: "img/fanarts/comic-comunidad.png",
+      alt: "Cómic de la comunidad: conversación entre amigos",
+      artista: "eclipsenoctis",
+      enlace: "https://www.twitch.tv/eclipsenoctis",
     },
     {
-      src: 'fanarts%20y%20emotes/fanarts/fanart5.jpg',
-      alt: 'Fanart de una batalla legendaria de Pokémon',
+      src: "img/fanarts/batalla-pokemon.jpg",
+      alt: "Fanart de una batalla legendaria de Pokémon",
+      artista: "daggercrosstv",
+      enlace: "https://www.twitch.tv/daggercrosstv",
     },
     {
-      src: 'fanarts%20y%20emotes/fanarts/fanart6.jpeg',
-      alt: 'Boceto a tinta de dos personajes chibi',
+      src: "img/fanarts/boceto-tinta-chibi.jpeg",
+      alt: "Boceto a tinta de dos personajes chibi",
+      artista: "vtkairo",
+      enlace: "https://www.twitch.tv/vtkairo",
     },
     {
-      src: 'fanarts%20y%20emotes/fanarts/fanart7.jpg',
-      alt: 'Retrato pintado de Wewin con playera roja',
+      src: "img/fanarts/retrato-pintado.jpg",
+      alt: "Retrato pintado de Wewin con playera roja",
+      artista: "vtkairo",
+      enlace: "https://www.twitch.tv/vtkairo",
     },
     {
-      src: 'fanarts%20y%20emotes/fanarts/fanart8.png',
-      alt: 'Fanart estilo peluche de Wewin sentado',
+      src: "img/fanarts/peluche-wewin.png",
+      alt: "Fanart estilo peluche de Wewin sentado",
+      artista: "eclipsenoctis",
+      enlace: "https://www.twitch.tv/eclipsenoctis",
     },
     {
-      src: 'fanarts%20y%20emotes/fanarts/image.png',
-      alt: 'Ilustración anime de Wewin acomodando una corbata roja',
+      src: "img/fanarts/corbata-roja.png",
+      alt: "Ilustración anime de Wewin acomodando una corbata roja",
+      artista: "arandaidai",
+      enlace: "https://www.instagram.com/arandaidai/",
     },
     {
-      src: 'fanarts%20y%20emotes/fanarts/IMG_1175.jpg',
-      alt: 'Boceto a lápiz de un retrato hecho por la comunidad',
+      src: "img/fanarts/boceto-lapiz.jpg",
+      alt: "Boceto a lápiz de un retrato hecho por la comunidad",
+      artista: "koru",
+      enlace: "",
     },
     {
-      src: 'fanarts%20y%20emotes/fanarts/pixil-frame-0_2-removebg-preview.png',
-      alt: 'Pixel art de guerrero con espada (fanart)',
+      src: "img/fanarts/pixel-guerrero.png",
+      alt: "Pixel art de guerrero con espada (fanart)",
+      artista: "loki_vt_",
+      enlace: "https://www.twitch.tv/loki_vt_",
     },
     {
-      src: 'fanarts%20y%20emotes/fanarts/RINCon-removebg-preview.png',
-      alt: 'Póster de «Rincón del chisme» by @wewinvt',
+      src: "img/fanarts/poster-rincon-chisme.png",
+      alt: "Póster de «Rincón del chisme» by @wewinvt",
+      artista: "frozenyogurt02",
+      enlace: "https://www.twitch.tv/frozenyogurt02",
     },
     {
-      src: 'fanarts%20y%20emotes/fanarts/RINCON_1.png',
-      alt: 'Sticker circular de Rincón del chisme con la mascota',
+      src: "img/fanarts/wechi-bebe.png",
+      alt: "Wechi bebé: mascota cariñosa con su juguete",
+      artista: "andromeda_vte",
+      enlace: "https://www.twitch.tv/andromeda_vte",
     },
     {
-      src: 'fanarts%20y%20emotes/fanarts/wechi_bebe2.0.png',
-      alt: 'Wechi bebé: mascota cariñosa con su juguete',
+      src: "img/fanarts/dino-pijama.png",
+      alt: "Fanart de Wewin con pijama de dinosaurio",
+      artista: "cosmic_alexs",
+      enlace: "https://www.twitch.tv/cosmic_alexs",
+    },
+    {
+      src: "img/fanarts/cumpleanos-pixel.png",
+      alt: "Fanart pixel art de cumpleaños de Wewin: «Pongan bachata» con chibis de Red, Goku, Luffy y Edward",
+      artista: "Josswarz",
+      enlace: "",
     },
   ],
 };

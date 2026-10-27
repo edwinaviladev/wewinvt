@@ -1,16 +1,22 @@
 /**
- * Wewin World — comportamiento compartido (vanilla JS).
+ * WewinVT — comportamiento compartido (vanilla JS).
  * - Menú móvil.
  * - Animaciones de entrada al hacer scroll.
  * - Indicador de "en vivo" consultando la señal pública de Twitch
  *   (sin servidor propio: usa api.ivr.fi y cae a decapi.me).
+ * - Tarjeta de horario de streams (se oculta si no hay datos).
  */
 
 (function () {
   'use strict';
 
-  var DATA = window.WEWIN || { channel: 'wewinvt', twitchUrl: 'https://www.twitch.tv/wewinvt' };
+  var DATA = window.WEWIN || {
+    channel: 'wewinvt',
+    twitchUrl: 'https://www.twitch.tv/wewinvt',
+    horario: null,
+  };
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var horario = DATA.horario || { zona: 'hora CDMX', dias: [] };
 
   /* ------------------------------------------------------------------ */
   /* Menú móvil                                                          */
@@ -76,11 +82,68 @@
   });
 
   /* ------------------------------------------------------------------ */
+  /* Horario de streams                                                  */
+  /* ------------------------------------------------------------------ */
+
+  function proximoStreamTexto() {
+    if (horario.dias && horario.dias.length > 0) {
+      var proximo = horario.dias[0];
+      return 'Próximo stream: ' + proximo.dia + ' ' + proximo.hora + ' (' + horario.zona + ')';
+    }
+    return horario.texto ? horario.texto : '';
+  }
+
+  function renderScheduleSlot() {
+    var slot = document.querySelector('[data-schedule-slot]');
+    if (!slot) return;
+
+    var lines = [];
+    if (horario.dias && horario.dias.length > 0) {
+      horario.dias.forEach(function (dia) {
+        lines.push(dia.dia + ' · ' + dia.hora + ' (' + horario.zona + ')');
+      });
+    } else if (horario.texto) {
+      lines.push(horario.texto);
+    }
+    if (lines.length === 0) return;
+
+    var card = document.createElement('div');
+    card.className = 'schedule-card';
+    card.setAttribute('aria-label', 'Horario de streams');
+
+    var title = document.createElement('strong');
+    title.textContent = 'Cuándo hay stream';
+    card.appendChild(title);
+
+    lines.forEach(function (line) {
+      var span = document.createElement('span');
+      span.textContent = line;
+      card.appendChild(span);
+    });
+
+    slot.appendChild(card);
+  }
+
+  renderScheduleSlot();
+
+  /* ------------------------------------------------------------------ */
   /* Indicador de señal en vivo                                          */
   /* ------------------------------------------------------------------ */
 
   var CACHE_KEY = 'wewin:live-status';
   var CACHE_TTL_MS = 60 * 1000;
+  var SIGNAL_TIMEOUT_MS = 5 * 1000;
+
+  function withTimeout(promise, ms, mensaje) {
+    return Promise.race([
+      promise,
+      new Promise(function (_resolve, reject) {
+        window.setTimeout(function () {
+          reject(new Error(mensaje || 'timeout'));
+        }, ms);
+      }),
+    ]);
+  }
 
   function readCache() {
     try {
@@ -118,7 +181,11 @@
     if (cached) return cached;
 
     try {
-      var response = await fetch('https://api.ivr.fi/v2/twitch/user?login=' + DATA.channel);
+      var response = await withTimeout(
+        fetch('https://api.ivr.fi/v2/twitch/user?login=' + DATA.channel),
+        SIGNAL_TIMEOUT_MS,
+        'ivr timeout'
+      );
       if (!response.ok) throw new Error('ivr disponibilidad ' + response.status);
 
       var payload = await response.json();
@@ -151,9 +218,13 @@
       writeCache(status);
       return status;
     } catch (ivrError) {
-      // Plan B: decapi.me responde texto plano con CORS abierto.
+      // Plan B: decapi.me responde texto plano con CORS abierto (con margen corto).
       try {
-        var res = await fetch('https://decapi.me/twitch/uptime/' + DATA.channel);
+        var res = await withTimeout(
+          fetch('https://decapi.me/twitch/uptime/' + DATA.channel),
+          2500,
+          'decapi timeout'
+        );
         var text = await res.text();
         var isLive = !/is offline/i.test(text);
         var parsedStatus = {
@@ -173,8 +244,24 @@
     }
   }
 
+  function insertarReproductor(panel) {
+    if (panel.querySelector('.stream-frame')) return;
+
+    // En producción el sitio vive en wewinvt.com (apex y www, como parámetro parent).
+    var iframe = document.createElement('iframe');
+    iframe.className = 'stream-frame';
+    iframe.src =
+      'https://player.twitch.tv/?channel=' +
+      DATA.channel +
+      '&parent=wewinvt.com&parent=www.wewinvt.com&muted=true';
+    iframe.title = 'Stream en vivo de Wewin en Twitch';
+    iframe.allowFullscreen = true;
+    iframe.loading = 'lazy';
+    panel.appendChild(iframe);
+  }
+
   function renderSignal(panel, status) {
-    var dotColor = {
+    var stateClass = {
       live: 'signal-live',
       offline: 'signal-offline',
       error: 'signal-error',
@@ -182,7 +269,7 @@
     }[status.state] || 'signal-offline';
 
     panel.classList.remove('signal-live', 'signal-offline', 'signal-loading', 'signal-error');
-    panel.classList.add(dotColor);
+    panel.classList.add(stateClass);
 
     var label = panel.querySelector('[data-signal-label]');
     var strong = panel.querySelector('[data-signal-strong]');
@@ -218,6 +305,7 @@
         });
       }
       if (cta) cta.textContent = 'Entrar a la transmisión';
+      insertarReproductor(panel);
     } else if (status.state === 'offline') {
       if (label) label.textContent = 'Sin transmisión por ahora';
       if (strong) strong.textContent = 'Wewin no está en vivo';
@@ -228,9 +316,14 @@
       }
       if (cta) cta.textContent = 'Ir al canal';
     } else {
-      if (label) label.textContent = 'Señal no disponible';
-      if (strong) strong.textContent = 'No pudimos revisar el canal';
-      if (text) text.textContent = 'Puedes entrar directamente a Twitch para comprobar el estado.';
+      // Estado de respaldo: la consulta falló o expiró.
+      if (label) label.textContent = 'Sin transmisión por ahora';
+      if (strong) strong.textContent = 'Wewin no está en vivo';
+      if (text) {
+        var proximo = proximoStreamTexto();
+        text.textContent =
+          proximo || 'Síguelo en Twitch para enterarte cuando empiece.';
+      }
       if (cta) cta.textContent = 'Ir al canal';
     }
 
