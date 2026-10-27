@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <script>document.documentElement.classList.add('js');</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Emotes y fanarts | WewinVT</title>
+    <meta
+      name="description"
+      content="La galería de WewinVT: emotes del canal y fanarts hechos por la comunidad."
+    />
+    <meta name="theme-color" content="#1a1b26" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=JetBrains+Mono:wght@700;800&family=Space+Grotesk:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <header class="site-header">
+      <div class="shell nav-bar">
+        <a class="brand" href="index.html">
+          <img src="fanarts%20y%20emotes/emotes/a%20sin%20fondo.png" alt="Logo de Wewin" width="32" height="32" />
+          WewinVT
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Abrir o cerrar el menú">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="4" y1="7" x2="20" y2="7" />
+            <line x1="4" y1="12" x2="20" y2="12" />
+            <line x1="4" y1="17" x2="20" y2="17" />
+          </svg>
+        </button>
+        <nav class="nav-menu" id="nav-menu" aria-label="Navegación principal">
+          <ul class="nav-list">
+            <li><a class="nav-link" href="index.html">Inicio</a></li>
+            <li><a class="nav-link is-active" href="emotes.html" aria-current="page">Emotes y fanarts</a></li>
+            <li><a class="nav-link" href="cartas.html">Cartas</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenido" class="shell">
+      <section class="section" aria-labelledby="galeria-titulo">
+        <div class="section-heading" data-animate>
+          <p class="eyebrow">Fan hub</p>
+          <h1 id="galeria-titulo" style="font-size: clamp(2rem, 4.5vw, 3rem)">Emotes y fanarts.</h1>
+          <p class="lead">
+            El cast de emotes del canal y el mosaico de fanarts hechos por la comunidad.
+            Cualquier pieza: haz clic para verla en grande.
+          </p>
+        </div>
+
+        <h2 class="eyebrow" data-animate>Emotes del canal</h2>
+        <ul class="emote-grid" data-emote-list aria-label="Emotes de Wewin"></ul>
+
+        <h2 class="eyebrow" style="margin-top: var(--space-8)" data-animate>Fanarts de la comunidad</h2>
+        <ul class="fanart-grid" data-fanart-list aria-label="Fanarts de Wewin"></ul>
+        <p class="gallery-note" data-animate>
+          Todo el arte de esta página es cortesía de la comunidad de Wewin. ¡Gracias por tanto arte bonito! 🎨
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell footer-bar">
+        <span>© <span data-year>2026</span> wewinvt</span>
+        <ul aria-label="Navegación del pie de página">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="emotes.html">Emotes y fanarts</a></li>
+          <li><a href="cartas.html">Cartas</a></li>
+        </ul>
+      </div>
+    </footer>
+
+    <!-- Lightbox compartido para emotes y fanarts -->
+    <div class="lightbox" data-lightbox hidden role="dialog" aria-modal="true" aria-label="Vista previa de la imagen">
+      <img class="lb-img" data-lightbox-img src="" alt="" />
+      <button class="lb-btn lb-prev" data-lightbox-prev type="button" aria-label="Imagen anterior">‹</button>
+      <button class="lb-btn lb-next" data-lightbox-next type="button" aria-label="Imagen siguiente">›</button>
+      <button class="lb-close" data-lightbox-close type="button" aria-label="Cerrar vista previa">✕</button>
+      <p class="lb-caption" data-lightbox-caption></p>
+    </div>
+
+    <script src="js/data.js" defer></script>
+    <script src="js/main.js" defer></script>
+    <script src="js/gallery.js" defer></script>
+  </body>
+</html>

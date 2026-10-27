@@ -1,0 +1,28 @@
+# WewinVT — portal del canal (sitio estático)
+
+# Versión anterior del sitio (React/Vite) que ya no se despliega
+/old/
+
+# Estado/caché de herramientas locales (skills, editores)
+/.atl/
+
+# Sistema operativo
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# Editores e IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Dependencias y artefactos por si en el futuro se usa alguna herramienta
+node_modules/
+dist/
+*.log
+
+# Envs por si algún día se agregan claves (ej. API de Twitch)
+.env
+.env.*

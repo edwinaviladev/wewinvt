@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <script>document.documentElement.classList.add('js');</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cartas | WewinVT</title>
+    <meta
+      name="description"
+      content="La sección de cartas de WewinVT está en construcción. Muy pronto: colecciones, logros y recuerdos del canal."
+    />
+    <meta name="theme-color" content="#1a1b26" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=JetBrains+Mono:wght@700;800&family=Space+Grotesk:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <header class="site-header">
+      <div class="shell nav-bar">
+        <a class="brand" href="index.html">
+          <img src="fanarts%20y%20emotes/emotes/a%20sin%20fondo.png" alt="Logo de Wewin" width="32" height="32" />
+          WewinVT
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Abrir o cerrar el menú">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="4" y1="7" x2="20" y2="7" />
+            <line x1="4" y1="12" x2="20" y2="12" />
+            <line x1="4" y1="17" x2="20" y2="17" />
+          </svg>
+        </button>
+        <nav class="nav-menu" id="nav-menu" aria-label="Navegación principal">
+          <ul class="nav-list">
+            <li><a class="nav-link" href="index.html">Inicio</a></li>
+            <li><a class="nav-link" href="emotes.html">Emotes y fanarts</a></li>
+            <li><a class="nav-link is-active" href="cartas.html" aria-current="page">Cartas</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenido">
+      <section class="shell construction" aria-labelledby="cartas-titulo">
+        <p class="construction-badge" data-animate>En construcción</p>
+        <h1 id="cartas-titulo" data-animate>Haciendo magia con las cartas…</h1>
+        <p class="lead" data-animate>
+          La sección de cartas todavía se está trabajando. Los logros, coleccionables y recuerdos
+          del canal llegarán aquí, así que de momento esta zona <strong>no está disponible</strong>.
+        </p>
+
+        <div class="card-fan" data-animate aria-hidden="true">
+          <div class="gcard gcard-back"><span>?</span></div>
+          <div class="gcard gcard-front"><span>?</span></div>
+          <div class="gcard gcard-mid"><span>?</span></div>
+        </div>
+
+        <p class="ok-note" data-animate>¿Qué trae una carta? Eso lo sabremos cuando llegue el momento. ✨</p>
+
+        <div class="notfound-actions" data-animate>
+          <a class="button button-primary" href="index.html">Volver al inicio</a>
+          <a class="button button-secondary" href="emotes.html">Ver emotes y fanarts</a>
+          <span class="button" aria-disabled="true">Ver colección (pronto)</span>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell footer-bar">
+        <span>© <span data-year>2026</span> wewinvt</span>
+        <ul aria-label="Navegación del pie de página">
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="emotes.html">Emotes y fanarts</a></li>
+          <li><a href="cartas.html">Cartas</a></li>
+        </ul>
+      </div>
+    </footer>
+
+    <script src="js/data.js" defer></script>
+    <script src="js/main.js" defer></script>
+  </body>
+</html>
