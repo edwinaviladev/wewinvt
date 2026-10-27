@@ -1,0 +1,152 @@
+/* =========================================================
+   WewinVT · Paleta "Chocolate y playera roja"
+   Se carga DESPUÉS de css/styles.css
+   ========================================================= */
+
+:root {
+  /* Fondos cacao */
+  --bg: #17110f;
+  --bg-deep: #100b0a;
+  --surface: rgb(42 30 26 / 72%);
+  --surface-strong: rgb(42 30 26 / 92%);
+
+  /* Acentos (se conservan los nombres originales) */
+  --violet: #d7263d; /* Rojo playera: principal, botones */
+  --pink: #ff5a6a; /* Rojo vivo: acentos, "en vivo" */
+  --gold: #f2b263; /* Caramelo: metas, logros, avisos */
+  --cyan: #a8e6d4; /* Monster blanco: enlaces, detalles */
+  --blue: #ff9eb1; /* Rubor: corazones, apoyo */
+  --green: #a8e6d4;
+
+  /* Texto */
+  --text: #f6ebdd;
+  --muted: rgb(191 168 153 / 92%);
+  --soft: rgb(246 235 221 / 10%);
+  --line: rgb(242 178 99 / 18%);
+
+  --focus-ring: 0 0 0 3px rgb(255 90 106 / 40%);
+}
+
+/* ---------- Colores que estaban fijos en styles.css ---------- */
+
+::selection {
+  background: rgb(215 38 61 / 52%);
+}
+
+.button-primary {
+  color: #fff7f0;
+  box-shadow: 0 12px 32px rgb(215 38 61 / 30%);
+}
+
+.button-primary:hover {
+  box-shadow: 0 16px 40px rgb(215 38 61 / 36%);
+}
+
+.site-header {
+  background: rgb(23 17 15 / 78%);
+}
+
+@media (max-width: 640px) {
+  .nav-menu {
+    background: rgb(23 17 15 / 96%);
+  }
+}
+
+.signal-live .signal-dot {
+  box-shadow: 0 0 0 0 rgb(255 90 106 / 55%);
+}
+
+@keyframes dot-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(255 90 106 / 55%);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgb(255 90 106 / 0%);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(255 90 106 / 0%);
+  }
+}
+
+.gif-badge {
+  background: rgb(168 230 212 / 18%);
+}
+
+.lightbox {
+  background: rgb(16 11 10 / 88%);
+}
+
+.construction-badge {
+  border: 1px solid rgb(242 178 99 / 40%);
+  background: rgb(242 178 99 / 12%);
+}
+
+.gcard {
+  border: 1px solid rgb(215 38 61 / 45%);
+  background: rgb(42 30 26 / 96%);
+}
+
+.gcard::before,
+.gcard::after {
+  border: 1px dashed rgb(246 235 221 / 22%);
+}
+
+.gcard span {
+  color: rgb(242 178 99 / 85%);
+}
+
+/* ---------- Estrellas → chispas de chocolate y confeti ---------- */
+
+body::before {
+  box-shadow:
+    6vw 14vh 0 1.5px rgb(255 90 106 / 55%),
+    19vw 31vh 0 1px rgb(242 178 99 / 45%),
+    34vw 8vh 0 1px rgb(246 235 221 / 45%),
+    47vw 46vh 0 1.5px rgb(255 158 177 / 40%),
+    58vw 19vh 0 1px rgb(242 178 99 / 50%),
+    71vw 38vh 0 1.5px rgb(255 90 106 / 40%),
+    84vw 11vh 0 1px rgb(246 235 221 / 40%),
+    91vw 62vh 0 1.5px rgb(242 178 99 / 40%),
+    15vw 68vh 0 1px rgb(255 158 177 / 35%),
+    63vw 79vh 0 1.5px rgb(255 90 106 / 35%),
+    88vw 88vh 0 1px rgb(246 235 221 / 35%),
+    29vw 92vh 0 1.5px rgb(242 178 99 / 35%);
+}
+
+body::after {
+  box-shadow:
+    12vw 51vh 0 1px rgb(242 178 99 / 45%),
+    26vw 24vh 0 1.5px rgb(255 90 106 / 35%),
+    41vw 66vh 0 1px rgb(246 235 221 / 40%),
+    52vw 89vh 0 1.5px rgb(255 158 177 / 35%),
+    66vw 5vh 0 1px rgb(242 178 99 / 50%),
+    77vw 55vh 0 1.5px rgb(255 90 106 / 35%),
+    95vw 27vh 0 1px rgb(246 235 221 / 40%),
+    4vw 41vh 0 1.5px rgb(242 178 99 / 35%),
+    49vw 12vh 0 1px rgb(255 158 177 / 40%),
+    37vw 79vh 0 1.5px rgb(255 90 106 / 30%),
+    74vw 72vh 0 1px rgb(246 235 221 / 35%),
+    96vw 95vh 0 1.5px rgb(242 178 99 / 30%);
+}
+
+/* ---------- Tarjetas de redes (acentos definidos en el HTML) ---------- */
+
+.social-card[href*="tiktok"] {
+  --accent: #a8e6d4 !important;
+}
+.social-card[href*="instagram"] {
+  --accent: #ff9eb1 !important;
+}
+.social-card[href*="x.com"] {
+  --accent: #f6ebdd !important;
+}
+.social-card[href*="discord"] {
+  --accent: #ff5a6a !important;
+}
+.social-card[href*="ko-fi"] {
+  --accent: #f2b263 !important;
+}
+.social-card[href*="streamloots"] {
+  --accent: #ff9eb1 !important;
+}
+/* Twitch conserva su morado oficial (#a970ff) */

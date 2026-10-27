@@ -6,6 +6,9 @@
 # Estado/caché de herramientas locales (skills, editores)
 /.atl/
 
+# Doc de planeación personal (no se publica)
+/upgrades.md
+
 # Sistema operativo
 Thumbs.db
 Desktop.ini
