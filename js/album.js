@@ -229,6 +229,7 @@
         <span class="card__inner">
           <span class="card__face card__face--front">
             <img class="card__arte" src="${datos.src}" alt="${datos.alt}" loading="lazy" decoding="async" draggable="false" />
+            <i class="card__foil"></i>
             <i class="card__holo"></i>
             <i class="card__spark"></i>
             <span class="card__scrim card__scrim--top">

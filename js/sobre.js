@@ -331,6 +331,7 @@
           </span>
           <span class="card__face card__face--front">
             <img class="card__arte" src="${datos.src}" alt="${datos.alt}" draggable="false" />
+            <i class="card__foil"></i>
             <i class="card__holo"></i>
             <i class="card__spark"></i>
             <span class="card__scrim card__scrim--top">
@@ -397,9 +398,18 @@
     }
   }
 
-  /* Mini onda del color de la rareza en el centro de la carta */
+  /* Florecimiento de color + onda en el centro de la carta */
   function anilloMini(x, y, color) {
     if (REDUCED) return;
+
+    const flor = document.createElement("i");
+    flor.className = "bloom";
+    flor.style.left = `${x}px`;
+    flor.style.top = `${y}px`;
+    flor.style.setProperty("--c", color);
+    flor.addEventListener("animationend", () => flor.remove());
+    fx.append(flor);
+
     const anillo = document.createElement("i");
     anillo.className = "mini-ring";
     anillo.style.left = `${x}px`;
@@ -409,8 +419,25 @@
     fx.append(anillo);
   }
 
+  /* Chispas en línea del color de la rareza */
+  function chispasRadiales(x, y, n, colores) {
+    if (REDUCED) return;
+    for (let i = 0; i < n; i++) {
+      const chispa = document.createElement("i");
+      chispa.className = "spark";
+      chispa.style.left = `${x}px`;
+      chispa.style.top = `${y}px`;
+      chispa.style.setProperty("--largo", `${30 + azar(46)}px`);
+      chispa.style.setProperty("--ang", `${azar(360)}deg`);
+      chispa.style.setProperty("--dist", `${-(160 + azar(280))}px`);
+      chispa.style.setProperty("--c", elegir(colores));
+      chispa.addEventListener("animationend", () => chispa.remove());
+      fx.append(chispa);
+    }
+  }
+
   /* Estrellitas que titilan sobre la carta */
-  function destellos(el, n, colores) {
+  function destellos(el, n, colores, grande = false) {
     if (REDUCED) return;
     const r = el.getBoundingClientRect();
     for (let i = 0; i < n; i++) {
@@ -418,7 +445,7 @@
       d.className = "destello";
       d.style.left = `${r.left + Math.random() * r.width}px`;
       d.style.top = `${r.top + Math.random() * r.height}px`;
-      const lado = 10 + azar(9);
+      const lado = grande ? 14 + azar(10) : 10 + azar(9);
       d.style.width = `${lado}px`;
       d.style.height = `${lado}px`;
       d.style.setProperty("--c", elegir(colores));
@@ -538,19 +565,22 @@
     anilloMini(c.x, c.y, color);
 
     if (rareza === "comun") {
-      burst(c.x, c.y, 10, 0.6, [color, "#f6ebdd"]);
+      burst(c.x, c.y, 12, 0.6, [color, "#f6ebdd"]);
       destellos(el, 5, [color, "#f6ebdd"]);
     } else if (rareza === "rara") {
-      burst(c.x, c.y, 18, 0.8, MINTS);
+      chispasRadiales(c.x, c.y, 8, MINTS);
+      burst(c.x, c.y, 20, 0.8, MINTS);
       destellos(el, 9, MINTS);
     } else if (rareza === "epica") {
-      burst(c.x, c.y, 32, 1, ROJOS);
-      destellos(el, 14, ROJOS);
+      chispasRadiales(c.x, c.y, 12, ROJOS);
+      burst(c.x, c.y, 34, 1, ROJOS);
+      destellos(el, 14, ROJOS, true);
       mostrarTinte(color);
       mostrarSplash("¡Épica!", color);
     } else {
-      burst(c.x, c.y, 48, 1.4, DORADOS);
-      destellos(el, 18, DORADOS);
+      chispasRadiales(c.x, c.y, 16, DORADOS);
+      burst(c.x, c.y, 52, 1.4, DORADOS);
+      destellos(el, 18, DORADOS, true);
       confeti(46);
       activarRays(2600);
       temblor();
