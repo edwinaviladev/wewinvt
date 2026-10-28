@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sobre coleccionable · Prototipo | WewinVT</title>
+    <meta name="description" content="Prototipo del sobre coleccionable de WewinVT: abre un sobre, obtén hasta 3 cartas aleatorias de emotes y fanarts." />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#100b0a" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=JetBrains+Mono:wght@700;800&family=Space+Grotesk:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/sobre.css" />
+  </head>
+  <body>
+    <!--
+      PROTOTIPO · Widget de sobres coleccionables (futura sección overlay)
+      Flujo: sobre → rasgado → 3 cartas boca abajo → revelado con efectos por rareza.
+      Los sonidos se sintetizan con Web Audio (sin archivos).
+    -->
+    <main class="stage" data-stage>
+      <a class="back-link" href="cartas.html">← Sección cartas</a>
+
+      <!-- Emotes flotando de fondo (ambiente Balatro) -->
+      <div class="bg-float" aria-hidden="true">
+        <img src="img/emotes/risa.png" alt="" />
+        <img src="img/emotes/gordinflon.gif" alt="" />
+        <img src="img/emotes/gran-corazon.png" alt="" />
+      </div>
+
+      <div class="rays" data-rays aria-hidden="true"></div>
+      <div class="flash" data-flash aria-hidden="true"></div>
+
+      <!-- SOBRE -->
+      <div class="layer pack-layer">
+        <button class="pack" data-pack type="button" aria-label="Abrir el sobre coleccionable">
+          <span class="pack__strip" aria-hidden="true">
+            <span class="pack__strip-label">WewinVT · Serie 1</span>
+          </span>
+          <span class="pack__seal" aria-hidden="true">W</span>
+          <span class="pack__body" aria-hidden="true">
+            <span class="pack__frame"></span>
+            <span class="pack__brand">W</span>
+            <span class="pack__title">Sobre coleccionable</span>
+            <span class="pack__dots">✦ ✦ ✦</span>
+            <span class="pack__count">3 cartas de la comunidad</span>
+            <span class="pack__band">Edición comunidad</span>
+          </span>
+          <span class="pack__hint">Toca para abrir</span>
+        </button>
+      </div>
+
+      <!-- CARTAS -->
+      <div class="layer hand-layer">
+        <div class="hand" data-hand aria-label="Cartas obtenidas"></div>
+      </div>
+
+      <!-- UI inferior -->
+      <div class="bottom-ui">
+        <p class="hint" data-hint aria-live="polite">Toca el sobre para abrirlo</p>
+        <div class="actions" data-actions hidden>
+          <button class="btn btn--ghost" data-reveal-all type="button">Revelar todas</button>
+          <button class="btn btn--primary" data-again type="button">Abrir otro sobre</button>
+        </div>
+      </div>
+
+      <!-- HUD -->
+      <div class="hud">
+        <button class="hud__btn" data-mute type="button" aria-pressed="false" aria-label="Silenciar sonidos" title="Sonido">🔊</button>
+        <span class="hud__count">Sobres abiertos: <b data-opened>0</b></span>
+      </div>
+
+      <!-- Controles de prueba (solo prototipo) -->
+      <div class="dev">
+        <label>modo prueba:
+          <select data-force>
+            <option value="">aleatorio</option>
+            <option value="rara">garantizar Rara+</option>
+            <option value="epica">garantizar Épica+</option>
+            <option value="legendaria">garantizar Legendaria</option>
+          </select>
+        </label>
+      </div>
+
+      <!-- Capa de partículas -->
+      <div class="fx" data-fx aria-hidden="true"></div>
+    </main>
+
+    <script src="js/sobre-data.js" defer></script>
+    <script src="js/sobre.js" defer></script>
+  </body>
+</html>
