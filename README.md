@@ -60,6 +60,9 @@ Twitch conserva su morado oficial (`#a970ff`).
    `https://wewinvt.com/emotes` y `/cartas` directamente.
 5. En *Custom domains* agrega `wewinvt.com` y `www.wewinvt.com`.
 
+Si despliegas el Worker con Wrangler y `assets.directory` apunta a la raíz,
+`.assetsignore` excluye `.git` del paquete estático.
+
 ### GitHub Pages (alternativa)
 
 1. En *Settings → Pages*, elige la rama (`main`) y la carpeta raíz.
