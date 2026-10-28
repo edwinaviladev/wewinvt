@@ -740,6 +740,25 @@ body {
 }
 .hud__count b { color: var(--caramelo); }
 
+.hud__album {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid rgb(246 235 221 / 20%);
+  background: rgb(23 17 15 / 80%);
+  transition: color 0.2s, border-color 0.2s, transform 0.15s;
+}
+.hud__album:hover {
+  color: var(--caramelo);
+  border-color: rgb(242 178 99 / 50%);
+  transform: scale(1.05);
+}
+
 .back-link {
   position: absolute;
   top: 22px;

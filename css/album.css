@@ -1,0 +1,254 @@
+/* =========================================================
+   WewinVT · Álbum de colección (prototipo)
+   Reutiliza el motor visual de css/sobre.css (cartas, botones, paleta)
+   ========================================================= */
+
+body { overflow-y: auto; }
+body.sin-scroll { overflow: hidden !important; }
+
+.album-shell {
+  min-height: 100dvh;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(72px, 12vh, 110px) 20px 72px;
+}
+
+/* ---------- Encabezado ---------- */
+
+.album-head { text-align: center; margin-bottom: 26px; }
+
+.eyebrow {
+  margin: 0 0 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--caramelo);
+}
+
+.album-head h1 {
+  margin: 0 0 10px;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: clamp(32px, 6vw, 54px);
+}
+
+.album-sub {
+  margin: 0 auto 26px;
+  max-width: 560px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.album-vacio {
+  margin: 0 0 14px;
+  color: var(--rubor);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.album-progreso {
+  max-width: 460px;
+  margin: 0 auto 16px;
+}
+
+.barra {
+  height: 14px;
+  border-radius: 999px;
+  border: 1px solid rgb(246 235 221 / 18%);
+  background: rgb(16 11 10 / 80%);
+  overflow: hidden;
+}
+
+.barra i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--rojo-vivo), var(--caramelo));
+  box-shadow: 0 0 18px rgb(242 178 99 / 45%);
+  transition: width 1s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.barra-texto {
+  margin: 10px 0 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+.barra-texto b { color: var(--caramelo); font-size: 14px; }
+
+.album-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 auto 22px;
+}
+
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgb(246 235 221 / 16%);
+  background: rgb(23 17 15 / 80%);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+.stat i {
+  width: 9px;
+  height: 9px;
+  rotate: 45deg;
+  background: var(--c, #f2b263);
+  box-shadow: 0 0 8px var(--c, #f2b263);
+}
+.stat b { color: var(--text); }
+
+.album-acciones {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ---------- Secciones por rareza ---------- */
+
+.album-seccion { margin: 36px 0; }
+
+.album-rareza {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.album-rareza h2 {
+  margin: 0;
+  font-family: "Space Grotesk", sans-serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: clamp(22px, 3.6vw, 30px);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--c, #f2b263);
+}
+.album-rareza .conteo {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  color: var(--muted);
+}
+.album-rareza .linea {
+  flex: 1;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--c, #f2b263), transparent 85%);
+  opacity: 0.4;
+}
+
+.album-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: center;
+}
+
+.album-seccion .card { --cw: clamp(118px, 15.5vw, 172px); }
+
+/* Cartas aún sin descubrir */
+.card--locked { cursor: default; }
+.card--locked .card__face--back { opacity: 0.5; }
+.card--locked .card__emblem {
+  background: radial-gradient(circle at 32% 30%, #93816d, #6f5c4b 55%, #4c3e32);
+  color: #241813;
+  box-shadow: none;
+}
+
+/* ---------- Detalle de carta ---------- */
+
+.detalle {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 26px;
+  background: rgb(16 11 10 / 88%);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+.detalle[hidden] { display: none; }
+
+.detalle-caja {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 30px;
+  max-width: 800px;
+  animation: detalle-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.detalle .card { --cw: clamp(210px, 30vw, 292px); }
+
+.detalle-info {
+  display: grid;
+  gap: 12px;
+  min-width: 250px;
+}
+.detalle-info h3 {
+  margin: 0 0 4px;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(22px, 4vw, 30px);
+}
+.detalle-dato {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 10px;
+  font-size: 14px;
+}
+.detalle-dato span {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  padding-top: 2px;
+}
+.detalle-dato b { color: var(--text); }
+.detalle-dato a { color: var(--mint); }
+
+.detalle-cerrar {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+}
+
+@keyframes detalle-in {
+  from { transform: translateY(26px) scale(0.94); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* ---------- Pie ---------- */
+
+.album-pie {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 44px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: rgb(191 168 153 / 65%);
+}
+.album-pie b { color: var(--caramelo); }
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 640px) {
+  .detalle-dato { grid-template-columns: 74px 1fr; }
+  .album-grid { gap: 12px; }
+}
