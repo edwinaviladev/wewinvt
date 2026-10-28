@@ -65,6 +65,9 @@ export default {
       }
 
       if (url.pathname === "/api/login" && request.method === "POST") {
+        if (!env.CLIENT_SECRET) {
+          return json({ error: "el servidor no tiene CLIENT_SECRET configurado (debe ser de tipo Secret)" }, 500);
+        }
         const cuerpo = await request.json();
         const res = await fetch(TWITCH_TOKEN, {
           method: "POST",
@@ -83,6 +86,9 @@ export default {
       }
 
       if (url.pathname === "/api/refresh" && request.method === "POST") {
+        if (!env.CLIENT_SECRET) {
+          return json({ error: "el servidor no tiene CLIENT_SECRET configurado (debe ser de tipo Secret)" }, 500);
+        }
         const cuerpo = await request.json();
         const res = await fetch(TWITCH_TOKEN, {
           method: "POST",

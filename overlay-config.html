@@ -183,17 +183,11 @@
         <h2><span class="paso">2</span> Configura y conecta tu canal</h2>
 
         <div class="campo">
-          <label for="cliente-id">Client ID de la app</label>
-          <input id="cliente-id" type="text" autocomplete="off" spellcheck="false" placeholder="Ej. gp762nuoqolgmyluiscohesd3fldt7" />
-        </div>
-
-        <div class="campo">
-          <label for="cliente-secreto">Client Secret de la app</label>
-          <input id="cliente-secreto" type="password" autocomplete="off" spellcheck="false" placeholder="El que Twitch te muestra junto al Client ID" />
+          <label for="cliente-id">Client ID (lo sirve el servidor)</label>
+          <input id="cliente-id" type="text" readonly spellcheck="false" placeholder="Cargando desde el servidor…" />
           <small>
-            Twitch lo exige para canjear el token aunque se use PKCE. Se guarda solo en este
-            navegador. <strong>Opcional:</strong> si el servidor ya tiene el secret configurado,
-            no hace falta ponerlo aquí.
+            Se toma de la configuración del worker — así nunca se canjea con un Client ID distinto
+            al que autorizó Twitch.
           </small>
         </div>
 
@@ -248,7 +242,6 @@
         const redirectUri = location.origin + location.pathname;
 
         const inpClientId = $("#cliente-id");
-        const inpSecreto = $("#cliente-secreto");
         const inpCanal = $("#canal");
         const inpRecompensa = $("#recompensa");
         const lineaEstado = $("[data-estado-linea]");
@@ -288,18 +281,16 @@
         window.addEventListener("DOMContentLoaded", async () => {
           const config = window.TwitchAuth.leerConfig();
           if (config) {
-            inpClientId.value = config.clientId || "";
-            inpSecreto.value = config.clientSecret || "";
             inpCanal.value = config.canal || "";
             inpRecompensa.value = config.recompensa || "";
           }
 
-          /* Si el servidor ya tiene el Client ID, se prellena */
+          /* El Client ID es propiedad del servidor: siempre manda él */
           try {
             const res = await fetch("/api/config");
             if (res.ok) {
               const datos = await res.json();
-              if (datos.clientId && !inpClientId.value) inpClientId.value = datos.clientId;
+              if (datos.clientId) inpClientId.value = datos.clientId;
             }
           } catch {
             /* sin worker desplegado todavía */
@@ -341,12 +332,11 @@
           limpiarError();
           const clientId = inpClientId.value.trim();
           if (!clientId) {
-            error("Necesitas el Client ID de tu aplicación (paso 1).");
+            error("El servidor aún no tiene el CLIENT_ID configurado (variable en wrangler/dashboard).");
             return;
           }
           window.TwitchAuth.guardarConfig({
             clientId,
-            clientSecret: inpSecreto.value.trim(),
             canal: inpCanal.value.trim().toLowerCase(),
             recompensa: inpRecompensa.value.trim(),
           });
