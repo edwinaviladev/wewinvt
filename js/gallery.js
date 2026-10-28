@@ -46,10 +46,10 @@
 
     button.appendChild(img);
 
-    if (item.gif) {
+    if (item.animada) {
       var badge = document.createElement('span');
-      badge.className = 'gif-badge';
-      badge.textContent = 'GIF';
+      badge.className = 'animation-badge';
+      badge.textContent = 'ANIMADO';
       button.appendChild(badge);
     }
 

@@ -12,7 +12,7 @@ wewinvt/
 ├── emotes.html           Galería de emotes y fanarts (lightbox + créditos de artista)
 ├── cartas.html           Sección de cartas: en construcción (sin enlace en la nav)
 ├── 404.html              Página de error (la sirven GitHub Pages y Cloudflare Pages)
-├── favicon.png           Favicon del sitio
+├── favicon.webp          Favicon del sitio
 ├── .gitignore            Ignora old/, cachés de herramientas y basura del sistema
 ├── robots.txt            Indica el sitemap (dominio wewinvt.com)
 ├── sitemap.xml           Mapa de páginas para buscadores (URLs limpias)
@@ -25,9 +25,9 @@ wewinvt/
 │   │                     reproductor de Twitch y tarjeta de horario
 │   └── gallery.js        Render de galerías, créditos y lightbox (solo en emotes.html)
 ├── img/
-│   ├── og-wewin.png      Imagen 1200×630 para compartir en redes
-│   ├── emotes/           Emotes con nombres limpios (risa.png, bonk.png, hola.png…)
-│   └── fanarts/          Fanarts con nombres limpios (pongan-bachata.png, retrato-pintado.jpg…)
+│   ├── og-wewin.webp     Imagen 1200×630 para compartir en redes
+│   ├── emotes/           Emotes optimizados en WebP
+│   └── fanarts/          Fanarts optimizados en WebP
 └── fanarts y emotes/     Carpeta original con los archivos fuente (respaldo, sin referencias)
 ```
 
@@ -77,7 +77,9 @@ Twitch conserva su morado oficial (`#a970ff`).
 - **Créditos de emotes y fanarts**: campos `artista` y `enlace` en `js/data.js`
   (párrafo bajo la miniatura y autor como enlace en el lightbox); mientras estén
   vacíos, no se muestra crédito (el lightbox muestra la descripción).
-- **OG para compartir**: `img/og-wewin.png` (1200×630) y metadatos Open Graph/Twitter
+- **Imágenes**: las páginas cargan WebP; los emotes animados conservan la animación.
+  Los originales se mantienen para poder volver a convertirlos.
+- **OG para compartir**: `img/og-wewin.webp` (1200×630) y metadatos Open Graph/Twitter
   con URL absoluta en las tres páginas públicas.
 
 ## Créditos
