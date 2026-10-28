@@ -907,6 +907,26 @@ body.modo-overlay.is-transparente .hud,
 body.modo-overlay.is-transparente .dev,
 body.modo-overlay.is-transparente .back-link { display: none; }
 
+/* Registro en pantalla del modo debug (?debug=1) */
+.debug-log {
+  position: absolute;
+  top: 56px;
+  left: 12px;
+  z-index: 9;
+  width: min(420px, 62vw);
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgb(242 178 99 / 40%);
+  background: rgb(16 11 10 / 92%);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--muted);
+  pointer-events: none;
+}
+.debug-log .ok { color: var(--mint); }
+.debug-log .err { color: var(--rojo-vivo); }
+
 /* Banner: quién canjeó el sobre */
 .canje-banner {
   position: absolute;

@@ -24,6 +24,10 @@
   const solo = $("[data-solo]");
   const btnDemo = $("[data-demo]");
   const banner = $("[data-banner]");
+  const debugLog = $("[data-debug-log]");
+
+  /* ?debug=1 muestra en pantalla la conexión y los canjes que llegan */
+  const DEBUG = new URLSearchParams(location.search).get("debug") === "1";
 
   /* Modo: "interactivo" (sobre.html) u "overlay" (overlay.html, canje automático) */
   const MODO = document.body.dataset.modo === "overlay" ? "overlay" : "interactivo";
@@ -604,30 +608,62 @@
     return a === b || a.includes(b);
   }
 
+  /* =========================================================
+     DEBUG EN PANTALLA (?debug=1)
+     ========================================================= */
+  function debugLinea(texto, clase = "") {
+    if (!DEBUG || !debugLog) return;
+    debugLog.hidden = false;
+    const linea = document.createElement("div");
+    if (clase) linea.className = clase;
+    const hora = new Date().toLocaleTimeString("es-MX", { hour12: false });
+    linea.textContent = `[${hora}] ${texto}`;
+    debugLog.prepend(linea);
+    while (debugLog.children.length > 9) debugLog.lastChild.remove();
+  }
+
   function actualizarEstadoTwitch(nuevoEstado, detalle = "") {
     const chip = $("[data-twitch-estado]");
-    if (!chip) return;
-    chip.hidden = false;
-    chip.dataset.estado = nuevoEstado;
-    chip.textContent = `Twitch: ${nuevoEstado}${detalle ? ` · ${detalle}` : ""}`;
+    if (chip) {
+      chip.hidden = false;
+      chip.dataset.estado = nuevoEstado;
+      chip.textContent = `Twitch: ${nuevoEstado}${detalle ? ` · ${detalle}` : ""}`;
+    }
+    debugLinea(
+      `twitch: ${nuevoEstado}${detalle ? ` · ${detalle}` : ""}`,
+      nuevoEstado === "error" ? "err" : nuevoEstado === "conectado" ? "ok" : ""
+    );
   }
 
   async function iniciarTwitch() {
     if (!window.TwitchAuth || !window.TwitchEvents) return;
     const config = window.TwitchAuth.leerConfig();
-    if (!config?.clientId) return;
+    if (!config?.clientId) {
+      debugLinea("sin configuración: conecta Twitch en overlay-config.html", "err");
+      return;
+    }
+    debugLinea(`config: canal "${config.canal || "(mi canal)"}" · recompensa "${config.recompensa || "(cualquiera)"}"`);
 
     try {
       const token = await window.TwitchAuth.tokenValido();
-      if (!token) return;
+      if (!token) {
+        debugLinea("sin token: conecta Twitch en overlay-config.html", "err");
+        return;
+      }
       const canal = await window.TwitchAuth.obtenerUsuario(token, config.clientId, config.canal);
       if (!canal) throw new Error("no se encontró el canal configurado");
+      debugLinea(`canal: ${canal.display_name} (@${canal.login})`, "ok");
 
       window.TwitchEvents.conectar({
         clientId: config.clientId,
         broadcasterId: canal.id,
         alRedimir: (evento) => {
-          if (!coincideRecompensa(evento.reward?.title, config.recompensa)) return;
+          const titulo = evento.reward?.title || "";
+          debugLinea(`canje recibido: @${evento.user_login || "?"} — "${titulo}"`, "ok");
+          if (!coincideRecompensa(titulo, config.recompensa)) {
+            debugLinea(`ignorado: no contiene "${config.recompensa}"`);
+            return;
+          }
           encolarCanje({ usuario: evento.user_login || "", rareza: "" });
         },
         alEstado: actualizarEstadoTwitch,
@@ -694,6 +730,8 @@
     if (new URLSearchParams(location.search).get("probar") === "1") {
       setTimeout(() => encolarCanje({ usuario: "test" }), 1500);
     }
+
+    debugLinea("overlay cargado");
 
     /* Conexión real a Twitch (si está configurada) */
     iniciarTwitch();
