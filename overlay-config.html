@@ -188,6 +188,15 @@
         </div>
 
         <div class="campo">
+          <label for="cliente-secreto">Client Secret de la app</label>
+          <input id="cliente-secreto" type="password" autocomplete="off" spellcheck="false" placeholder="El que Twitch te muestra junto al Client ID" />
+          <small>
+            Twitch lo exige para canjear el token aunque se use PKCE. Se guarda solo en este
+            navegador (el permiso es de solo lectura de canjes).
+          </small>
+        </div>
+
+        <div class="campo">
           <label for="canal">Canal de Twitch</label>
           <input id="canal" type="text" autocomplete="off" spellcheck="false" placeholder="wewinvt" />
           <small>El canal dueño de los puntos (normalmente el tuyo).</small>
@@ -238,6 +247,7 @@
         const redirectUri = location.origin + location.pathname;
 
         const inpClientId = $("#cliente-id");
+        const inpSecreto = $("#cliente-secreto");
         const inpCanal = $("#canal");
         const inpRecompensa = $("#recompensa");
         const lineaEstado = $("[data-estado-linea]");
@@ -278,6 +288,7 @@
           const config = window.TwitchAuth.leerConfig();
           if (config) {
             inpClientId.value = config.clientId || "";
+            inpSecreto.value = config.clientSecret || "";
             inpCanal.value = config.canal || "";
             inpRecompensa.value = config.recompensa || "";
           }
@@ -323,6 +334,7 @@
           }
           window.TwitchAuth.guardarConfig({
             clientId,
+            clientSecret: inpSecreto.value.trim(),
             canal: inpCanal.value.trim().toLowerCase(),
             recompensa: inpRecompensa.value.trim(),
           });

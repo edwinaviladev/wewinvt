@@ -101,16 +101,21 @@ window.TwitchAuth = (() => {
 
     history.replaceState(null, "", location.pathname);
 
+    /* Twitch exige el client_secret en el canje aunque se use PKCE */
+    const cuerpo = {
+      client_id: clientId,
+      code,
+      code_verifier: verifier,
+      grant_type: "authorization_code",
+      redirect_uri: redirectUri,
+    };
+    const secreto = leerConfig()?.clientSecret;
+    if (secreto) cuerpo.client_secret = secreto;
+
     const res = await fetch(TOKEN, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        client_id: clientId,
-        code,
-        code_verifier: verifier,
-        grant_type: "authorization_code",
-        redirect_uri: redirectUri,
-      }),
+      body: new URLSearchParams(cuerpo),
     });
     if (!res.ok) {
       const cuerpo = await res.text().catch(() => "");
@@ -150,6 +155,7 @@ window.TwitchAuth = (() => {
         client_id: config.clientId,
         grant_type: "refresh_token",
         refresh_token: token.refresh_token,
+        ...(config.clientSecret ? { client_secret: config.clientSecret } : {}),
       }),
     });
     if (!res.ok) {
