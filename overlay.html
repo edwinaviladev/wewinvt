@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Overlay · Sobre coleccionable | WewinVT</title>
+    <meta name="description" content="Overlay de canje de puntos de WewinVT: el sobre aparece, se abre y las cartas se destapan una por una." />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#100b0a" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=JetBrains+Mono:wght@700;800&family=Space+Grotesk:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/sobre.css" />
+  </head>
+  <!--
+    MODO OVERLAY · Canje de puntos
+    Secuencia automática: sobre entra → se rasga solo → 3 cartas salen una por una,
+    se destapan, se muestran un momento y salen de pantalla.
+    - Botón "Simular canje" para probar.
+    - API futura: window.SobreOverlay.canje() o postMessage { type: "wewinvt:canje" }.
+    - Con ?transparente=1 el fondo queda transparente (browser source de OBS) y se oculta la UI de prueba.
+  -->
+  <body data-modo="overlay" class="modo-overlay">
+    <main class="stage" data-stage>
+      <a class="back-link" href="sobre.html">← Prototipo interactivo</a>
+
+      <div class="bg-float" aria-hidden="true">
+        <img src="img/emotes/risa.png" alt="" />
+        <img src="img/emotes/gordinflon.gif" alt="" />
+        <img src="img/emotes/gran-corazon.png" alt="" />
+      </div>
+
+      <div class="rays" data-rays aria-hidden="true"></div>
+      <div class="flash" data-flash aria-hidden="true"></div>
+
+      <!-- SOBRE (decorativo aquí: la secuencia corre sola) -->
+      <div class="layer pack-layer">
+        <div class="pack" data-pack aria-hidden="true" hidden>
+          <span class="pack__strip" aria-hidden="true">
+            <span class="pack__strip-label">WewinVT · Serie 1</span>
+          </span>
+          <span class="pack__seal" aria-hidden="true">W</span>
+          <span class="pack__body" aria-hidden="true">
+            <span class="pack__frame"></span>
+            <span class="pack__brand">W</span>
+            <span class="pack__title">Sobre coleccionable</span>
+            <span class="pack__dots">✦ ✦ ✦</span>
+            <span class="pack__count">3 cartas de la comunidad</span>
+            <span class="pack__band">Edición comunidad</span>
+          </span>
+          <span class="pack__hint">Toca para abrir</span>
+        </div>
+      </div>
+
+      <!-- Quién canjeó el sobre -->
+      <div class="canje-banner" data-banner hidden></div>
+
+      <!-- Carta en solitario (una a la vez) -->
+      <div class="solo" data-solo hidden></div>
+
+      <!-- UI de prueba -->
+      <div class="demo-ui">
+        <button class="btn btn--primary" data-demo type="button">▶ Simular canje de puntos</button>
+        <p class="demo-note">modo overlay · agrega <code>?transparente=1</code> para usarlo como browser source de OBS</p>
+      </div>
+
+      <div class="hud">
+        <span class="estado-twitch" data-twitch-estado hidden>Twitch: …</span>
+        <a class="hud__config" href="overlay-config.html" title="Configurar Twitch" aria-label="Configurar Twitch">⚙</a>
+        <button class="hud__btn" data-mute type="button" aria-pressed="false" aria-label="Silenciar sonidos" title="Sonido">🔊</button>
+        <span class="hud__count">Sobres abiertos: <b data-opened>0</b></span>
+      </div>
+
+      <div class="dev">
+        <label>modo prueba:
+          <select data-force>
+            <option value="">aleatorio</option>
+            <option value="rara">garantizar Rara+</option>
+            <option value="epica">garantizar Épica+</option>
+            <option value="legendaria">garantizar Legendaria</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="fx" data-fx aria-hidden="true"></div>
+    </main>
+
+    <script src="js/sobre-data.js" defer></script>
+    <script src="js/twitch-auth.js" defer></script>
+    <script src="js/twitch-events.js" defer></script>
+    <script src="js/sobre.js" defer></script>
+  </body>
+</html>

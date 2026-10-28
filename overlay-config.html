@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Configurar overlay · WewinVT</title>
+    <meta name="description" content="Configura la integración de Twitch para el overlay de sobres coleccionables de WewinVT." />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#100b0a" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=JetBrains+Mono:wght@700;800&family=Space+Grotesk:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/sobre.css" />
+    <style>
+      /* ---------- Página de configuración ---------- */
+      body { overflow: auto; }
+
+      .config-shell {
+        min-height: 100dvh;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: clamp(24px, 5vh, 56px) 20px 64px;
+      }
+
+      .config-head { margin-bottom: 26px; }
+      .config-head h1 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(24px, 5vw, 34px);
+        margin: 6px 0 8px;
+      }
+      .config-head .eyebrow {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--caramelo);
+        margin: 0;
+      }
+      .config-head p { color: var(--muted); margin: 0; }
+
+      .panel {
+        background: rgb(42 30 26 / 72%);
+        border: 1px solid rgb(242 178 99 / 22%);
+        border-radius: 16px;
+        padding: 20px 22px;
+        margin-bottom: 18px;
+      }
+      .panel h2 {
+        font-size: 17px;
+        margin: 0 0 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .panel h2 .paso {
+        width: 24px; height: 24px;
+        border-radius: 50%;
+        display: grid; place-items: center;
+        background: linear-gradient(180deg, var(--rojo-vivo), var(--rojo));
+        color: #fff7f0;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        flex-shrink: 0;
+      }
+      .panel p, .panel li { color: var(--muted); font-size: 14px; line-height: 1.6; }
+      .panel ol, .panel ul { margin: 8px 0 0; padding-left: 20px; }
+      .panel a { color: var(--mint); }
+
+      .redirect-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: rgb(16 11 10 / 75%);
+        border: 1px dashed rgb(242 178 99 / 40%);
+      }
+      .redirect-box code {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 12px;
+        color: var(--caramelo);
+        word-break: break-all;
+      }
+      .copy-btn {
+        flex-shrink: 0;
+        border: 1px solid rgb(242 178 99 / 45%);
+        background: rgb(242 178 99 / 12%);
+        color: var(--caramelo);
+        border-radius: 8px;
+        padding: 6px 12px;
+        font: 700 12px "JetBrains Mono", monospace;
+        cursor: pointer;
+      }
+      .copy-btn:hover { background: rgb(242 178 99 / 22%); }
+
+      .campo { display: grid; gap: 6px; margin-bottom: 14px; }
+      .campo label { font-weight: 800; font-size: 14px; }
+      .campo small { color: var(--muted); }
+      .campo input {
+        border-radius: 10px;
+        border: 1px solid rgb(246 235 221 / 22%);
+        background: rgb(16 11 10 / 80%);
+        color: var(--text);
+        padding: 11px 14px;
+        font: 600 14px "JetBrains Mono", monospace;
+      }
+      .campo input:focus-visible {
+        outline: none;
+        border-color: var(--caramelo);
+        box-shadow: var(--focus-ring);
+      }
+
+      .estado-linea {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        color: var(--muted);
+        min-height: 22px;
+        margin: 4px 0 14px;
+      }
+      .estado-linea .punto {
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        background: var(--muted);
+        flex-shrink: 0;
+      }
+      .estado-linea.ok .punto { background: var(--mint); box-shadow: 0 0 10px rgb(168 230 212 / 60%); }
+      .estado-linea.ok { color: var(--mint); }
+      .estado-linea.mal .punto { background: var(--rojo-vivo); box-shadow: 0 0 10px rgb(255 90 106 / 60%); }
+      .estado-linea.mal { color: var(--rojo-vivo); }
+
+      .acciones-config { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+      .aviso-error {
+        color: var(--rojo-vivo);
+        font-size: 14px;
+        min-height: 20px;
+        margin: 8px 0 0;
+      }
+      .hud__btn { font-size: 15px; }
+    </style>
+  </head>
+  <body>
+    <main class="config-shell">
+      <header class="config-head">
+        <p class="eyebrow">Overlay · Canje de puntos</p>
+        <h1>Conecta Twitch con los sobres</h1>
+        <p>
+          Cuando alguien canjee los puntos que elijas en tu canal, el overlay abrirá un sobre en vivo.
+        </p>
+      </header>
+
+      <!-- Paso 1: app de Twitch -->
+      <section class="panel">
+        <h2><span class="paso">1</span> Crea tu aplicación en el portal de desarrolladores</h2>
+        <ol>
+          <li>
+            Entra a <a href="https://dev.twitch.tv/console/apps" target="_blank" rel="noreferrer">dev.twitch.tv/console/apps</a>
+            y haz clic en <strong>Register Your Application</strong>.
+          </li>
+          <li>Nombre: el que quieras (ej. <em>Sobres WewinVT</em>). Categoría: <em>Chat Integration</em> o <em>Other</em>.</li>
+          <li>
+            En <strong>OAuth Redirect URLs</strong> pega exactamente esta dirección
+            (cópiala con el botón; debe coincidir letra por letra):
+            <span class="redirect-box">
+              <code id="redirect-uri"></code>
+              <button class="copy-btn" data-copiar type="button">Copiar</button>
+            </span>
+          </li>
+          <li>Crea la app y copia su <strong>Client ID</strong> para el paso 2.</li>
+        </ol>
+      </section>
+
+      <!-- Paso 2: configuración -->
+      <section class="panel">
+        <h2><span class="paso">2</span> Configura y conecta tu canal</h2>
+
+        <div class="campo">
+          <label for="cliente-id">Client ID de la app</label>
+          <input id="cliente-id" type="text" autocomplete="off" spellcheck="false" placeholder="Ej. gp762nuoqolgmyluiscohesd3fldt7" />
+        </div>
+
+        <div class="campo">
+          <label for="canal">Canal de Twitch</label>
+          <input id="canal" type="text" autocomplete="off" spellcheck="false" placeholder="wewinvt" />
+          <small>El canal dueño de los puntos (normalmente el tuyo).</small>
+        </div>
+
+        <div class="campo">
+          <label for="recompensa">Nombre de la recompensa que abre el sobre</label>
+          <input id="recompensa" type="text" autocomplete="off" spellcheck="false" placeholder="Ej. Sobre de cartas" />
+          <small>Déjalo vacío para que <strong>cualquier</strong> canje de puntos abra un sobre.</small>
+        </div>
+
+        <p class="estado-linea" data-estado-linea hidden>
+          <span class="punto" aria-hidden="true"></span>
+          <span data-estado-texto></span>
+        </p>
+
+        <p class="aviso-error" data-error role="alert"></p>
+
+        <div class="acciones-config">
+          <button class="btn btn--primary" data-conectar type="button">Conectar con Twitch</button>
+          <button class="btn btn--ghost" data-verificar type="button">Probar conexión</button>
+          <a class="btn btn--ghost" href="overlay.html?probar=1">Abrir overlay de prueba ↗</a>
+        </div>
+
+        <p style="color: var(--muted); font-size: 12px; margin-top: 14px">
+          El permiso usado es <code style="color: var(--caramelo)">channel:read:redemptions</code> (solo lectura de canjes).
+          El token vive en este navegador y se renueva solo.
+        </p>
+      </section>
+
+      <!-- Ayuda -->
+      <section class="panel">
+        <h2><span class="paso">3</span> Ponlo en el stream (OBS)</h2>
+        <ul>
+          <li>Agrega un <strong>Browser Source</strong> con la URL:<br /><code style="color: var(--caramelo)" data-url-overlay></code></li>
+          <li>Ancho 1920 · Alto 1080 · activa "Refresh browser when scene becomes active" si quieres.</li>
+          <li>Con <code>?transparente=1</code> el fondo es transparente y se oculta la UI de prueba.</li>
+          <li>Si varios viewers canjean seguido, los sobres se encolan y salen uno tras otro.</li>
+        </ul>
+      </section>
+    </main>
+
+    <script src="js/twitch-auth.js" defer></script>
+    <script defer>
+      (() => {
+        "use strict";
+        const $ = (sel) => document.querySelector(sel);
+        const redirectUri = location.origin + location.pathname;
+
+        const inpClientId = $("#cliente-id");
+        const inpCanal = $("#canal");
+        const inpRecompensa = $("#recompensa");
+        const lineaEstado = $("[data-estado-linea]");
+        const textoEstado = $("[data-estado-texto]");
+        const cajaError = $("[data-error]");
+
+        $("#redirect-uri").textContent = redirectUri;
+        $("[data-url-overlay]").textContent =
+          location.origin + location.pathname.replace("overlay-config.html", "overlay.html") + "?transparente=1";
+
+        $("[data-copiar]").addEventListener("click", async (e) => {
+          try {
+            await navigator.clipboard.writeText(redirectUri);
+            e.target.textContent = "¡Copiado!";
+            setTimeout(() => (e.target.textContent = "Copiar"), 1600);
+          } catch {
+            cajaError.textContent = "No se pudo copiar: selecciónalo y cópialo manualmente.";
+          }
+        });
+
+        function pintarEstado(clase, texto) {
+          lineaEstado.hidden = false;
+          lineaEstado.className = "estado-linea" + (clase ? ` ${clase}` : "");
+          textoEstado.textContent = texto;
+        }
+
+        function limpiarError() {
+          cajaError.textContent = "";
+        }
+
+        function error(msg) {
+          cajaError.textContent = msg;
+          pintarEstado("mal", "Sin conexión.");
+        }
+
+        /* Regresar de Twitch con ?code=... */
+        window.addEventListener("DOMContentLoaded", async () => {
+          const config = window.TwitchAuth.leerConfig();
+          if (config) {
+            inpClientId.value = config.clientId || "";
+            inpCanal.value = config.canal || "";
+            inpRecompensa.value = config.recompensa || "";
+          }
+
+          const query = new URLSearchParams(location.search);
+          if (query.get("error")) {
+            error(`Twitch rechazó el acceso (${query.get("error")}).`);
+            return;
+          }
+          if (query.get("code")) {
+            try {
+              limpiarError();
+              const id = (config?.clientId || inpClientId.value).trim();
+              if (!id) throw new Error("falta el Client ID");
+              await window.TwitchAuth.completarLogin(id, redirectUri);
+              pintarEstado("ok", "¡Twitch conectado! El token se renovará solo.");
+            } catch (e) {
+              error(`No se pudo completar el login: ${e.message}`);
+            }
+            return;
+          }
+          if (window.TwitchAuth.leerToken()) {
+            pintarEstado("", "Ya existe un token guardado. Usa «Probar conexión» para verificarlo.");
+          }
+        });
+
+        $("[data-conectar]").addEventListener("click", () => {
+          limpiarError();
+          const clientId = inpClientId.value.trim();
+          if (!clientId) {
+            error("Necesitas el Client ID de tu aplicación (paso 1).");
+            return;
+          }
+          window.TwitchAuth.guardarConfig({
+            clientId,
+            canal: inpCanal.value.trim().toLowerCase(),
+            recompensa: inpRecompensa.value.trim(),
+          });
+          window.TwitchAuth.iniciarLogin(clientId, redirectUri).catch((e) => error(e.message));
+        });
+
+        $("[data-verificar]").addEventListener("click", async () => {
+          limpiarError();
+          try {
+            const config = window.TwitchAuth.leerConfig();
+            if (!config?.clientId) throw new Error("primero guarda la configuración con «Conectar»");
+            const token = await window.TwitchAuth.tokenValido();
+            if (!token) throw new Error("aún no hay token: usa «Conectar con Twitch»");
+            const usuario = await window.TwitchAuth.obtenerUsuario(token, config.clientId, config.canal);
+            if (!usuario) throw new Error("no se encontró ese canal");
+            pintarEstado("ok", `Conectado como ${usuario.display_name} (@${usuario.login}).`);
+          } catch (e) {
+            error(e.message);
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
