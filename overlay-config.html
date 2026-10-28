@@ -314,7 +314,11 @@
 
           const query = new URLSearchParams(location.search);
           if (query.get("error")) {
-            error(`Twitch rechazó el acceso (${query.get("error")}).`);
+            if (query.get("error") === "redirect_mismatch") {
+              error(`El redirect URI de la página no está registrado en tu app de Twitch. Agrega EXACTO "${redirectUri}" en dev.twitch.tv/console/apps → tu app → OAuth Redirect URLs.`);
+            } else {
+              error(`Twitch rechazó el acceso (${query.get("error")}).`);
+            }
             return;
           }
           if (query.get("code")) {

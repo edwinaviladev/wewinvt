@@ -327,7 +327,11 @@
 
     /* Regreso de Twitch con ?code=... (login del viewer) */
     const query = new URLSearchParams(location.search);
-    if (query.get("code") && clienteId) {
+    if (query.get("error")) {
+      const linea = $("[data-identidad]");
+      if (linea) linea.textContent = `Twitch canceló el login (${query.get("error")}). Intenta de nuevo.`;
+      history.replaceState(null, "", location.pathname);
+    } else if (query.get("code") && clienteId) {
       try {
         await window.TwitchAuth.completarLogin(clienteId, location.origin + location.pathname);
       } catch (error) {
