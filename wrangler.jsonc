@@ -2,6 +2,9 @@
   "name": "wewinvt",
   "main": "worker.js",
   "compatibility_date": "2026-01-01",
+  "vars": {
+    "CLIENT_ID": "op28ng6zg78d56abgmhbqj3dgr9t90"
+  },
   "assets": {
     "directory": ".",
     "not_found_handling": "404-page",
