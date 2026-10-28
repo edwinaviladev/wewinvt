@@ -228,24 +228,22 @@
       <span class="card__bob">
         <span class="card__inner">
           <span class="card__face card__face--front">
-            <span class="card__barra">
+            <img class="card__arte" src="${datos.src}" alt="${datos.alt}" loading="lazy" decoding="async" draggable="false" />
+            <i class="card__holo"></i>
+            <i class="card__spark"></i>
+            <span class="card__scrim card__scrim--top">
               <span class="card__name">${datos.nombre}</span>
               <span class="card__num">${numeroDe(datos)}</span>
             </span>
-            <span class="card__ventana">
-              <img src="${datos.src}" alt="${datos.alt}" loading="lazy" decoding="async" draggable="false" />
-              <i class="card__holo"></i>
-              <i class="card__spark"></i>
-            </span>
-            <span class="card__caja">
-              <span class="card__datos">
+            <span class="card__scrim card__scrim--base">
+              <span class="card__fila">
                 <span class="card__tipo">${datos.tipo}</span>
-                <span class="card__rareza-nombre">${RAREZAS[datos.rareza].nombre}</span>
+                <span class="card__rareza-lado">
+                  <span class="card__rareza-nombre">${RAREZAS[datos.rareza].nombre}</span>
+                  <span class="card__simbolo">${RAREZAS[datos.rareza].simbolo}</span>
+                </span>
               </span>
-              <span class="card__pie">
-                <span class="card__credito">Illus. ${datos.artista || "Anónimo"}</span>
-                <span class="card__simbolo">${RAREZAS[datos.rareza].simbolo}</span>
-              </span>
+              <span class="card__credito">Illus. ${datos.artista || "Anónimo"}</span>
             </span>
           </span>
         </span>
