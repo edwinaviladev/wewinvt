@@ -310,20 +310,68 @@
   /* =========================================================
      EFECTOS
      ========================================================= */
+  /* Estallido de partículas: mezcla de chips que se voltean, gemas y estrellitas,
+     con impulso hacia fuera y caída con gravedad */
   function burst(x, y, n = 22, fuerza = 1, colores = COLORES) {
     if (REDUCED) return;
     for (let i = 0; i < n; i++) {
       const p = document.createElement("i");
-      p.className = "p";
+      const tipo = azar(4); // 0-1 chip de papel · 2 gema · 3 estrellita
+      p.className = tipo < 2 ? "p p--chip" : tipo === 2 ? "p p--gema" : "p p--estrella";
+
       const ang = Math.random() * Math.PI * 2;
-      const dist = (60 + Math.random() * 190) * fuerza;
+      const dist = (80 + Math.random() * 220) * fuerza;
       p.style.left = `${x}px`;
       p.style.top = `${y}px`;
-      p.style.setProperty("--dx", `${Math.cos(ang) * dist}px`);
-      p.style.setProperty("--dy", `${Math.sin(ang) * dist - 40}px`);
+      p.style.setProperty("--dx", `${(Math.cos(ang) * dist).toFixed(1)}px`);
+      p.style.setProperty("--dy", `${(Math.sin(ang) * dist - 60 * fuerza).toFixed(1)}px`);
+      p.style.setProperty("--fall", `${(120 + Math.random() * 110) * fuerza}px`);
+      const baseGiro = tipo === 2 ? 45 : 0; /* las gemas nacen en diamante */
+      p.style.setProperty(
+        "--spin",
+        `${baseGiro + (Math.random() < 0.5 ? -1 : 1) * (180 + azar(540))}deg`
+      );
+      p.style.setProperty(
+        "--flip",
+        tipo < 2 ? `${(Math.random() < 0.5 ? -1 : 1) * (240 + azar(360))}deg` : "0deg"
+      );
       p.style.setProperty("--c", elegir(colores));
+      p.style.animationDelay = `${azar(70)}ms`;
+      p.style.animationDuration = `${(0.9 + Math.random() * 0.5).toFixed(2)}s`;
       p.addEventListener("animationend", () => p.remove());
       fx.append(p);
+    }
+  }
+
+  /* Mini onda del color de la rareza en el centro de la carta */
+  function anilloMini(x, y, color) {
+    if (REDUCED) return;
+    const anillo = document.createElement("i");
+    anillo.className = "mini-ring";
+    anillo.style.left = `${x}px`;
+    anillo.style.top = `${y}px`;
+    anillo.style.setProperty("--c", color);
+    anillo.addEventListener("animationend", () => anillo.remove());
+    fx.append(anillo);
+  }
+
+  /* Estrellitas que titilan sobre la carta */
+  function destellos(el, n, colores) {
+    if (REDUCED) return;
+    const r = el.getBoundingClientRect();
+    for (let i = 0; i < n; i++) {
+      const d = document.createElement("i");
+      d.className = "destello";
+      d.style.left = `${r.left + Math.random() * r.width}px`;
+      d.style.top = `${r.top + Math.random() * r.height}px`;
+      const lado = 10 + azar(9);
+      d.style.width = `${lado}px`;
+      d.style.height = `${lado}px`;
+      d.style.setProperty("--c", elegir(colores));
+      d.style.setProperty("--t", `${(0.45 + Math.random() * 0.4).toFixed(2)}s`);
+      d.style.setProperty("--d", `${azar(300)}ms`);
+      d.addEventListener("animationend", () => d.remove());
+      fx.append(d);
     }
   }
 
@@ -431,21 +479,29 @@
   /* Efectos por rareza (compartidos entre modos) */
   function efectosRareza(rareza, el) {
     const c = centroDe(el);
+    const color = COLOR_RAREZA[rareza];
+
+    anilloMini(c.x, c.y, color);
+
     if (rareza === "comun") {
-      burst(c.x, c.y, 8, 0.6);
+      burst(c.x, c.y, 10, 0.6, [color, "#f6ebdd"]);
+      destellos(el, 5, [color, "#f6ebdd"]);
     } else if (rareza === "rara") {
-      burst(c.x, c.y, 16, 0.8, MINTS);
+      burst(c.x, c.y, 18, 0.8, MINTS);
+      destellos(el, 9, MINTS);
     } else if (rareza === "epica") {
-      burst(c.x, c.y, 30, 1, ROJOS);
-      mostrarTinte("#ff5a6a");
-      mostrarSplash("¡Épica!", "#ff5a6a");
+      burst(c.x, c.y, 32, 1, ROJOS);
+      destellos(el, 14, ROJOS);
+      mostrarTinte(color);
+      mostrarSplash("¡Épica!", color);
     } else {
-      burst(c.x, c.y, 44, 1.4, DORADOS);
+      burst(c.x, c.y, 48, 1.4, DORADOS);
+      destellos(el, 18, DORADOS);
       confeti(46);
       activarRays(2600);
       temblor();
-      mostrarTinte("#f2b263");
-      mostrarSplash("¡Legendaria!", "#f2b263", true);
+      mostrarTinte(color);
+      mostrarSplash("¡Legendaria!", color, true);
     }
   }
 
