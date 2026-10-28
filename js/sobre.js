@@ -217,6 +217,10 @@
   let estado = "idle"; // idle | abriendo | cartas | listo
   let cartasActuales = [];
   let reveladas = 0;
+  /* Contexto del canje en curso (modo overlay) y del canal conectado */
+  let canalId = null;
+  let usuarioActual = "";
+  let usuarioIdActual = "";
 
   function contarAbiertos() {
     return Number(localStorage.getItem("wewinvt_sobres") || 0);
@@ -230,6 +234,41 @@
       localStorage.setItem("wewinvt_coleccion", JSON.stringify(coleccion));
     } catch {
       /* sin almacenamiento disponible */
+    }
+  }
+
+  /* Sube cartas/pack a la colección en línea del usuario con sesión iniciada */
+  async function subirColeccion(ids, sobres = 0) {
+    try {
+      const token = await window.TwitchAuth?.tokenValido?.();
+      if (!token) return;
+      await fetch("/api/coleccion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ anadir: ids, sobres }),
+      });
+    } catch {
+      /* offline: queda guardado localmente */
+    }
+  }
+
+  /* Registra en la nube un canje del stream: las cartas van al coleccionista */
+  async function registrarCanjeNube() {
+    try {
+      const token = await window.TwitchAuth?.tokenValido?.();
+      if (!token || !canalId || !usuarioIdActual) return;
+      await fetch("/api/canje", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          broadcasterId: canalId,
+          usuarioId: usuarioIdActual,
+          usuarioLogin: usuarioActual,
+          cartas: cartasActuales.map((c) => c.id),
+        }),
+      });
+    } catch {
+      /* silencioso: el evento en pantalla no depende de la nube */
     }
   }
 
@@ -631,6 +670,7 @@
       conectarTilt(btn);
       efectosRareza(datos.rareza, btn);
       coleccionGuardar(datos.id);
+      subirColeccion([datos.id]);
 
       reveladas++;
       if (reveladas === cartasActuales.length) terminar();
@@ -642,6 +682,7 @@
     btnRevealAll.hidden = true;
     hint.textContent = elegir(FRASES);
     setTimeout(() => AudioFX.fanfare(), 380);
+    subirColeccion([], 1);
 
     const abiertos = contarAbiertos() + 1;
     localStorage.setItem("wewinvt_sobres", String(abiertos));
@@ -671,10 +712,12 @@
      Aparece el sobre → se rasga solo → las cartas salen una por
      una, se destapan, se muestran un momento y salen de pantalla.
      ========================================================= */
-  function secuenciaCanje(forzar = "", usuario = "") {
+  function secuenciaCanje(forzar = "", usuario = "", usuarioId = "") {
     if (MODO !== "overlay" || secuencia || estado !== "idle") return;
     secuencia = true;
     if (forzar) forceSel.value = forzar;
+    usuarioActual = usuario;
+    usuarioIdActual = usuarioId;
     btnDemo.hidden = true;
     mostrarBanner(usuario);
 
@@ -706,6 +749,7 @@
       pack.hidden = true;
       pack.classList.remove("is-entering", "is-winding", "is-open");
       construirSobre();
+      registrarCanjeNube();
       soltarCartas();
     }, 1800);
   }
@@ -745,7 +789,8 @@
       conectarTilt(btn);
       AudioFX.sting(datos.rareza);
       efectosRareza(datos.rareza, btn);
-      coleccionGuardar(datos.id);
+      /* En el overlay las cartas son del viewer que canjeó:
+         no se guardan en el navegador del streamer, la nube las registra */
     }, 950);
 
     /* Se muestra un momento y sale de pantalla */
@@ -829,7 +874,7 @@
     if (secuencia || estado !== "idle") return;
     const siguiente = colaCanjes.shift();
     if (!siguiente) return;
-    secuenciaCanje(siguiente.rareza || "", siguiente.usuario || "");
+    secuenciaCanje(siguiente.rareza || "", siguiente.usuario || "", siguiente.usuarioId || "");
   }
 
   /* =========================================================
@@ -898,6 +943,7 @@
       const canal = await window.TwitchAuth.obtenerUsuario(token, config.clientId, config.canal);
       if (!canal) throw new Error("no se encontró el canal configurado");
       debugLinea(`canal: ${canal.display_name} (@${canal.login})`, "ok");
+      canalId = canal.id;
 
       window.TwitchEvents.conectar({
         clientId: config.clientId,
@@ -909,7 +955,11 @@
             debugLinea(`ignorado: no contiene "${config.recompensa}"`);
             return;
           }
-          encolarCanje({ usuario: evento.user_login || "", rareza: "" });
+          encolarCanje({
+            usuario: evento.user_login || "",
+            usuarioId: evento.user_id || "",
+            rareza: "",
+          });
         },
         alEstado: actualizarEstadoTwitch,
       });
@@ -962,7 +1012,11 @@
     };
     window.addEventListener("message", (evento) => {
       if (evento.data && evento.data.type === "wewinvt:canje") {
-        encolarCanje({ rareza: evento.data.rareza || "", usuario: evento.data.usuario || "" });
+        encolarCanje({
+          rareza: evento.data.rareza || "",
+          usuario: evento.data.usuario || "",
+          usuarioId: evento.data.usuarioId || "",
+        });
       }
     });
 
