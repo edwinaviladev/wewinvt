@@ -287,25 +287,10 @@
   });
 
   /* =========================================================
-     REINICIAR COLECCIÓN (para probar)
+     REINICIAR COLECCIÓN
+     Se retiró la UI de reinicio: para pruebas, borra las claves
+     "wewinvt_coleccion" y "wewinvt_sobres" desde la consola.
      ========================================================= */
-  $("[data-reiniciar]").addEventListener("click", async () => {
-    if (!confirm("¿Borrar toda la colección de este navegador?")) return;
-    localStorage.removeItem("wewinvt_coleccion");
-    localStorage.removeItem("wewinvt_sobres");
-    try {
-      const token = await window.TwitchAuth.tokenValido();
-      if (token) {
-        await fetch("/api/coleccion", {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        });
-      }
-    } catch {
-      /* si falla la nube, al menos se limpia lo local */
-    }
-    location.reload();
-  });
 
   /* =========================================================
      INICIO
