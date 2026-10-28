@@ -71,6 +71,13 @@
       .panel ol, .panel ul { margin: 8px 0 0; padding-left: 20px; }
       .panel a { color: var(--mint); }
 
+      .panel-aviso {
+        background: rgb(242 178 99 / 10%);
+        border-color: rgb(242 178 99 / 45%);
+      }
+      .panel-aviso p { color: var(--text); margin: 0; }
+      .panel-aviso a { color: var(--caramelo); font-weight: 800; }
+
       .redirect-box {
         display: flex;
         align-items: center;
@@ -156,6 +163,15 @@
           Cuando alguien canjee los puntos que elijas en tu canal, el overlay abrirá un sobre en vivo.
         </p>
       </header>
+
+      <!-- Aviso: esta página es solo del dueño del canal -->
+      <div class="panel panel-aviso">
+        <p>
+          🔐 <strong>Esta página es solo para configurar el canal</strong> (dueño del stream).
+          Si eres coleccionista, conecta tu Twitch directamente en el
+          <a href="album.html">álbum</a> — ahí vas directo a autorizar con Twitch, sin ver nada de esto.
+        </p>
+      </div>
 
       <!-- Paso 1: app de Twitch -->
       <section class="panel">
