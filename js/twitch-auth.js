@@ -66,7 +66,7 @@ window.TwitchAuth = (() => {
 
   /* ---------- Login (redirige a Twitch y regresa con ?code=...) ---------- */
 
-  async function iniciarLogin(clientId, redirectUri) {
+  async function iniciarLogin(clientId, redirectUri, scopes = SCOPES) {
     const verifier = crearVerifier();
     const state = crearVerifier();
     sessionStorage.setItem("wewinvt_pkce_verifier", verifier);
@@ -77,7 +77,7 @@ window.TwitchAuth = (() => {
       client_id: clientId,
       redirect_uri: redirectUri,
       response_type: "code",
-      scope: SCOPES,
+      scope: scopes,
       code_challenge: challenge,
       code_challenge_method: "S256",
       state,
@@ -101,7 +101,6 @@ window.TwitchAuth = (() => {
 
     history.replaceState(null, "", location.pathname);
 
-    /* Twitch exige el client_secret en el canje aunque se use PKCE */
     const cuerpo = {
       client_id: clientId,
       code,
@@ -109,6 +108,28 @@ window.TwitchAuth = (() => {
       grant_type: "authorization_code",
       redirect_uri: redirectUri,
     };
+
+    /* 1) Canje vía el Worker: el client secret vive en el servidor */
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(cuerpo),
+      });
+      if (res.ok) {
+        const datos = await res.json();
+        guardarToken({
+          access_token: datos.access_token,
+          refresh_token: datos.refresh_token,
+          expira: Date.now() + Math.max((datos.expires_in || 0) - 60, 30) * 1000,
+        });
+        return datos;
+      }
+    } catch {
+      /* sin Worker disponible: se cae al canje directo */
+    }
+
+    /* 2) Canje directo (requiere el secret guardado en la config local) */
     const secreto = leerConfig()?.clientSecret;
     if (secreto) cuerpo.client_secret = secreto;
 
@@ -118,14 +139,14 @@ window.TwitchAuth = (() => {
       body: new URLSearchParams(cuerpo),
     });
     if (!res.ok) {
-      const cuerpo = await res.text().catch(() => "");
-      let motivo = cuerpo;
+      const cuerpoRes = await res.text().catch(() => "");
+      let motivo = cuerpoRes;
       try {
-        motivo = JSON.parse(cuerpo)?.message || cuerpo;
+        motivo = JSON.parse(cuerpoRes)?.message || cuerpoRes;
       } catch {
         /* cuerpo no era JSON, se usa tal cual */
       }
-      console.warn("[TwitchAuth] respuesta del token endpoint:", res.status, cuerpo);
+      console.warn("[TwitchAuth] respuesta del token endpoint:", res.status, cuerpoRes);
       throw new Error(`no se pudo canjear el código (${res.status})${motivo ? `: ${motivo}` : ""}`);
     }
 
@@ -143,7 +164,34 @@ window.TwitchAuth = (() => {
   async function refrescar() {
     const config = leerConfig();
     const token = leerToken();
-    if (!token?.refresh_token || !config?.clientId) {
+    if (!token?.refresh_token) {
+      borrarToken();
+      throw new Error("sin refresh token");
+    }
+
+    /* 1) Renovación vía el Worker (el secret vive en el servidor) */
+    try {
+      const res = await fetch("/api/refresh", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: token.refresh_token }),
+      });
+      if (res.ok) {
+        const datos = await res.json();
+        const nuevo = {
+          access_token: datos.access_token,
+          refresh_token: datos.refresh_token || token.refresh_token,
+          expira: Date.now() + Math.max((datos.expires_in || 0) - 60, 30) * 1000,
+        };
+        guardarToken(nuevo);
+        return nuevo.access_token;
+      }
+    } catch {
+      /* sin Worker disponible: se cae a la renovación directa */
+    }
+
+    /* 2) Renovación directa (requiere el secret en la config local) */
+    if (!config?.clientId) {
       borrarToken();
       throw new Error("sin credenciales para refrescar el token");
     }

@@ -192,7 +192,8 @@
           <input id="cliente-secreto" type="password" autocomplete="off" spellcheck="false" placeholder="El que Twitch te muestra junto al Client ID" />
           <small>
             Twitch lo exige para canjear el token aunque se use PKCE. Se guarda solo en este
-            navegador (el permiso es de solo lectura de canjes).
+            navegador. <strong>Opcional:</strong> si el servidor ya tiene el secret configurado,
+            no hace falta ponerlo aquí.
           </small>
         </div>
 
@@ -291,6 +292,17 @@
             inpSecreto.value = config.clientSecret || "";
             inpCanal.value = config.canal || "";
             inpRecompensa.value = config.recompensa || "";
+          }
+
+          /* Si el servidor ya tiene el Client ID, se prellena */
+          try {
+            const res = await fetch("/api/config");
+            if (res.ok) {
+              const datos = await res.json();
+              if (datos.clientId && !inpClientId.value) inpClientId.value = datos.clientId;
+            }
+          } catch {
+            /* sin worker desplegado todavía */
           }
 
           const query = new URLSearchParams(location.search);
