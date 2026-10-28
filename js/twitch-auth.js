@@ -112,7 +112,17 @@ window.TwitchAuth = (() => {
         redirect_uri: redirectUri,
       }),
     });
-    if (!res.ok) throw new Error(`no se pudo canjear el código (${res.status})`);
+    if (!res.ok) {
+      const cuerpo = await res.text().catch(() => "");
+      let motivo = cuerpo;
+      try {
+        motivo = JSON.parse(cuerpo)?.message || cuerpo;
+      } catch {
+        /* cuerpo no era JSON, se usa tal cual */
+      }
+      console.warn("[TwitchAuth] respuesta del token endpoint:", res.status, cuerpo);
+      throw new Error(`no se pudo canjear el código (${res.status})${motivo ? `: ${motivo}` : ""}`);
+    }
 
     const datos = await res.json();
     guardarToken({

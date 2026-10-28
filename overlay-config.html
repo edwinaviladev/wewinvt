@@ -195,7 +195,7 @@
 
         <div class="campo">
           <label for="recompensa">Nombre de la recompensa que abre el sobre</label>
-          <input id="recompensa" type="text" autocomplete="off" spellcheck="false" placeholder="Ej. Sobre de cartas" />
+          <input id="recompensa" type="text" autocomplete="off" spellcheck="false" placeholder="Ej. gacha" />
           <small>Déjalo vacío para que <strong>cualquier</strong> canje de puntos abra un sobre.</small>
         </div>
 
@@ -295,7 +295,17 @@
               await window.TwitchAuth.completarLogin(id, redirectUri);
               pintarEstado("ok", "¡Twitch conectado! El token se renovará solo.");
             } catch (e) {
-              error(`No se pudo completar el login: ${e.message}`);
+              const msg = String(e.message || e);
+              console.warn("[Twitch] fallo el login:", e);
+              if (/invalid grant/i.test(msg)) {
+                error("El código de Twitch ya se usó o expiró (dura solo segundos). Da clic otra vez en «Conectar con Twitch» y no recargues la página al volver.");
+              } else if (/invalid client/i.test(msg)) {
+                error("El Client ID no corresponde a una app válida. Cópialo de nuevo desde dev.twitch.tv/console/apps.");
+              } else if (/redirect/i.test(msg)) {
+                error(`El redirect URI no coincide. Debe estar registrado EXACTO en tu app: ${redirectUri}`);
+              } else {
+                error(`No se pudo completar el login: ${msg}`);
+              }
             }
             return;
           }
