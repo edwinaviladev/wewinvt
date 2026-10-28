@@ -222,6 +222,17 @@
     return Number(localStorage.getItem("wewinvt_sobres") || 0);
   }
 
+  /* La colección vive en localStorage: { idDeCarta: vecesObtenida } */
+  function coleccionGuardar(id) {
+    try {
+      const coleccion = JSON.parse(localStorage.getItem("wewinvt_coleccion") || "{}");
+      coleccion[id] = (coleccion[id] || 0) + 1;
+      localStorage.setItem("wewinvt_coleccion", JSON.stringify(coleccion));
+    } catch {
+      /* sin almacenamiento disponible */
+    }
+  }
+
   function pintarContador() {
     openedEl.textContent = String(contarAbiertos());
   }
@@ -619,6 +630,7 @@
       AudioFX.sting(datos.rareza);
       conectarTilt(btn);
       efectosRareza(datos.rareza, btn);
+      coleccionGuardar(datos.id);
 
       reveladas++;
       if (reveladas === cartasActuales.length) terminar();
@@ -733,6 +745,7 @@
       conectarTilt(btn);
       AudioFX.sting(datos.rareza);
       efectosRareza(datos.rareza, btn);
+      coleccionGuardar(datos.id);
     }, 950);
 
     /* Se muestra un momento y sale de pantalla */
