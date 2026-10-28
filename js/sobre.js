@@ -143,12 +143,14 @@
         noise({ t: 0.05, d: 0.3, v: 0.32, f: 500, f2: 2600, q: 1.2 });
         osc({ t: 0.3, f: 1200, type: "square", d: 0.05, v: 0.08 });
       },
-      /* Estallido: sub-bass + crujido de foil */
+      /* Estallido: doble sub-bass + crujido de foil + chispa metálica */
       boom() {
         if (muted) return;
-        osc({ f: 130, f2: 38, type: "sine", d: 0.5, v: 0.4 });
-        noise({ d: 0.5, v: 0.5, f: 300, f2: 2400, q: 0.6 });
-        noise({ d: 0.28, v: 0.35, f: 5200, f2: 900, q: 0.8, type: "lowpass" });
+        osc({ f: 130, f2: 38, type: "sine", d: 0.55, v: 0.5 });
+        osc({ t: 0.05, f: 90, f2: 30, type: "sine", d: 0.6, v: 0.3 });
+        noise({ d: 0.5, v: 0.6, f: 300, f2: 2400, q: 0.6 });
+        noise({ d: 0.28, v: 0.4, f: 5200, f2: 900, q: 0.8, type: "lowpass" });
+        noise({ t: 0.02, d: 0.16, v: 0.22, f: 4200, type: "highpass" });
       },
       pop(i = 0) {
         if (muted) return;
@@ -358,30 +360,63 @@
     setTimeout(() => rays.classList.remove("is-on"), ms);
   }
 
-  /* El sobre estalla: onda expansiva + pedazos de foil volando */
+  /* El sobre estalla: onda expansiva + humo + chispas + pedazos de foil */
   function estallido(x, y) {
     if (REDUCED) return;
 
-    const onda = document.createElement("i");
-    onda.className = "shock";
-    onda.style.left = `${x}px`;
-    onda.style.top = `${y}px`;
-    onda.addEventListener("animationend", () => onda.remove());
-    fx.append(onda);
+    /* Onda expansiva doble */
+    for (let i = 0; i < 2; i++) {
+      const onda = document.createElement("i");
+      onda.className = "shock";
+      onda.style.left = `${x}px`;
+      onda.style.top = `${y}px`;
+      if (i > 0) onda.style.animationDelay = "80ms";
+      onda.addEventListener("animationend", () => onda.remove());
+      fx.append(onda);
+    }
 
+    /* Humo que se despeja */
+    for (let i = 0; i < 5; i++) {
+      const humo = document.createElement("i");
+      humo.className = "humo";
+      const tam = 90 + azar(80);
+      humo.style.width = `${tam}px`;
+      humo.style.height = `${tam}px`;
+      humo.style.left = `${x + (Math.random() - 0.5) * 160}px`;
+      humo.style.top = `${y + (Math.random() - 0.5) * 200}px`;
+      humo.style.setProperty("--t", `${(0.8 + Math.random() * 0.5).toFixed(2)}s`);
+      humo.addEventListener("animationend", () => humo.remove());
+      fx.append(humo);
+    }
+
+    /* Chispas que cruzan la pantalla */
+    for (let i = 0; i < 10; i++) {
+      const chispa = document.createElement("i");
+      chispa.className = "spark";
+      chispa.style.left = `${x}px`;
+      chispa.style.top = `${y}px`;
+      chispa.style.setProperty("--largo", `${40 + azar(60)}px`);
+      chispa.style.setProperty("--ang", `${azar(360)}deg`);
+      chispa.style.setProperty("--dist", `${-(240 + azar(300))}px`);
+      chispa.style.setProperty("--c", elegir(["#ffdf9e", "#f2b263", "#f6ebdd", "#ff9eb1"]));
+      chispa.addEventListener("animationend", () => chispa.remove());
+      fx.append(chispa);
+    }
+
+    /* Pedazos del sobre */
     const FOIL = ["#3f2c22", "#241813", "#4a3520", "#5a4128", "#f2b263", "#d7263d", "#ff5a6a"];
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 22; i++) {
       const pedazo = document.createElement("i");
       pedazo.className = "frag";
-      const lado = 14 + azar(30);
+      const lado = 16 + azar(34);
       pedazo.style.width = `${lado}px`;
       pedazo.style.height = `${Math.round(lado * (0.6 + Math.random() * 0.8))}px`;
-      pedazo.style.left = `${x + (Math.random() - 0.5) * 150}px`;
-      pedazo.style.top = `${y + (Math.random() - 0.5) * 200}px`;
+      pedazo.style.left = `${x + (Math.random() - 0.5) * 170}px`;
+      pedazo.style.top = `${y + (Math.random() - 0.5) * 220}px`;
       pedazo.style.setProperty("--c", elegir(FOIL));
-      pedazo.style.setProperty("--dx", `${(Math.random() - 0.5) * 480}px`);
-      pedazo.style.setProperty("--dy", `${-(40 + Math.random() * 320)}px`);
-      pedazo.style.setProperty("--fr", `${(Math.random() - 0.5) * 760}deg`);
+      pedazo.style.setProperty("--dx", `${(Math.random() - 0.5) * 560}px`);
+      pedazo.style.setProperty("--dy", `${-(60 + Math.random() * 380)}px`);
+      pedazo.style.setProperty("--fr", `${(Math.random() - 0.5) * 840}deg`);
       pedazo.style.setProperty("--d", `${azar(90)}ms`);
       pedazo.addEventListener("animationend", () => pedazo.remove());
       fx.append(pedazo);
@@ -496,7 +531,7 @@
       activarRays(2600);
       const c = centroDe(pack);
       estallido(c.x, c.y);
-      burst(c.x, c.y, 40, 1.4);
+      burst(c.x, c.y, 48, 1.5);
       temblor();
       destello();
     }, 600);
@@ -593,7 +628,7 @@
       activarRays(3000);
       const c = centroDe(pack);
       estallido(c.x, c.y);
-      burst(c.x, c.y, 50, 1.6);
+      burst(c.x, c.y, 60, 1.8);
       temblor();
       destello();
     }, 1200);
