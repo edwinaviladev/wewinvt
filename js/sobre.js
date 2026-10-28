@@ -32,7 +32,7 @@
   /* Modo: "interactivo" (sobre.html) u "overlay" (overlay.html, canje automático) */
   const MODO = document.body.dataset.modo === "overlay" ? "overlay" : "interactivo";
   let secuencia = false;
-  let splashT1 = 0, splashT2 = 0, finalT1 = 0, finalT2 = 0;
+  let splashT1 = 0, splashT2 = 0, finalT1 = 0, finalT2 = 0, recuentoT1 = 0, recuentoT2 = 0;
   /* Cola de canjes: si varios viewers canjean seguido, los sobres salen en fila */
   const colaCanjes = [];
   const MAX_COLA = 10;
@@ -142,6 +142,13 @@
         noise({ d: 0.38, v: 0.5, f: 900, f2: 3600, q: 0.8 });
         noise({ t: 0.05, d: 0.3, v: 0.32, f: 500, f2: 2600, q: 1.2 });
         osc({ t: 0.3, f: 1200, type: "square", d: 0.05, v: 0.08 });
+      },
+      /* Estallido: sub-bass + crujido de foil */
+      boom() {
+        if (muted) return;
+        osc({ f: 130, f2: 38, type: "sine", d: 0.5, v: 0.4 });
+        noise({ d: 0.5, v: 0.5, f: 300, f2: 2400, q: 0.6 });
+        noise({ d: 0.28, v: 0.35, f: 5200, f2: 900, q: 0.8, type: "lowpass" });
       },
       pop(i = 0) {
         if (muted) return;
@@ -351,6 +358,36 @@
     setTimeout(() => rays.classList.remove("is-on"), ms);
   }
 
+  /* El sobre estalla: onda expansiva + pedazos de foil volando */
+  function estallido(x, y) {
+    if (REDUCED) return;
+
+    const onda = document.createElement("i");
+    onda.className = "shock";
+    onda.style.left = `${x}px`;
+    onda.style.top = `${y}px`;
+    onda.addEventListener("animationend", () => onda.remove());
+    fx.append(onda);
+
+    const FOIL = ["#3f2c22", "#241813", "#4a3520", "#5a4128", "#f2b263", "#d7263d", "#ff5a6a"];
+    for (let i = 0; i < 14; i++) {
+      const pedazo = document.createElement("i");
+      pedazo.className = "frag";
+      const lado = 14 + azar(30);
+      pedazo.style.width = `${lado}px`;
+      pedazo.style.height = `${Math.round(lado * (0.6 + Math.random() * 0.8))}px`;
+      pedazo.style.left = `${x + (Math.random() - 0.5) * 150}px`;
+      pedazo.style.top = `${y + (Math.random() - 0.5) * 200}px`;
+      pedazo.style.setProperty("--c", elegir(FOIL));
+      pedazo.style.setProperty("--dx", `${(Math.random() - 0.5) * 480}px`);
+      pedazo.style.setProperty("--dy", `${-(40 + Math.random() * 320)}px`);
+      pedazo.style.setProperty("--fr", `${(Math.random() - 0.5) * 760}deg`);
+      pedazo.style.setProperty("--d", `${azar(90)}ms`);
+      pedazo.addEventListener("animationend", () => pedazo.remove());
+      fx.append(pedazo);
+    }
+  }
+
   function centroDe(el) {
     const r = el.getBoundingClientRect();
     return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
@@ -451,13 +488,16 @@
     AudioFX.grab();
     pack.classList.add("is-winding");
 
-    /* 600ms: rasgado */
+    /* 600ms: el sobre estalla */
     setTimeout(() => {
       pack.classList.add("is-open");
       AudioFX.rip();
+      AudioFX.boom();
       activarRays(2600);
       const c = centroDe(pack);
+      estallido(c.x, c.y);
       burst(c.x, c.y, 40, 1.4);
+      temblor();
       destello();
     }, 600);
 
@@ -536,7 +576,7 @@
     mostrarBanner(usuario);
 
     /* 1. El sobre entra con muelle */
-    pack.classList.remove("is-entering", "is-winding", "is-open", "is-backdrop", "is-exit");
+    pack.classList.remove("is-entering", "is-winding", "is-open");
     pack.hidden = false;
     pack.classList.add("is-entering");
 
@@ -549,18 +589,22 @@
     setTimeout(() => {
       pack.classList.add("is-open");
       AudioFX.rip();
+      AudioFX.boom();
       activarRays(3000);
       const c = centroDe(pack);
-      burst(c.x, c.y, 44, 1.5);
+      estallido(c.x, c.y);
+      burst(c.x, c.y, 50, 1.6);
+      temblor();
       destello();
     }, 1200);
 
-    /* 3. El sobre queda abierto al fondo y salen las cartas una por una */
+    /* 3. Se despeja el humo del estallido y salen las cartas una por una */
     setTimeout(() => {
-      pack.classList.add("is-backdrop");
+      pack.hidden = true;
+      pack.classList.remove("is-entering", "is-winding", "is-open");
       construirSobre();
       soltarCartas();
-    }, 1750);
+    }, 1800);
   }
 
   function soltarCartas() {
@@ -616,24 +660,17 @@
   function cerrarCanje() {
     solo.innerHTML = "";
     solo.hidden = true;
-    pack.classList.add("is-exit");
     rays.classList.remove("is-on");
 
-    /* El banner de quién canjeó se retira al terminar el evento */
+    /* El banner se retira al terminar el evento */
     banner.classList.add("is-out");
     setTimeout(() => {
       banner.hidden = true;
     }, 500);
 
-    /* Se menciona la rareza más grande del sobre */
-    setTimeout(() => mostrarFinal(mejorRareza(cartasActuales)), 420);
+    /* Vuelven las 3 cartas del sobre junto al "Mejor del sobre" */
+    mostrarRecuento(cartasActuales);
 
-    setTimeout(() => {
-      pack.hidden = true;
-      pack.classList.remove("is-entering", "is-winding", "is-open", "is-backdrop", "is-exit");
-    }, 520);
-
-    /* El idle vuelve cuando termina el mensaje final, para no encimar nada */
     setTimeout(() => {
       estado = "idle";
       secuencia = false;
@@ -645,7 +682,33 @@
 
       /* Si hay más canjes en la fila, sale el siguiente */
       procesarCola();
-    }, 3000);
+    }, 3700);
+  }
+
+  function mostrarRecuento(cartas) {
+    const finalEl = $("[data-final]");
+    const contenedor = $("[data-final-hand]");
+    if (!finalEl || !contenedor) return;
+
+    contenedor.innerHTML = "";
+    contenedor.hidden = false;
+    contenedor.classList.remove("is-out");
+
+    cartas.forEach((datos, i) => {
+      const btn = crearCarta(datos, i);
+      btn.classList.add("is-flip", "is-revealed");
+      contenedor.append(btn);
+    });
+
+    setTimeout(() => mostrarFinal(mejorRareza(cartas)), 550);
+
+    clearTimeout(recuentoT1);
+    clearTimeout(recuentoT2);
+    recuentoT1 = setTimeout(() => contenedor.classList.add("is-out"), 3150);
+    recuentoT2 = setTimeout(() => {
+      contenedor.innerHTML = "";
+      contenedor.hidden = true;
+    }, 3650);
   }
 
   /* =========================================================
