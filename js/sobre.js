@@ -32,15 +32,18 @@
   /* Modo: "interactivo" (sobre.html) u "overlay" (overlay.html, canje automático) */
   const MODO = document.body.dataset.modo === "overlay" ? "overlay" : "interactivo";
   let secuencia = false;
-  let bannerT = null;
+  let splashT1 = 0, splashT2 = 0, finalT1 = 0, finalT2 = 0;
   /* Cola de canjes: si varios viewers canjean seguido, los sobres salen en fila */
   const colaCanjes = [];
   const MAX_COLA = 10;
   /* Tiempo que cada carta se muestra antes de salir de pantalla */
-  const HOLD_MS = { comun: 1700, rara: 1700, epica: 2300, legendaria: 2900 };
+  const HOLD_MS = { comun: 1400, rara: 1400, epica: 1900, legendaria: 2500 };
 
   const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const COLORES = ["#d7263d", "#ff5a6a", "#f2b263", "#a8e6d4", "#ff9eb1", "#f6ebdd"];
+  const MINTS = ["#a8e6d4", "#c9f0e4", "#f6ebdd"];
+  const ROJOS = ["#ff5a6a", "#ff9eb1", "#f6ebdd"];
+  const DORADOS = ["#f2b263", "#ffdf9e", "#f6ebdd"];
 
   /* =========================================================
      RAREZAS
@@ -51,6 +54,12 @@
     rara: { nombre: "Rara", peso: 25 },
     epica: { nombre: "Épica", peso: 15 },
     legendaria: { nombre: "Legendaria", peso: 5 },
+  };
+  const COLOR_RAREZA = {
+    comun: "#bfa78f",
+    rara: "#a8e6d4",
+    epica: "#ff5a6a",
+    legendaria: "#f2b263",
   };
   /* El tercer sobre garantiza Rara o mejor (estilo TCGP) */
   const PESOS_SLOT3 = { comun: 0, rara: 70, epica: 22, legendaria: 8 };
@@ -292,7 +301,7 @@
   /* =========================================================
      EFECTOS
      ========================================================= */
-  function burst(x, y, n = 22, fuerza = 1) {
+  function burst(x, y, n = 22, fuerza = 1, colores = COLORES) {
     if (REDUCED) return;
     for (let i = 0; i < n; i++) {
       const p = document.createElement("i");
@@ -303,7 +312,7 @@
       p.style.top = `${y}px`;
       p.style.setProperty("--dx", `${Math.cos(ang) * dist}px`);
       p.style.setProperty("--dy", `${Math.sin(ang) * dist - 40}px`);
-      p.style.setProperty("--c", elegir(COLORES));
+      p.style.setProperty("--c", elegir(colores));
       p.addEventListener("animationend", () => p.remove());
       fx.append(p);
     }
@@ -353,17 +362,74 @@
     if (rareza === "comun") {
       burst(c.x, c.y, 8, 0.6);
     } else if (rareza === "rara") {
-      burst(c.x, c.y, 16, 0.8);
+      burst(c.x, c.y, 16, 0.8, MINTS);
     } else if (rareza === "epica") {
-      burst(c.x, c.y, 26);
-      destello();
+      burst(c.x, c.y, 30, 1, ROJOS);
+      mostrarTinte("#ff5a6a");
+      mostrarSplash("¡Épica!", "#ff5a6a");
     } else {
-      burst(c.x, c.y, 34, 1.3);
-      confeti(40);
-      activarRays(2400);
+      burst(c.x, c.y, 44, 1.4, DORADOS);
+      confeti(46);
+      activarRays(2600);
       temblor();
-      destello();
+      mostrarTinte("#f2b263");
+      mostrarSplash("¡Legendaria!", "#f2b263", true);
     }
+  }
+
+  /* Texto grande de la rareza (estilo Balatro) */
+  function mostrarSplash(nombre, color, grande = false) {
+    const splash = $("[data-splash]");
+    if (!splash) return;
+    const span = splash.querySelector("span");
+    span.textContent = nombre;
+    span.style.setProperty("--r-splash", color);
+    span.style.fontSize = grande ? "clamp(52px, 13vw, 132px)" : "";
+    splash.hidden = false;
+    splash.classList.remove("is-out");
+    void splash.offsetWidth;
+    clearTimeout(splashT1);
+    clearTimeout(splashT2);
+    splashT1 = setTimeout(() => splash.classList.add("is-out"), grande ? 2100 : 1600);
+    splashT2 = setTimeout(() => {
+      splash.hidden = true;
+    }, (grande ? 2100 : 1600) + 450);
+  }
+
+  /* Destello a pantalla completa del color de la rareza */
+  function mostrarTinte(color) {
+    const tinte = $("[data-tint]");
+    if (!tinte || REDUCED) return;
+    tinte.style.setProperty("--c-tint", color);
+    tinte.classList.remove("is-on");
+    void tinte.offsetWidth;
+    tinte.classList.add("is-on");
+  }
+
+  /* La rareza más grande del sobre */
+  function mejorRareza(cartas) {
+    if (!cartas?.length) return "comun";
+    return cartas.reduce(
+      (mejor, c) => (ORDEN.indexOf(c.rareza) > ORDEN.indexOf(mejor.rareza) ? c : mejor),
+      cartas[0]
+    ).rareza;
+  }
+
+  function mostrarFinal(rareza) {
+    const finalEl = $("[data-final]");
+    if (!finalEl) return;
+    const nombre = $("[data-final-rareza]", finalEl);
+    nombre.textContent = RAREZAS[rareza]?.nombre || "Común";
+    nombre.style.setProperty("--c-final", COLOR_RAREZA[rareza] || "#f2b263");
+    finalEl.hidden = false;
+    finalEl.classList.remove("is-out");
+    void finalEl.offsetWidth;
+    clearTimeout(finalT1);
+    clearTimeout(finalT2);
+    finalT1 = setTimeout(() => finalEl.classList.add("is-out"), 2500);
+    finalT2 = setTimeout(() => {
+      finalEl.hidden = true;
+    }, 3000);
   }
 
   /* =========================================================
@@ -385,17 +451,17 @@
     AudioFX.grab();
     pack.classList.add("is-winding");
 
-    /* 620ms: rasgado */
+    /* 600ms: rasgado */
     setTimeout(() => {
       pack.classList.add("is-open");
       AudioFX.rip();
-      activarRays(2200);
+      activarRays(2600);
       const c = centroDe(pack);
-      burst(c.x, c.y, 26);
+      burst(c.x, c.y, 40, 1.4);
       destello();
-    }, 620);
+    }, 600);
 
-    /* 1050ms: salen las cartas */
+    /* 950ms: salen las cartas */
     setTimeout(() => {
       construirSobre();
       pintarCartas();
@@ -403,7 +469,7 @@
       reveladas = 0;
       pack.hidden = true;
 
-      cartasActuales.forEach((_, i) => setTimeout(() => AudioFX.pop(i), i * 140));
+      cartasActuales.forEach((_, i) => setTimeout(() => AudioFX.pop(i), i * 120));
 
       hint.textContent = "Toca una carta para revelarla";
       btnRevealAll.hidden = false;
@@ -425,7 +491,7 @@
 
       reveladas++;
       if (reveladas === cartasActuales.length) terminar();
-    }, 330);
+    }, 260);
   }
 
   function terminar() {
@@ -475,26 +541,26 @@
     pack.classList.add("is-entering");
 
     /* 2. Carga y rasgado */
-    setTimeout(() => pack.classList.remove("is-entering"), 620);
+    setTimeout(() => pack.classList.remove("is-entering"), 480);
     setTimeout(() => {
       pack.classList.add("is-winding");
       AudioFX.grab();
-    }, 780);
+    }, 600);
     setTimeout(() => {
       pack.classList.add("is-open");
       AudioFX.rip();
-      activarRays(2800);
+      activarRays(3000);
       const c = centroDe(pack);
-      burst(c.x, c.y, 26);
+      burst(c.x, c.y, 44, 1.5);
       destello();
-    }, 1430);
+    }, 1200);
 
     /* 3. El sobre queda abierto al fondo y salen las cartas una por una */
     setTimeout(() => {
       pack.classList.add("is-backdrop");
       construirSobre();
       soltarCartas();
-    }, 2250);
+    }, 1750);
   }
 
   function soltarCartas() {
@@ -525,17 +591,17 @@
       btn.classList.add("is-flip");
       btn.setAttribute("aria-label", `${datos.nombre}, ${RAREZAS[datos.rareza].nombre} (${datos.tipo})`);
       AudioFX.whoosh();
-    }, 700);
+    }, 550);
 
     setTimeout(() => {
       btn.classList.add("is-revealed");
       conectarTilt(btn);
       AudioFX.sting(datos.rareza);
       efectosRareza(datos.rareza, btn);
-    }, 1250);
+    }, 950);
 
     /* Se muestra un momento y sale de pantalla */
-    const salida = 1250 + HOLD_MS[datos.rareza];
+    const salida = 950 + HOLD_MS[datos.rareza];
     setTimeout(() => {
       btn.classList.add("is-out");
       AudioFX.whoosh();
@@ -544,28 +610,42 @@
     setTimeout(() => {
       btn.remove();
       alTerminar();
-    }, salida + 600);
+    }, salida + 450);
   }
 
   function cerrarCanje() {
     solo.innerHTML = "";
     solo.hidden = true;
     pack.classList.add("is-exit");
+    rays.classList.remove("is-on");
+
+    /* El banner de quién canjeó se retira al terminar el evento */
+    banner.classList.add("is-out");
+    setTimeout(() => {
+      banner.hidden = true;
+    }, 500);
+
+    /* Se menciona la rareza más grande del sobre */
+    setTimeout(() => mostrarFinal(mejorRareza(cartasActuales)), 420);
+
     setTimeout(() => {
       pack.hidden = true;
       pack.classList.remove("is-entering", "is-winding", "is-open", "is-backdrop", "is-exit");
-    }, 560);
-    rays.classList.remove("is-on");
-    estado = "idle";
-    secuencia = false;
-    btnDemo.hidden = false;
+    }, 520);
 
-    const abiertos = contarAbiertos() + 1;
-    localStorage.setItem("wewinvt_sobres", String(abiertos));
-    pintarContador();
+    /* El idle vuelve cuando termina el mensaje final, para no encimar nada */
+    setTimeout(() => {
+      estado = "idle";
+      secuencia = false;
+      btnDemo.hidden = false;
 
-    /* Si hay más canjes en la fila, sale el siguiente */
-    procesarCola();
+      const abiertos = contarAbiertos() + 1;
+      localStorage.setItem("wewinvt_sobres", String(abiertos));
+      pintarContador();
+
+      /* Si hay más canjes en la fila, sale el siguiente */
+      procesarCola();
+    }, 3000);
   }
 
   /* =========================================================
@@ -594,8 +674,6 @@
     banner.hidden = false;
     banner.classList.remove("is-out");
     void banner.offsetWidth;
-    clearTimeout(bannerT);
-    bannerT = setTimeout(() => banner.classList.add("is-out"), 2800);
   }
 
   /* =========================================================

@@ -308,7 +308,7 @@ body {
 
 /* --- Secuencia de apertura --- */
 
-.pack.is-winding { animation: pack-wind 0.62s ease-in-out forwards; }
+.pack.is-winding { animation: pack-wind 0.55s ease-in-out forwards; }
 .pack.is-winding .pack__hint { animation: none; opacity: 0; transition: opacity 0.2s; }
 
 @keyframes pack-wind {
@@ -328,15 +328,42 @@ body {
     0 0 60px rgb(242 178 99 / 30%);
 }
 
-.pack.is-open { animation: none; }
+.pack.is-open {
+  animation: pack-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes pack-pop {
+  0% { transform: scale(1.08); }
+  45% { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+
+/* Luz que brota del interior al abrirse */
+.pack__light {
+  position: absolute;
+  inset: 6% 5% 10%;
+  border-radius: 16px;
+  background: radial-gradient(ellipse at 50% 58%, rgb(255 236 204 / 95%), rgb(242 178 99 / 55%) 46%, transparent 78%);
+  opacity: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.pack.is-open .pack__light { animation: light-burst 0.6s ease-out forwards; }
+
+@keyframes light-burst {
+  0% { opacity: 0; transform: scaleY(0.25); }
+  35% { opacity: 1; transform: scaleY(1); }
+  100% { opacity: 0; transform: scaleY(1.12); }
+}
 
 .pack.is-open .pack__strip {
-  animation: strip-fly 0.8s cubic-bezier(0.3, 0.6, 0.6, 1) forwards;
+  animation: strip-fly 0.7s cubic-bezier(0.3, 0.6, 0.6, 1) forwards;
 }
 
 @keyframes strip-fly {
-  30% { transform: translate(0, -26px) rotate(-4deg); opacity: 1; }
-  100% { transform: translate(16vw, -72vh) rotate(28deg); opacity: 0; }
+  25% { transform: translate(0, -36px) rotate(-6deg); opacity: 1; }
+  100% { transform: translate(24vw, -90vh) rotate(44deg); opacity: 0; }
 }
 
 .pack.is-open .pack__seal { animation: seal-fly 0.7s 0.08s ease-in forwards; }
@@ -347,7 +374,7 @@ body {
 }
 
 .pack.is-open .pack__body {
-  animation: pack-drop 0.55s 0.3s ease-in forwards;
+  animation: pack-drop 0.45s 0.28s ease-in forwards;
 }
 
 @keyframes pack-drop {
@@ -377,7 +404,7 @@ body {
   color: inherit;
   font: inherit;
   cursor: pointer;
-  animation: card-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  animation: card-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
   animation-delay: var(--d, 0s);
   transition: transform 0.25s ease;
   transform: rotate(var(--tilt, 0deg));
@@ -409,7 +436,7 @@ body {
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.7s cubic-bezier(0.3, 0.7, 0.3, 1);
+  transition: transform 0.55s cubic-bezier(0.3, 0.7, 0.3, 1);
 }
 
 .card.is-flip .card__inner { transform: rotateY(180deg); }
@@ -860,7 +887,7 @@ body {
 
 .solo .card {
   --tilt: 0deg;
-  animation: card-solo-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: card-solo-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 @keyframes card-solo-in {
@@ -870,7 +897,7 @@ body {
 
 .card.is-out {
   pointer-events: none;
-  animation: card-out 0.55s ease-in both;
+  animation: card-out 0.45s ease-in both;
 }
 
 @keyframes card-out {
@@ -944,15 +971,15 @@ body.modo-overlay.is-transparente .back-link { display: none; }
   letter-spacing: 0.4px;
   white-space: nowrap;
   box-shadow: 0 10px 30px rgb(0 0 0 / 45%), 0 0 24px rgb(242 178 99 / 25%);
-  animation: banner-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: banner-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   transition: opacity 0.45s;
   pointer-events: none;
 }
 .canje-banner.is-out { opacity: 0; }
 
 @keyframes banner-pop {
-  from { transform: scale(0.5) translateY(16px); opacity: 0; }
-  to { transform: scale(1) translateY(0); opacity: 1; }
+  from { transform: scale(0.5) translateY(16px); }
+  to { transform: scale(1) translateY(0); }
 }
 
 /* Estado de conexión de Twitch (HUD) */
@@ -992,3 +1019,102 @@ body.modo-overlay.is-transparente .back-link { display: none; }
   border-color: rgb(242 178 99 / 50%);
   color: var(--caramelo);
 }
+
+/* =========================================================
+   SPLASH DE RAREZA · tinte de color · mejor del sobre
+   ========================================================= */
+
+/* Destello a pantalla completa del color de la rareza */
+.tint {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 50% 42%, var(--c-tint, transparent), transparent 66%);
+}
+.tint.is-on { animation: tint-flash 0.55s ease-out; }
+
+@keyframes tint-flash {
+  0% { opacity: 0.6; }
+  100% { opacity: 0; }
+}
+
+/* Texto grande de la rareza (épica / legendaria) */
+.rarity-splash {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+.rarity-splash.is-out { opacity: 0; }
+.rarity-splash span {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: clamp(46px, 11vw, 110px);
+  color: var(--r-splash, #f2b263);
+  -webkit-text-stroke: 2px rgb(16 11 10 / 55%);
+  text-shadow:
+    0 0 36px var(--r-splash, #f2b263),
+    0 6px 0 rgb(16 11 10 / 45%),
+    0 16px 48px rgb(0 0 0 / 55%);
+  animation:
+    splash-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+    splash-float 2.4s 0.55s ease-in-out infinite;
+}
+
+@keyframes splash-pop {
+  0% { transform: scale(0.25) rotate(-8deg); }
+  62% { transform: scale(1.18) rotate(2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes splash-float {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.05) rotate(-1.5deg); }
+}
+
+/* Cierre: la rareza más grande del sobre */
+.final-splash {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 6px;
+  pointer-events: none;
+  transition: opacity 0.45s;
+}
+.final-splash.is-out { opacity: 0; }
+
+.final-label {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 800;
+  font-size: clamp(12px, 2.2vw, 16px);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.final-rareza {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: clamp(40px, 9vw, 96px);
+  color: var(--c-final, #f2b263);
+  -webkit-text-stroke: 2px rgb(16 11 10 / 55%);
+  text-shadow: 0 0 32px var(--c-final, #f2b263), 0 6px 0 rgb(16 11 10 / 45%), 0 16px 48px rgb(0 0 0 / 55%);
+  animation: splash-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* En modo transparente (OBS) no se ve nada de fondo: solo el evento */
+body.modo-overlay.is-transparente .bg-float { display: none; }
