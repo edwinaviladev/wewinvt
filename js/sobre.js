@@ -42,7 +42,7 @@
   const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const COLORES = ["#d7263d", "#ff5a6a", "#f2b263", "#a8e6d4", "#ff9eb1", "#f6ebdd"];
   const MINTS = ["#a8e6d4", "#c9f0e4", "#f6ebdd"];
-  const ROJOS = ["#ff5a6a", "#ff9eb1", "#f6ebdd"];
+  const EPICAS = ["#b994ff", "#d4baff", "#f6ebdd"];
   const DORADOS = ["#f2b263", "#ffdf9e", "#f6ebdd"];
 
   /* =========================================================
@@ -58,7 +58,7 @@
   const COLOR_RAREZA = {
     comun: "#bfa78f",
     rara: "#a8e6d4",
-    epica: "#ff5a6a",
+    epica: "#b994ff",
     legendaria: "#f2b263",
   };
   /* El tercer sobre garantiza Rara o mejor (estilo TCGP) */
@@ -572,9 +572,9 @@
       burst(c.x, c.y, 20, 0.8, MINTS);
       destellos(el, 9, MINTS);
     } else if (rareza === "epica") {
-      chispasRadiales(c.x, c.y, 12, ROJOS);
-      burst(c.x, c.y, 34, 1, ROJOS);
-      destellos(el, 14, ROJOS, true);
+      chispasRadiales(c.x, c.y, 12, EPICAS);
+      burst(c.x, c.y, 34, 1, EPICAS);
+      destellos(el, 14, EPICAS, true);
       mostrarTinte(color);
       mostrarSplash("¡Épica!", color);
     } else {

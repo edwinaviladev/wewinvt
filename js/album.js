@@ -14,7 +14,7 @@
   const RAREZAS = {
     comun: { nombre: "Común", color: "#bfa78f", simbolo: "●" },
     rara: { nombre: "Rara", color: "#a8e6d4", simbolo: "◆" },
-    epica: { nombre: "Épica", color: "#ff5a6a", simbolo: "★" },
+    epica: { nombre: "Épica", color: "#b994ff", simbolo: "★" },
     legendaria: { nombre: "Legendaria", color: "#f2b263", simbolo: "★" },
   };
 
