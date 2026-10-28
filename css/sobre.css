@@ -399,6 +399,7 @@ body {
 .card {
   --rare: var(--muted);
   --glow: rgb(191 168 153 / 35%);
+  --card-radius: clamp(18px, calc(var(--cw) * 0.095), 30px);
   --tilt: 0deg;
   position: relative;
   width: var(--cw);
@@ -449,7 +450,7 @@ body {
 .card__face {
   position: absolute;
   inset: 0;
-  border-radius: 18px;
+  border-radius: var(--card-radius, 18px);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   overflow: hidden;
@@ -504,9 +505,39 @@ body {
   position: absolute;
   inset: 7px;
   z-index: 4;
-  border: 1px solid rgb(255 255 255 / 24%);
-  border-radius: 11px;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: calc(var(--card-radius, 18px) - 7px);
   box-shadow: inset 0 0 0 1px rgb(0 0 0 / 12%);
+  pointer-events: none;
+}
+
+/* Aro de fuego en el borde: la máscara mantiene libre el centro de la ilustración */
+.card__face--front::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 4px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from 205deg,
+    transparent 0 6%,
+    var(--fire-ember) 10%,
+    var(--fire-core) 13%,
+    transparent 20% 36%,
+    var(--fire-accent) 42%,
+    var(--fire-core) 46%,
+    transparent 53% 72%,
+    var(--fire-ember) 79%,
+    var(--fire-core) 83%,
+    transparent 90% 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  filter: blur(1px);
+  opacity: 0;
   pointer-events: none;
 }
 
@@ -515,6 +546,28 @@ body {
 @keyframes rare-pulse {
   0%, 100% { box-shadow: inset 0 0 0 2px var(--rare), inset 0 0 0 5px rgb(16 11 10 / 78%), 0 16px 34px rgb(0 0 0 / 55%), 0 0 22px var(--glow); }
   50% { box-shadow: inset 0 0 0 2px var(--rare), inset 0 0 0 5px rgb(16 11 10 / 78%), 0 16px 34px rgb(0 0 0 / 55%), 0 0 42px var(--glow); }
+}
+
+.card.is-revealed[data-rareza="epica"] .card__face--front::after {
+  animation: fire-flicker 1.9s ease-in-out infinite;
+}
+.card.is-revealed[data-rareza="legendaria"] .card__face--front::after {
+  animation: fire-flicker 1.25s ease-in-out infinite;
+}
+
+@keyframes fire-flicker {
+  0%, 100% { opacity: var(--fire-low); filter: blur(0.7px) brightness(0.96); }
+  42% { opacity: var(--fire-mid); filter: blur(1.6px) brightness(1.16); }
+  68% { opacity: var(--fire-high); filter: blur(1px) brightness(1.28); }
+}
+
+.card.is-revealed[data-rareza="legendaria"] .card__face--front {
+  animation: rare-pulse-legendaria 1.8s ease-in-out infinite;
+}
+
+@keyframes rare-pulse-legendaria {
+  0%, 100% { box-shadow: inset 0 0 0 2px var(--rare), inset 0 0 0 5px rgb(16 11 10 / 78%), 0 16px 34px rgb(0 0 0 / 55%), 0 0 24px var(--glow), 0 0 6px rgb(255 215 117 / 30%); }
+  50% { box-shadow: inset 0 0 0 2px var(--rare), inset 0 0 0 5px rgb(16 11 10 / 78%), 0 16px 34px rgb(0 0 0 / 55%), 0 0 48px var(--glow), 0 0 17px rgb(255 215 117 / 65%); }
 }
 
 /* Textura de foil según la rareza (la legendaria brilla como carta dorada) */
@@ -544,10 +597,10 @@ body {
 }
 
 .card[data-rareza="legendaria"] .card__foil {
-  opacity: 0.5;
+  opacity: 0.34;
   background:
-    linear-gradient(115deg, transparent 25%, rgb(255 223 158 / 50%) 42%, rgb(255 246 224 / 40%) 52%, rgb(255 158 177 / 25%) 60%, transparent 75%) 0 0 / 260% 260%,
-    repeating-linear-gradient(48deg, rgb(255 223 158 / 12%) 0 6px, rgb(242 178 99 / 6%) 6px 12px, transparent 12px 22px);
+    linear-gradient(115deg, transparent 36%, rgb(255 244 194 / 62%) 46%, rgb(255 185 57 / 58%) 50%, rgb(255 255 255 / 68%) 54%, transparent 64%) 0 0 / 260% 260%,
+    repeating-linear-gradient(48deg, rgb(255 223 158 / 8%) 0 6px, rgb(242 178 99 / 5%) 6px 12px, transparent 12px 22px);
   animation: foil-desliza 3.4s ease-in-out infinite;
 }
 
@@ -599,7 +652,7 @@ body {
   padding: clamp(5px, calc(var(--cw) * 0.025), 10px) clamp(7px, calc(var(--cw) * 0.035), 13px);
   border: 1px solid rgb(255 255 255 / 18%);
   border-bottom-color: color-mix(in srgb, var(--rare) 65%, transparent);
-  border-radius: 10px;
+  border-radius: 14px;
   background: linear-gradient(135deg, rgb(16 11 10 / 80%), rgb(16 11 10 / 55%));
   box-shadow: 0 5px 16px rgb(0 0 0 / 26%);
 }
@@ -614,7 +667,7 @@ body {
   padding: clamp(5px, calc(var(--cw) * 0.026), 10px) clamp(7px, calc(var(--cw) * 0.035), 13px);
   border: 1px solid color-mix(in srgb, var(--rare) 48%, rgb(255 255 255 / 18%));
   border-top: 2px solid var(--rare);
-  border-radius: 10px;
+  border-radius: 14px;
   background: linear-gradient(145deg, rgb(16 11 10 / 86%), rgb(16 11 10 / 72%));
   box-shadow: 0 7px 20px rgb(0 0 0 / 28%), inset 0 1px 0 rgb(255 255 255 / 9%);
 }
@@ -698,8 +751,11 @@ body {
   transition: opacity 0.4s;
 }
 
-.card.is-revealed[data-rareza="epica"] .card__holo { opacity: 0.4; }
-.card.is-revealed[data-rareza="legendaria"] .card__holo { opacity: 0.75; }
+.card.is-revealed[data-rareza="epica"] .card__holo { opacity: 0.24; }
+.card[data-rareza="legendaria"] .card__holo {
+  background: linear-gradient(115deg, transparent 22%, rgb(255 255 255 / 22%) 40%, rgb(255 207 91 / 38%) 50%, rgb(255 248 224 / 24%) 58%, transparent 78%);
+}
+.card.is-revealed[data-rareza="legendaria"] .card__holo { opacity: 0.3; }
 
 /* Chispas de la legendaria */
 .card__spark {
@@ -709,21 +765,22 @@ body {
   pointer-events: none;
   opacity: 0;
   background-image:
-    radial-gradient(circle, #fff 0 1.5px, transparent 2px),
-    radial-gradient(circle, var(--caramelo) 0 1.5px, transparent 2px);
-  background-size: 46px 46px, 62px 62px;
-  background-position: 0 0, 20px 30px;
+    radial-gradient(circle, rgb(255 255 255 / 100%) 0 1.2px, transparent 2.3px),
+    radial-gradient(circle, rgb(255 223 145 / 95%) 0 1px, transparent 2.6px),
+    radial-gradient(circle, rgb(255 255 255 / 82%) 0 0.8px, transparent 2px);
+  background-size: 42px 42px, 59px 59px, 83px 83px;
+  background-position: 0 0, 20px 30px, 13px 8px;
+  filter: drop-shadow(0 0 3px rgb(255 203 92 / 55%));
 }
 
 .card.is-revealed[data-rareza="legendaria"] .card__spark {
-  opacity: 0.75;
-  animation: spark-twinkle 1.6s steps(2) infinite;
+  opacity: 0.9;
+  animation: spark-twinkle 1.25s ease-in-out infinite;
 }
 
 @keyframes spark-twinkle {
-  0% { background-position: 0 0, 20px 30px; opacity: 0.35; }
-  50% { background-position: 12px 8px, 34px 44px; opacity: 0.8; }
-  100% { background-position: 0 0, 20px 30px; opacity: 0.35; }
+  0%, 100% { background-position: 0 0, 20px 30px, 13px 8px; opacity: 0.4; }
+  50% { background-position: 12px 8px, 34px 44px, 40px 24px; opacity: 0.95; }
 }
 
 /* Símbolo y crédito dentro del panel inferior */
@@ -735,12 +792,21 @@ body {
 }
 
 .card[data-rareza="legendaria"] .card__simbolo {
-  animation: simbolo-brillo 1.8s ease-in-out infinite;
+  transform-origin: center;
+  animation: simbolo-brillo 1.4s ease-in-out infinite;
 }
 
 @keyframes simbolo-brillo {
-  0%, 100% { text-shadow: 0 0 8px var(--glow); }
-  50% { text-shadow: 0 0 16px var(--glow), 0 0 30px var(--glow); }
+  0%, 100% {
+    transform: scale(0.92) rotate(-6deg);
+    filter: drop-shadow(0 0 4px rgb(255 215 117 / 55%));
+    text-shadow: 0 0 8px var(--glow);
+  }
+  50% {
+    transform: scale(1.18) rotate(6deg);
+    filter: drop-shadow(0 0 7px rgb(255 232 163 / 90%)) drop-shadow(0 0 15px rgb(255 190 67 / 70%));
+    text-shadow: 0 0 16px var(--glow), 0 0 30px var(--glow);
+  }
 }
 
 .card__credito {
@@ -756,8 +822,26 @@ body {
 /* Colores por rareza (paleta del sitio) */
 .card[data-rareza="comun"] { --rare: #bfa78f; --glow: rgb(191 167 143 / 30%); }
 .card[data-rareza="rara"] { --rare: var(--mint); --glow: rgb(168 230 212 / 40%); }
-.card[data-rareza="epica"] { --rare: var(--epica); --glow: rgb(185 148 255 / 48%); }
-.card[data-rareza="legendaria"] { --rare: var(--caramelo); --glow: rgb(242 178 99 / 60%); }
+.card[data-rareza="epica"] {
+  --rare: var(--epica);
+  --glow: rgb(185 148 255 / 48%);
+  --fire-ember: rgb(255 112 49 / 84%);
+  --fire-core: rgb(255 214 140 / 92%);
+  --fire-accent: rgb(185 148 255 / 90%);
+  --fire-low: 0.16;
+  --fire-mid: 0.34;
+  --fire-high: 0.56;
+}
+.card[data-rareza="legendaria"] {
+  --rare: var(--caramelo);
+  --glow: rgb(255 187 69 / 68%);
+  --fire-ember: rgb(255 97 31 / 92%);
+  --fire-core: rgb(255 226 141 / 100%);
+  --fire-accent: rgb(242 178 99 / 94%);
+  --fire-low: 0.3;
+  --fire-mid: 0.56;
+  --fire-high: 0.78;
+}
 
 /* Tilt 3D al revelar (JavaScript mueve --rx/--ry/--mx/--my) */
 .card.is-revealed {
@@ -1175,12 +1259,16 @@ body.modo-overlay.is-transparente .back-link { display: none; }
   z-index: 3;
   pointer-events: none;
   opacity: 0;
-  background: radial-gradient(circle at 50% 42%, var(--c-tint, transparent), transparent 66%);
+  background:
+    radial-gradient(ellipse at 50% 58%, color-mix(in srgb, var(--c-tint, transparent) 40%, transparent), transparent 58%),
+    radial-gradient(ellipse at 50% 100%, rgb(255 117 41 / 12%), transparent 72%);
+  mix-blend-mode: screen;
 }
 .tint.is-on { animation: tint-flash 0.7s ease-out; }
 
 @keyframes tint-flash {
-  0% { opacity: 0.85; }
+  0% { opacity: 0.36; }
+  40% { opacity: 0.2; }
   100% { opacity: 0; }
 }
 
@@ -1207,13 +1295,19 @@ body.modo-overlay.is-transparente .back-link { display: none; }
   height: 150px;
   margin: -75px 0 0 -75px;
   border-radius: 50%;
-  background: radial-gradient(circle, var(--c, #f2b263) 0%, transparent 65%);
-  filter: blur(4px);
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--c, #f2b263) 34%, transparent) 0%,
+    rgb(255 121 42 / 12%) 30%,
+    transparent 68%
+  );
+  mix-blend-mode: screen;
+  filter: blur(6px);
   animation: bloom 0.7s ease-out forwards;
 }
 
 @keyframes bloom {
-  0% { transform: scale(0.2); opacity: 0.9; }
+  0% { transform: scale(0.2); opacity: 0.58; }
   100% { transform: scale(3.2); opacity: 0; }
 }
 

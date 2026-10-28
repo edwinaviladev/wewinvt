@@ -42,8 +42,8 @@
   const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const COLORES = ["#d7263d", "#ff5a6a", "#f2b263", "#a8e6d4", "#ff9eb1", "#f6ebdd"];
   const MINTS = ["#a8e6d4", "#c9f0e4", "#f6ebdd"];
-  const EPICAS = ["#b994ff", "#d4baff", "#f6ebdd"];
-  const DORADOS = ["#f2b263", "#ffdf9e", "#f6ebdd"];
+  const EPICAS = ["#b994ff", "#ff9b4b", "#ffd9a1"];
+  const DORADOS = ["#ff8038", "#f2b263", "#ffdf9e", "#fff6d8"];
 
   /* =========================================================
      RAREZAS
