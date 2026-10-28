@@ -50,10 +50,10 @@
      ========================================================= */
   const ORDEN = ["comun", "rara", "epica", "legendaria"];
   const RAREZAS = {
-    comun: { nombre: "Común", peso: 55 },
-    rara: { nombre: "Rara", peso: 25 },
-    epica: { nombre: "Épica", peso: 15 },
-    legendaria: { nombre: "Legendaria", peso: 5 },
+    comun: { nombre: "Común", peso: 55, simbolo: "●" },
+    rara: { nombre: "Rara", peso: 25, simbolo: "◆" },
+    epica: { nombre: "Épica", peso: 15, simbolo: "★" },
+    legendaria: { nombre: "Legendaria", peso: 5, simbolo: "★" },
   };
   const COLOR_RAREZA = {
     comun: "#bfa78f",
@@ -330,18 +330,24 @@
             <span class="card__emblem">W</span>
           </span>
           <span class="card__face card__face--front">
-            <span class="card__head">
+            <span class="card__barra">
               <span class="card__name">${datos.nombre}</span>
               <span class="card__num">${numeroCard(numGlobal < 0 ? i : numGlobal)}</span>
             </span>
-            <span class="card__art">
+            <span class="card__ventana">
               <img src="${datos.src}" alt="${datos.alt}" draggable="false" />
               <i class="card__holo"></i>
               <i class="card__spark"></i>
             </span>
-            <span class="card__meta">
-              <span class="card__tipo">${datos.tipo}</span>
-              <span class="card__rareza"><span class="card__gem"></span>${RAREZAS[datos.rareza].nombre}</span>
+            <span class="card__caja">
+              <span class="card__datos">
+                <span class="card__tipo">${datos.tipo}</span>
+                <span class="card__rareza-nombre">${RAREZAS[datos.rareza].nombre}</span>
+              </span>
+              <span class="card__pie">
+                <span class="card__credito">Illus. ${datos.artista || "Anónimo"}</span>
+                <span class="card__simbolo">${RAREZAS[datos.rareza].simbolo}</span>
+              </span>
             </span>
           </span>
         </span>

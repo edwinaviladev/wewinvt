@@ -12,10 +12,10 @@
   const CATALOGO = window.SOBRE_CATALOGO || [];
   const ORDEN = ["legendaria", "epica", "rara", "comun"];
   const RAREZAS = {
-    comun: { nombre: "Común", color: "#bfa78f" },
-    rara: { nombre: "Rara", color: "#a8e6d4" },
-    epica: { nombre: "Épica", color: "#ff5a6a" },
-    legendaria: { nombre: "Legendaria", color: "#f2b263" },
+    comun: { nombre: "Común", color: "#bfa78f", simbolo: "●" },
+    rara: { nombre: "Rara", color: "#a8e6d4", simbolo: "◆" },
+    epica: { nombre: "Épica", color: "#ff5a6a", simbolo: "★" },
+    legendaria: { nombre: "Legendaria", color: "#f2b263", simbolo: "★" },
   };
 
   let coleccion = {};
@@ -195,6 +195,27 @@
     });
   }
 
+  /* Tilt 3D que sigue al puntero (también mueve el holo) */
+  function conectarTilt(card) {
+    const mover = (evento) => {
+      const r = card.getBoundingClientRect();
+      const px = (evento.clientX - r.left) / r.width - 0.5;
+      const py = (evento.clientY - r.top) / r.height - 0.5;
+      card.style.setProperty("--rx", `${(-py * 11).toFixed(2)}deg`);
+      card.style.setProperty("--ry", `${(px * 13).toFixed(2)}deg`);
+      card.style.setProperty("--mx", px.toFixed(3));
+      card.style.setProperty("--my", py.toFixed(3));
+    };
+    const salir = () => {
+      card.style.setProperty("--rx", "0deg");
+      card.style.setProperty("--ry", "0deg");
+      card.style.setProperty("--mx", "0");
+      card.style.setProperty("--my", "0");
+    };
+    card.addEventListener("pointermove", mover);
+    card.addEventListener("pointerleave", salir);
+  }
+
   function cartaObtenida(datos, indice, clickeable = true) {
     const btn = document.createElement("button");
     btn.type = "button";
@@ -207,23 +228,30 @@
       <span class="card__bob">
         <span class="card__inner">
           <span class="card__face card__face--front">
-            <span class="card__head">
+            <span class="card__barra">
               <span class="card__name">${datos.nombre}</span>
               <span class="card__num">${numeroDe(datos)}</span>
             </span>
-            <span class="card__art">
+            <span class="card__ventana">
               <img src="${datos.src}" alt="${datos.alt}" loading="lazy" decoding="async" draggable="false" />
               <i class="card__holo"></i>
               <i class="card__spark"></i>
             </span>
-            <span class="card__meta">
-              <span class="card__tipo">${datos.tipo}</span>
-              <span class="card__rareza"><span class="card__gem"></span>${RAREZAS[datos.rareza].nombre}</span>
+            <span class="card__caja">
+              <span class="card__datos">
+                <span class="card__tipo">${datos.tipo}</span>
+                <span class="card__rareza-nombre">${RAREZAS[datos.rareza].nombre}</span>
+              </span>
+              <span class="card__pie">
+                <span class="card__credito">Illus. ${datos.artista || "Anónimo"}</span>
+                <span class="card__simbolo">${RAREZAS[datos.rareza].simbolo}</span>
+              </span>
             </span>
           </span>
         </span>
       </span>
     `;
+    conectarTilt(btn);
     if (clickeable) btn.addEventListener("click", () => abrirDetalle(datos));
     return btn;
   }

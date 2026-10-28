@@ -17,7 +17,7 @@
   --rubor: #ff9eb1;
 
   /* Tamaño de carta */
-  --cw: clamp(138px, 23vw, 212px);
+  --cw: clamp(150px, 26vw, 246px);
   --ch: calc(var(--cw) * 1.4);
 }
 
@@ -398,6 +398,7 @@ body {
 .card {
   --rare: var(--muted);
   --glow: rgb(191 168 153 / 35%);
+  --tilt: 0deg;
   position: relative;
   width: var(--cw);
   height: var(--ch);
@@ -484,40 +485,45 @@ body {
   box-shadow: 0 6px 18px rgb(0 0 0 / 45%);
 }
 
-/* --- Frente --- */
+/* --- Frente: estilo Pokémon TCG (borde crema, marco dorado, caja de texto) --- */
 
 .card__face--front {
   transform: rotateY(180deg);
-  background: linear-gradient(165deg, #33231c 0%, #221610 60%, #170e0b 100%);
+  background: linear-gradient(170deg, #fcf4e6 0%, #f2e7d0 100%);
   box-shadow:
-    inset 0 0 0 3px var(--rare),
-    inset 0 0 0 5px rgb(0 0 0 / 35%),
-    0 16px 34px rgb(0 0 0 / 50%),
-    0 0 34px var(--glow);
+    inset 0 0 0 1px rgb(36 24 19 / 24%),
+    0 16px 34px rgb(0 0 0 / 55%),
+    0 0 32px var(--glow);
   display: flex;
   flex-direction: column;
-  padding: 9px 9px 8px;
+  gap: calc(var(--cw) * 0.028);
+  padding: calc(var(--cw) * 0.042);
 }
 
 .card.is-revealed .card__face--front { animation: rare-pulse 2.4s ease-in-out infinite; }
 
 @keyframes rare-pulse {
-  0%, 100% { box-shadow: inset 0 0 0 3px var(--rare), inset 0 0 0 5px rgb(0 0 0 / 35%), 0 16px 34px rgb(0 0 0 / 50%), 0 0 26px var(--glow); }
-  50% { box-shadow: inset 0 0 0 3px var(--rare), inset 0 0 0 5px rgb(0 0 0 / 35%), 0 16px 34px rgb(0 0 0 / 50%), 0 0 54px var(--glow); }
+  0%, 100% { box-shadow: inset 0 0 0 1px rgb(36 24 19 / 24%), 0 16px 34px rgb(0 0 0 / 55%), 0 0 20px var(--glow); }
+  50% { box-shadow: inset 0 0 0 1px rgb(36 24 19 / 24%), 0 16px 34px rgb(0 0 0 / 55%), 0 0 52px var(--glow); }
 }
 
-.card__head {
+/* Barra del nombre con el color de la rareza */
+.card__barra {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: 6px;
-  padding: 2px 4px 7px;
+  gap: 8px;
+  padding: calc(var(--cw) * 0.016) calc(var(--cw) * 0.032);
+  border-radius: calc(var(--cw) * 0.058);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--rare) 70%, #fff8ec) 0%, var(--rare) 100%);
+  box-shadow: inset 0 0 0 1px rgb(36 24 19 / 32%), inset 0 1px 0 rgb(255 255 255 / 35%);
 }
 
 .card__name {
-  font-weight: 800;
-  font-size: calc(var(--cw) * 0.072);
-  letter-spacing: 0.2px;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: calc(var(--cw) * 0.08);
+  color: #241813;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -525,33 +531,39 @@ body {
 
 .card__num {
   font-family: "JetBrains Mono", monospace;
+  font-weight: 800;
   font-size: calc(var(--cw) * 0.058);
-  color: var(--muted);
+  color: rgb(36 24 19 / 72%);
   flex-shrink: 0;
 }
 
-.card__art {
+/* Ventana del arte con marco dorado */
+.card__ventana {
   position: relative;
   flex: 1;
-  border-radius: 9px;
+  min-height: 0;
+  border-radius: calc(var(--cw) * 0.055);
+  border: calc(var(--cw) * 0.014) solid var(--caramelo);
+  box-shadow: inset 0 0 0 1px rgb(36 24 19 / 40%), inset 0 0 18px rgb(0 0 0 / 35%);
   overflow: hidden;
-  border: 1px solid rgb(246 235 221 / 12%);
-  background: radial-gradient(circle at 50% 38%, rgb(242 178 99 / 14%), transparent 72%), #191009;
+  background:
+    radial-gradient(circle at 50% 38%, rgb(242 178 99 / 14%), transparent 72%),
+    linear-gradient(165deg, #2c1d15 0%, #1c120d 100%);
   display: grid;
   place-items: center;
 }
 
-.card__art img {
+.card__ventana img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-/* Emotes: fondo limpio y la pieza completa */
-.card[data-tipo="emote"] .card__art img {
+/* Emotes: la pieza completa flotando en la ventana */
+.card[data-tipo="emote"] .card__ventana img {
   object-fit: contain;
-  padding: 10%;
+  padding: calc(var(--cw) * 0.075);
 }
 
 /* Holo TCGP (épica y legendaria) */
@@ -595,49 +607,83 @@ body {
   100% { background-position: 0 0, 20px 30px; opacity: 0.35; }
 }
 
-/* Pie: tipo y rareza */
-.card__meta {
+/* Caja de texto crema (estilo TCG): tipo, rareza, crédito y símbolo */
+.card__caja {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--cw) * 0.02);
+  padding: calc(var(--cw) * 0.03) calc(var(--cw) * 0.038);
+  border-radius: calc(var(--cw) * 0.05);
+  background: linear-gradient(180deg, #fbf3e4 0%, #f2e7d0 100%);
+  box-shadow: inset 0 0 0 1px rgb(36 24 19 / 20%);
+}
+
+.card__datos {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 6px;
-  padding: 8px 2px 2px;
+  gap: 8px;
 }
 
 .card__tipo {
   font-family: "JetBrains Mono", monospace;
-  font-size: calc(var(--cw) * 0.052);
+  font-size: calc(var(--cw) * 0.048);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: var(--muted);
-  padding: 3px 8px;
-  border: 1px solid rgb(246 235 221 / 16%);
+  color: #4a382c;
+  padding: calc(var(--cw) * 0.008) calc(var(--cw) * 0.028);
+  border: 1px solid rgb(36 24 19 / 30%);
   border-radius: 999px;
+  flex-shrink: 0;
 }
 
-.card__rareza {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.card__rareza-nombre {
   font-family: "JetBrains Mono", monospace;
-  font-size: calc(var(--cw) * 0.056);
+  font-size: calc(var(--cw) * 0.05);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: var(--rare);
-  padding: 3px 9px;
-  border: 1px solid var(--rare);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--rare) 16%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.card__gem {
-  width: 8px;
-  height: 8px;
-  rotate: 45deg;
-  background: var(--rare);
-  box-shadow: 0 0 8px var(--glow);
+.card__pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-top: 1px solid rgb(36 24 19 / 16%);
+  padding-top: calc(var(--cw) * 0.02);
+}
+
+.card__credito {
+  font-size: calc(var(--cw) * 0.044);
+  font-style: italic;
+  color: rgb(74 56 44 / 85%);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Símbolo de rareza estilo TCG: ● común · ◆ rara · ★ épica/legendaria */
+.card__simbolo {
+  font-size: calc(var(--cw) * 0.09);
+  line-height: 1;
+  color: var(--rare);
+  text-shadow: 0 0 10px var(--glow);
+  flex-shrink: 0;
+}
+
+.card[data-rareza="legendaria"] .card__simbolo {
+  animation: simbolo-brillo 1.8s ease-in-out infinite;
+}
+
+@keyframes simbolo-brillo {
+  0%, 100% { text-shadow: 0 0 8px var(--glow); }
+  50% { text-shadow: 0 0 16px var(--glow), 0 0 30px var(--glow); }
 }
 
 /* Colores por rareza (paleta del sitio) */
@@ -910,6 +956,7 @@ body {
   inset: 0;
   display: grid;
   place-items: center;
+  perspective: 1200px;
   z-index: 3;
 }
 
@@ -1257,6 +1304,7 @@ body.modo-overlay.is-transparente .bg-float { display: none; }
   align-items: center;
   justify-content: center;
   gap: clamp(12px, 3vw, 32px);
+  perspective: 1200px;
   pointer-events: none;
   transition: opacity 0.45s;
 }
@@ -1264,7 +1312,7 @@ body.modo-overlay.is-transparente .bg-float { display: none; }
 
 /* Tamaño completo y abanico, como las cartas de sobre.html */
 .final-hand .card {
-  --cw: clamp(124px, 19vw, 204px);
+  --cw: clamp(138px, 19vw, 218px);
   cursor: default;
   animation: card-final-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
   animation-delay: var(--d, 0s);
