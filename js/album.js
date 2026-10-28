@@ -196,22 +196,28 @@
   }
 
   /* Tilt 3D que sigue al puntero (también mueve el holo) */
-  function conectarTilt(card) {
+  function conectarTilt(card, inclinacionX = 11, inclinacionY = 13) {
+    let limites;
+    const entrar = () => {
+      limites = card.getBoundingClientRect();
+    };
     const mover = (evento) => {
-      const r = card.getBoundingClientRect();
-      const px = (evento.clientX - r.left) / r.width - 0.5;
-      const py = (evento.clientY - r.top) / r.height - 0.5;
-      card.style.setProperty("--rx", `${(-py * 11).toFixed(2)}deg`);
-      card.style.setProperty("--ry", `${(px * 13).toFixed(2)}deg`);
+      limites ??= card.getBoundingClientRect();
+      const px = (evento.clientX - limites.left) / limites.width - 0.5;
+      const py = (evento.clientY - limites.top) / limites.height - 0.5;
+      card.style.setProperty("--rx", `${(-py * inclinacionX).toFixed(2)}deg`);
+      card.style.setProperty("--ry", `${(px * inclinacionY).toFixed(2)}deg`);
       card.style.setProperty("--mx", px.toFixed(3));
       card.style.setProperty("--my", py.toFixed(3));
     };
     const salir = () => {
+      limites = null;
       card.style.setProperty("--rx", "0deg");
       card.style.setProperty("--ry", "0deg");
       card.style.setProperty("--mx", "0");
       card.style.setProperty("--my", "0");
     };
+    card.addEventListener("pointerenter", entrar);
     card.addEventListener("pointermove", mover);
     card.addEventListener("pointerleave", salir);
   }
@@ -250,7 +256,7 @@
         </span>
       </span>
     `;
-    conectarTilt(btn);
+    conectarTilt(btn, clickeable ? 11 : 17, clickeable ? 13 : 19);
     if (clickeable) btn.addEventListener("click", () => abrirDetalle(datos));
     return btn;
   }

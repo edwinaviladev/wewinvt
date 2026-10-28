@@ -19,7 +19,6 @@
 
   /* Tamaño de carta */
   --cw: clamp(160px, 30vw, 280px);
-  --ch: calc(var(--cw) * 1.4);
 }
 
 * { box-sizing: border-box; }
@@ -399,11 +398,19 @@ body {
 .card {
   --rare: var(--muted);
   --glow: rgb(191 168 153 / 35%);
+  --fire-ember: rgb(255 126 52 / 45%);
+  --fire-core: rgb(255 213 126 / 42%);
+  --fire-accent: rgb(255 152 64 / 38%);
+  --fire-low: 0.05;
+  --fire-mid: 0.12;
+  --fire-high: 0.2;
+  --ch: calc(var(--cw) * 1.4);
   --card-radius: clamp(18px, calc(var(--cw) * 0.095), 30px);
   --tilt: 0deg;
   position: relative;
   width: var(--cw);
   height: var(--ch);
+  aspect-ratio: 5 / 7;
   border: 0;
   padding: 0;
   background: none;
@@ -454,7 +461,7 @@ body {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   overflow: hidden;
-  box-shadow: 0 18px 40px rgb(0 0 0 / 52%), 0 2px 0 rgb(255 255 255 / 7%);
+  box-shadow: 0 20px 44px rgb(0 0 0 / 50%);
 }
 
 /* --- Dorso --- */
@@ -464,11 +471,7 @@ body {
     radial-gradient(rgb(246 235 221 / 6%) 1px, transparent 1.3px) 0 0 / 11px 11px,
     repeating-linear-gradient(45deg, #241813 0 12px, #1c120e 12px 24px),
     #1c120e;
-  box-shadow:
-    inset 0 0 0 2px rgb(242 178 99 / 34%),
-    inset 0 0 0 6px #241813,
-    inset 0 0 0 7px rgb(242 178 99 / 16%),
-    0 16px 34px rgb(0 0 0 / 50%);
+  box-shadow: 0 20px 44px rgb(0 0 0 / 50%);
   display: grid;
   place-items: center;
 }
@@ -493,50 +496,24 @@ body {
   transform: rotateY(180deg);
   background: #1c120d;
   isolation: isolate;
-  box-shadow:
-    inset 0 0 0 2px var(--rare),
-    inset 0 0 0 5px rgb(16 11 10 / 78%),
-    0 16px 34px rgb(0 0 0 / 55%),
-    0 0 28px var(--glow);
+  box-shadow: 0 22px 48px rgb(0 0 0 / 58%), 0 0 28px var(--glow);
 }
 
-.card__face--front::before {
-  content: "";
-  position: absolute;
-  inset: 7px;
-  z-index: 4;
-  border: 1px solid rgb(255 255 255 / 16%);
-  border-radius: calc(var(--card-radius, 18px) - 7px);
-  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 12%);
-  pointer-events: none;
-}
-
-/* Aro de fuego en el borde: la máscara mantiene libre el centro de la ilustración */
+/* Luz de fuego suave en los extremos; el centro de la ilustración queda despejado */
 .card__face--front::after {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: -5%;
   z-index: 2;
-  padding: 4px;
   border-radius: inherit;
-  background: conic-gradient(
-    from 205deg,
-    transparent 0 6%,
-    var(--fire-ember) 10%,
-    var(--fire-core) 13%,
-    transparent 20% 36%,
-    var(--fire-accent) 42%,
-    var(--fire-core) 46%,
-    transparent 53% 72%,
-    var(--fire-ember) 79%,
-    var(--fire-core) 83%,
-    transparent 90% 100%
-  );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  filter: blur(1px);
+  background:
+    radial-gradient(ellipse 30% 19% at 1% 92%, var(--fire-ember) 0%, transparent 100%),
+    radial-gradient(ellipse 29% 19% at 98% 82%, var(--fire-core) 0%, transparent 100%),
+    radial-gradient(ellipse 17% 32% at 0% 48%, var(--fire-accent) 0%, transparent 100%),
+    radial-gradient(ellipse 15% 28% at 100% 34%, var(--fire-ember) 0%, transparent 100%),
+    radial-gradient(ellipse 34% 13% at 50% 0%, var(--fire-core) 0%, transparent 100%);
+  mix-blend-mode: screen;
+  filter: blur(10px) saturate(1.25);
   opacity: 0;
   pointer-events: none;
 }
@@ -544,8 +521,8 @@ body {
 .card.is-revealed .card__face--front { animation: rare-pulse 2.4s ease-in-out infinite; }
 
 @keyframes rare-pulse {
-  0%, 100% { box-shadow: inset 0 0 0 2px var(--rare), inset 0 0 0 5px rgb(16 11 10 / 78%), 0 16px 34px rgb(0 0 0 / 55%), 0 0 22px var(--glow); }
-  50% { box-shadow: inset 0 0 0 2px var(--rare), inset 0 0 0 5px rgb(16 11 10 / 78%), 0 16px 34px rgb(0 0 0 / 55%), 0 0 42px var(--glow); }
+  0%, 100% { box-shadow: 0 18px 40px rgb(0 0 0 / 56%), 0 0 22px var(--glow); }
+  50% { box-shadow: 0 22px 48px rgb(0 0 0 / 60%), 0 0 44px var(--glow); }
 }
 
 .card.is-revealed[data-rareza="epica"] .card__face--front::after {
@@ -556,9 +533,29 @@ body {
 }
 
 @keyframes fire-flicker {
-  0%, 100% { opacity: var(--fire-low); filter: blur(0.7px) brightness(0.96); }
-  42% { opacity: var(--fire-mid); filter: blur(1.6px) brightness(1.16); }
-  68% { opacity: var(--fire-high); filter: blur(1px) brightness(1.28); }
+  0%, 100% {
+    opacity: var(--fire-low);
+    filter: blur(9px) saturate(1.15) brightness(0.96);
+    transform: scale(1);
+  }
+  42% {
+    opacity: var(--fire-mid);
+    filter: blur(13px) saturate(1.4) brightness(1.16);
+    transform: scale(1.025, 1.04) translateY(-0.5%);
+  }
+  68% {
+    opacity: var(--fire-high);
+    filter: blur(10px) saturate(1.5) brightness(1.28);
+    transform: scale(1.01, 1.055) translateY(-0.8%);
+  }
+}
+
+.card.is-revealed:not([data-rareza="epica"]):not([data-rareza="legendaria"]) .card__face--front::after {
+  opacity: var(--fire-low);
+}
+.card.is-revealed:not([data-rareza="epica"]):not([data-rareza="legendaria"]):hover .card__face--front::after,
+.solo .card.is-revealed:not([data-rareza="epica"]):not([data-rareza="legendaria"]) .card__face--front::after {
+  animation: fire-flicker 2.1s ease-in-out infinite;
 }
 
 .card.is-revealed[data-rareza="legendaria"] .card__face--front {
@@ -566,8 +563,8 @@ body {
 }
 
 @keyframes rare-pulse-legendaria {
-  0%, 100% { box-shadow: inset 0 0 0 2px var(--rare), inset 0 0 0 5px rgb(16 11 10 / 78%), 0 16px 34px rgb(0 0 0 / 55%), 0 0 24px var(--glow), 0 0 6px rgb(255 215 117 / 30%); }
-  50% { box-shadow: inset 0 0 0 2px var(--rare), inset 0 0 0 5px rgb(16 11 10 / 78%), 0 16px 34px rgb(0 0 0 / 55%), 0 0 48px var(--glow), 0 0 17px rgb(255 215 117 / 65%); }
+  0%, 100% { box-shadow: 0 18px 42px rgb(0 0 0 / 58%), 0 0 24px var(--glow), 0 0 6px rgb(255 215 117 / 30%); }
+  50% { box-shadow: 0 22px 54px rgb(0 0 0 / 62%), 0 0 56px var(--glow), 0 0 22px rgb(255 215 117 / 65%); }
 }
 
 /* Textura de foil según la rareza (la legendaria brilla como carta dorada) */
@@ -825,22 +822,22 @@ body {
 .card[data-rareza="epica"] {
   --rare: var(--epica);
   --glow: rgb(185 148 255 / 48%);
-  --fire-ember: rgb(255 112 49 / 84%);
-  --fire-core: rgb(255 214 140 / 92%);
-  --fire-accent: rgb(185 148 255 / 90%);
-  --fire-low: 0.16;
-  --fire-mid: 0.34;
-  --fire-high: 0.56;
+  --fire-ember: rgb(255 112 49 / 68%);
+  --fire-core: rgb(255 214 140 / 62%);
+  --fire-accent: rgb(185 148 255 / 62%);
+  --fire-low: 0.12;
+  --fire-mid: 0.27;
+  --fire-high: 0.42;
 }
 .card[data-rareza="legendaria"] {
   --rare: var(--caramelo);
   --glow: rgb(255 187 69 / 68%);
-  --fire-ember: rgb(255 97 31 / 92%);
-  --fire-core: rgb(255 226 141 / 100%);
-  --fire-accent: rgb(242 178 99 / 94%);
-  --fire-low: 0.3;
-  --fire-mid: 0.56;
-  --fire-high: 0.78;
+  --fire-ember: rgb(255 97 31 / 78%);
+  --fire-core: rgb(255 226 141 / 82%);
+  --fire-accent: rgb(242 178 99 / 76%);
+  --fire-low: 0.2;
+  --fire-mid: 0.4;
+  --fire-high: 0.62;
 }
 
 /* Tilt 3D al revelar (JavaScript mueve --rx/--ry/--mx/--my) */
@@ -1108,12 +1105,13 @@ body {
   inset: 0;
   display: grid;
   place-items: center;
+  padding-top: clamp(40px, 22vh, 120px);
   perspective: 1200px;
   z-index: 3;
 }
 
 .solo .card {
-  --cw: min(400px, 40vw, 43vh);
+  --cw: min(520px, 58vw, 46vh);
   --tilt: 0deg;
   animation: card-solo-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
