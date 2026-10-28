@@ -5,7 +5,7 @@
  * (las suscripciones de tipo websocket viven mientras vive el socket).
  */
 window.TwitchEvents = (() => {
-  const WS_URL = "wss://eventsub.websocket.twitch.tv/ws";
+  const WS_URL = "wss://eventsub.wss.twitch.tv/ws";
   const API_SUBS = "https://api.twitch.tv/helix/eventsub/subscriptions";
   const TIPO = "channel.channel_points_custom_reward_redemption.add";
 
