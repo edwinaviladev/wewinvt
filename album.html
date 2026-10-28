@@ -2,12 +2,13 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <script>document.documentElement.classList.add('js');</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Álbum de colección | WewinVT</title>
     <meta name="description" content="El álbum de cartas coleccionables de WewinVT: emotes y fanarts de la comunidad por rareza, con progreso de colección." />
-    <meta name="robots" content="noindex, nofollow" />
-    <meta name="theme-color" content="#100b0a" />
+    <meta name="theme-color" content="#17110F" />
     <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="canonical" href="https://wewinvt.com/album" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,55 +16,78 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=JetBrains+Mono:wght@700;800&family=Space+Grotesk:wght@700&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/paleta-chocolate.css" />
     <link rel="stylesheet" href="css/sobre.css" />
     <link rel="stylesheet" href="css/album.css" />
   </head>
   <body>
     <!--
-      ÁLBUM DE COLECCIÓN (prototipo)
-      Lee la colección de localStorage (la llenan sobre.html y overlay.html al revelar cartas)
+      ÁLBUM DE COLECCIÓN
+      Lee la colección (localStorage unida con la nube vía /api/coleccion)
       y muestra el catálogo completo por rareza con estados de descubrimiento y detalle.
     -->
-    <main class="album-shell">
-      <nav class="mini-nav" aria-label="Navegación del sitio">
-        <a href="index.html">Inicio</a>
-        <a href="emotes.html">Emotes y fanarts</a>
-        <span class="actual" aria-current="page">Álbum</span>
-      </nav>
+    <a class="skip-link" href="#album-contenido">Saltar al contenido</a>
 
-      <header class="album-head">
-        <p class="eyebrow">Serie 1 · Emotes y fanarts</p>
-        <h1>Álbum de colección</h1>
-        <p class="album-sub">
-          Todas las cartas coleccionables del canal, hechas por la comunidad.
-          Consíguelas canjeando el gacha en el stream.
-        </p>
+    <header class="site-header">
+      <div class="shell nav-bar">
+        <a class="brand" href="index.html">
+          <img src="img/emotes/risa.png" alt="Logo de Wewin" width="32" height="32" />
+          WewinVT
+        </a>
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Abrir o cerrar el menú">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <line x1="4" y1="7" x2="20" y2="7" />
+            <line x1="4" y1="12" x2="20" y2="12" />
+            <line x1="4" y1="17" x2="20" y2="17" />
+          </svg>
+        </button>
+        <nav class="nav-menu" id="nav-menu" aria-label="Navegación principal">
+          <ul class="nav-list">
+            <li><a class="nav-link" href="index.html">Inicio</a></li>
+            <li><a class="nav-link" href="emotes.html">Emotes y fanarts</a></li>
+            <li><span class="nav-link is-active" aria-current="page">Álbum</span></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
 
-        <p class="album-vacio" data-vacio hidden>Aún no tienes cartas — ¡canjea el gacha en el stream! ✨</p>
+    <main id="album-contenido">
+      <div class="album-shell">
+        <header class="album-head">
+          <p class="eyebrow">Serie 1 · Emotes y fanarts</p>
+          <h1>Álbum de colección</h1>
+          <p class="album-sub">
+            Todas las cartas coleccionables del canal, hechas por la comunidad.
+            Consíguelas canjeando el gacha en el stream.
+          </p>
 
-        <div class="album-progreso">
-          <div class="barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-barra>
-            <i data-barra-fill style="width: 0%"></i>
+          <p class="album-vacio" data-vacio hidden>Aún no tienes cartas — ¡canjea el gacha en el stream! ✨</p>
+
+          <p class="album-identidad" data-identidad>Colección local en este navegador</p>
+
+          <div class="album-progreso">
+            <div class="barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-barra>
+              <i data-barra-fill style="width: 0%"></i>
+            </div>
+            <p class="barra-texto"><b data-total-obtenidas>0</b>/<span data-total-cartas>0</span> cartas · <b data-porcentaje>0%</b></p>
           </div>
-          <p class="barra-texto"><b data-total-obtenidas>0</b>/<span data-total-cartas>0</span> cartas · <b data-porcentaje>0%</b></p>
-        </div>
 
-      <p class="album-identidad" data-identidad>Colección local en este navegador</p>
+          <div class="album-stats" data-stats></div>
 
-        <div class="album-stats" data-stats></div>
+          <div class="album-acciones">
+            <button class="btn btn--ghost" data-conectar type="button">Conectar con Twitch</button>
+            <button class="btn btn--ghost" data-salir type="button" hidden>Salir</button>
+          </div>
+        </header>
 
-        <div class="album-acciones">
-          <button class="btn btn--ghost" data-conectar type="button">Conectar con Twitch</button>
-          <button class="btn btn--ghost" data-salir type="button" hidden>Salir</button>
-        </div>
-      </header>
+        <div data-album></div>
 
-      <div data-album></div>
-
-      <footer class="album-pie">
-        <span>Sobres abiertos: <b data-sobres>0</b></span>
-        <span>Colección guardada en este navegador</span>
-      </footer>
+        <footer class="album-pie">
+          <span>Sobres abiertos: <b data-sobres>0</b></span>
+          <span>Colección guardada en este navegador</span>
+        </footer>
+      </div>
     </main>
 
     <!-- Detalle de una carta -->
@@ -75,8 +99,14 @@
       <button class="hud__btn detalle-cerrar" data-cerrar type="button" aria-label="Cerrar detalle">✕</button>
     </div>
 
-    <script src="js/sobre-data.js" defer></script>
+    <footer class="site-footer">
+      <div class="shell footer-bar">
+        <span>© <span data-year>2026</span> wewinvt</span>
+      </div>
+    </footer>
+
     <script src="js/twitch-auth.js" defer></script>
+    <script src="js/main.js" defer></script>
     <script src="js/album.js" defer></script>
   </body>
 </html>

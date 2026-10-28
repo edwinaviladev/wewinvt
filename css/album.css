@@ -1,16 +1,20 @@
 /* =========================================================
    WewinVT · Álbum de colección (prototipo)
    Reutiliza el motor visual de css/sobre.css (cartas, botones, paleta)
+   Carga DESPUÉS de styles.css, paleta-chocolate.css y sobre.css
    ========================================================= */
 
-body { overflow-y: auto; }
+body {
+  overflow-y: auto;
+  line-height: 1.55;
+}
 body.sin-scroll { overflow: hidden !important; }
 
 .album-shell {
   min-height: 100dvh;
   max-width: 1180px;
   margin: 0 auto;
-  padding: clamp(72px, 12vh, 110px) 20px 72px;
+  padding: clamp(44px, 7vh, 72px) 20px 72px;
 }
 
 /* ---------- Encabezado ---------- */
