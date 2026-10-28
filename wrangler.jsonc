@@ -1,8 +1,16 @@
 {
   "name": "wewinvt",
+  "main": "worker.js",
   "compatibility_date": "2026-01-01",
   "assets": {
     "directory": ".",
-    "not_found_handling": "404-page"
-  }
+    "not_found_handling": "404-page",
+    "binding": "ASSETS"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "COLECCIONES",
+      "id": "c957d632283741bb9e605040627221d4"
+    }
+  ]
 }
