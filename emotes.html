@@ -4,38 +4,41 @@
     <meta charset="UTF-8" />
     <script>document.documentElement.classList.add('js');</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Emotes y fanarts | WewinVT</title>
+    <title>Galería | WewinVT</title>
     <meta
       name="description"
       content="La galería de WewinVT: emotes del canal y fanarts hechos por la comunidad."
     />
-    <meta name="theme-color" content="#17110F" />
+    <meta name="theme-color" content="#F5F0E8" />
     <link rel="icon" type="image/webp" href="favicon.webp" />
     <link rel="canonical" href="https://wewinvt.com/emotes" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=JetBrains+Mono:wght@700;800&family=Space+Grotesk:wght@700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400..700&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="css/paleta-chocolate.css" />
+    <link rel="stylesheet" href="css/paleta-editorial.css" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="WewinVT" />
-    <meta property="og:title" content="Emotes y fanarts | WewinVT" />
+    <meta property="og:title" content="Galería | WewinVT" />
     <meta
       property="og:description"
       content="El cast de emotes del canal y el mosaico de fanarts hechos por la comunidad de Wewin."
     />
-    <meta property="og:image" content="https://wewinvt.com/img/og-wewin.webp" />
+    <meta property="og:image" content="https://wewinvt.com/img/og-wewin.webp?v=2" />
     <meta property="og:image:type" content="image/webp" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="WewinVT y su avatar en pixel art, con la frase «Un pequeño universo, una gran comunidad» y enlace a Twitch." />
     <meta property="og:locale" content="es_MX" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Emotes y fanarts | WewinVT" />
+    <meta name="twitter:image" content="https://wewinvt.com/img/og-wewin.webp?v=2" />
+    <meta name="twitter:image:alt" content="WewinVT y su avatar en pixel art, con la frase «Un pequeño universo, una gran comunidad» y enlace a Twitch." />
+    <meta name="twitter:title" content="Galería | WewinVT" />
     <meta
       name="twitter:description"
       content="La galería de la comunidad de Wewin: emotes del canal y fanarts para celebrar los momentos del stream."
@@ -60,7 +63,7 @@
         <nav class="nav-menu" id="nav-menu" aria-label="Navegación principal">
           <ul class="nav-list">
             <li><a class="nav-link" href="index.html">Inicio</a></li>
-            <li><span class="nav-link is-active" aria-current="page">Emotes y fanarts</span></li>
+            <li><span class="nav-link is-active" aria-current="page">Galería</span></li>
             <li><a class="nav-link" href="album.html">Álbum</a></li>
           </ul>
         </nav>
@@ -68,26 +71,38 @@
     </header>
 
     <main id="contenido" class="shell">
-      <section class="section" aria-labelledby="galeria-titulo">
+      <section class="section gallery-page" aria-labelledby="galeria-titulo">
         <div class="section-heading" data-animate>
-          <p class="eyebrow">Fan hub</p>
-          <h1 id="galeria-titulo" style="font-size: clamp(2rem, 4.5vw, 3rem)">Emotes y fanarts.</h1>
+          <p class="eyebrow">Archivo visual · WewinVT</p>
+          <h1 id="galeria-titulo">Galería.</h1>
           <p class="lead">
-            El cast de emotes del canal y el mosaico de fanarts hechos por la comunidad.
-            Cualquier pieza: haz clic para verla en grande.
+            Emotes del canal y fanarts de la comunidad, reunidos con sus créditos.
+            Selecciona una obra para verla en grande.
           </p>
         </div>
 
-        <h2 class="eyebrow" data-animate>Emotes del canal</h2>
-        <ul class="emote-grid" data-emote-list aria-label="Emotes de Wewin"></ul>
+        <section class="gallery-section" aria-labelledby="fanarts-titulo">
+          <div class="gallery-section__heading" data-animate>
+            <p class="eyebrow">01 / Obras de la comunidad</p>
+            <h2 id="fanarts-titulo">Fanarts de la comunidad</h2>
+            <p>Ilustraciones y momentos del canal, con el crédito de cada artista.</p>
+          </div>
+          <ul class="fanart-grid" data-fanart-list aria-label="Fanarts de Wewin"></ul>
+          <p class="gallery-note" data-animate>
+            ¿Hiciste un fanart de Wewin? Compártelo en el canal de fanarts del
+            <a href="https://discord.gg/C6X7KWMaZc" target="_blank" rel="noreferrer">Discord</a>
+            y puede aparecer aquí.
+          </p>
+        </section>
 
-        <h2 class="eyebrow" style="margin-top: var(--space-8)" data-animate>Fanarts de la comunidad</h2>
-        <ul class="fanart-grid" data-fanart-list aria-label="Fanarts de Wewin"></ul>
-        <p class="gallery-note" data-animate>
-          ¿Hiciste un fanart de Wewin? Compártelo en el canal de fanarts del
-          <a href="https://discord.gg/C6X7KWMaZc" target="_blank" rel="noreferrer">Discord</a>
-          y puede aparecer aquí. 🎨
-        </p>
+        <section class="gallery-section" aria-labelledby="emotes-titulo">
+          <div class="gallery-section__heading" data-animate>
+            <p class="eyebrow">02 / Gestos del canal</p>
+            <h2 id="emotes-titulo">Emotes de Wewin</h2>
+            <p>Expresiones y pequeños momentos que acompañan cada stream.</p>
+          </div>
+          <ul class="emote-grid" data-emote-list aria-label="Emotes de Wewin"></ul>
+        </section>
       </section>
     </main>
 

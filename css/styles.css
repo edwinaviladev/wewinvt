@@ -1,32 +1,32 @@
 /* ==========================================================================
-   Wewin World — hoja de estilos compartida (HTML + CSS + JS vanilla)
-   Paleta: Tokyo Night (continuidad de marca con la versión anterior)
+   WewinVT — layout compartido (HTML + CSS + JS vanilla)
+   La dirección visual y los tokens viven en paleta-editorial.css.
    ========================================================================== */
 
 :root {
     /* Colores base */
-    --bg: #1a1b26;
-    --bg-deep: #14151f;
-    --surface: rgb(36 40 59 / 72%);
-    --surface-strong: rgb(31 35 53 / 88%);
-    --violet: #bb9af7;
-    --cyan: #7dcfff;
-    --gold: #e0af68;
-    --pink: #f7768e;
-    --blue: #7aa2f7;
-    --green: #9ece6a;
-    --text: #c0caf5;
-    --muted: rgb(169 177 214 / 82%);
-    --soft: rgb(192 202 245 / 11%);
-    --line: rgb(122 162 247 / 22%);
+    --bg: #f5f0e8;
+    --bg-deep: #eee7dc;
+    --surface: #fffcf6;
+    --surface-strong: #fffcf6;
+    --violet: #b84a43;
+    --cyan: #b84a43;
+    --gold: #825a21;
+    --pink: #8f3935;
+    --blue: #d9c8b5;
+    --green: #52664b;
+    --text: #242321;
+    --muted: #706a63;
+    --soft: #f0dfda;
+    --line: #e8dcd0;
 
     /* Tipografía */
     --font-heading:
-        "Space Grotesk", Inter, ui-sans-serif, system-ui, sans-serif;
+        "Newsreader", Georgia, serif;
     --font-body:
-        Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        "DM Sans", Arial, ui-sans-serif, system-ui, sans-serif;
     --font-mono:
-        "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+        "Space Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
 
     /* Espaciado */
     --space-2: 0.65rem;
@@ -68,63 +68,6 @@ body {
     font-family: var(--font-body);
     line-height: 1.6;
     text-rendering: optimizeLegibility;
-}
-
-/* Cielo nocturno plano: puntos de color sólido, sin gradientes ni imágenes */
-body::before,
-body::after {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 2px;
-    height: 2px;
-    border-radius: 50%;
-    z-index: -1;
-    pointer-events: none;
-}
-
-/* Estrellas: dos capas de puntos dibujados con box-shadow */
-body::before {
-    box-shadow:
-        6vw 14vh 0 1px rgb(192 202 245 / 65%),
-        19vw 31vh 0 1px rgb(192 202 245 / 35%),
-        34vw 8vh 0 0.5px rgb(192 202 245 / 55%),
-        47vw 46vh 0 1px rgb(192 202 245 / 30%),
-        58vw 19vh 0 0.5px rgb(192 202 245 / 60%),
-        71vw 38vh 0 1px rgb(192 202 245 / 40%),
-        84vw 11vh 0 0.5px rgb(192 202 245 / 50%),
-        91vw 62vh 0 1px rgb(192 202 245 / 45%),
-        15vw 68vh 0 0.5px rgb(192 202 245 / 35%),
-        63vw 79vh 0 1px rgb(192 202 245 / 30%),
-        88vw 88vh 0 0.5px rgb(192 202 245 / 40%),
-        29vw 92vh 0 1px rgb(192 202 245 / 35%);
-}
-
-body::after {
-    box-shadow:
-        12vw 51vh 0 0.5px rgb(192 202 245 / 45%),
-        26vw 24vh 0 1px rgb(192 202 245 / 25%),
-        41vw 66vh 0 0.5px rgb(192 202 245 / 50%),
-        52vw 89vh 0 1px rgb(192 202 245 / 30%),
-        66vw 5vh 0 0.5px rgb(192 202 245 / 55%),
-        77vw 55vh 0 1px rgb(192 202 245 / 35%),
-        95vw 27vh 0 0.5px rgb(192 202 245 / 45%),
-        4vw 41vh 0 1px rgb(192 202 245 / 30%),
-        49vw 12vh 0 0.5px rgb(192 202 245 / 40%),
-        37vw 79vh 0 1px rgb(192 202 245 / 25%),
-        74vw 72vh 0 0.5px rgb(192 202 245 / 40%),
-        96vw 95vh 0 1px rgb(192 202 245 / 30%);
-    animation: star-drift 160s linear infinite alternate;
-}
-
-@keyframes star-drift {
-    from {
-        transform: translate3d(0, 0, 0);
-    }
-    to {
-        transform: translate3d(-1.2rem, 1.4rem, 0);
-    }
 }
 
 ::selection {
@@ -549,17 +492,6 @@ p {
     transform: translateX(4px);
 }
 
-.signal-logo {
-    position: absolute;
-    top: var(--space-5);
-    right: var(--space-5);
-    width: 3.4rem;
-    height: 3.4rem;
-    border-radius: 50%;
-    border: 1px solid var(--line);
-    filter: saturate(1.05);
-}
-
 /* --------------------------------------------------------------------------
    Redes sociales / tarjetas generales
    -------------------------------------------------------------------------- */
@@ -833,111 +765,6 @@ p {
         bottom: 4.6rem;
         transform: none;
     }
-}
-
-/* --------------------------------------------------------------------------
-   Cartas: teaser "En construcción"
-   -------------------------------------------------------------------------- */
-
-.construction {
-    text-align: center;
-    padding-block: var(--space-section);
-}
-
-.construction-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    padding: 0.45rem 1rem;
-    border: 1px solid rgb(224 175 104 / 40%);
-    border-radius: var(--radius-pill);
-    background: rgb(224 175 104 / 12%);
-    color: var(--gold);
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-}
-
-.construction-badge::before {
-    content: "";
-    width: 0.6rem;
-    height: 0.6rem;
-    border-radius: 50%;
-    background: var(--gold);
-    animation: dot-pulse 1.6s ease-out infinite;
-}
-
-.construction h1 {
-    font-size: clamp(2.2rem, 5.4vw, 3.4rem);
-    margin-top: var(--space-5);
-}
-
-.construction .lead {
-    max-width: 52ch;
-    margin-inline: auto;
-    color: var(--muted);
-}
-
-.card-fan {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 17rem;
-    margin-block: var(--space-8);
-    perspective: 60rem;
-}
-
-.gcard {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: 9rem;
-    height: 13rem;
-    border-radius: var(--radius-lg);
-    border: 1px solid rgb(187 154 247 / 45%);
-    background: rgb(31 35 53 / 96%);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-}
-
-.gcard::before,
-.gcard::after {
-    content: "";
-    position: absolute;
-    inset: 0.55rem;
-    border: 1px dashed rgb(192 202 245 / 22%);
-    border-radius: var(--radius-md);
-}
-
-.gcard span {
-    font-family: var(--font-mono);
-    font-size: 3.4rem;
-    font-weight: 800;
-    color: rgb(224 175 104 / 85%);
-}
-
-.gcard-back {
-    position: absolute;
-    transform: rotate(-14deg) translateX(-7.5rem);
-}
-
-.gcard-mid {
-    transform: translateY(-0.6rem) scale(1.08);
-    z-index: 2;
-}
-
-.gcard-front {
-    position: absolute;
-    transform: rotate(14deg) translateX(7.5rem);
-}
-
-.ok-note {
-    color: var(--muted);
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
 }
 
 /* --------------------------------------------------------------------------

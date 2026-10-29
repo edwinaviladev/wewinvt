@@ -6,22 +6,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Álbum de colección | WewinVT</title>
     <meta name="description" content="El álbum de cartas coleccionables de WewinVT: emotes y fanarts de la comunidad por rareza, con progreso de colección." />
-    <meta name="theme-color" content="#17110F" />
+    <meta name="theme-color" content="#F5F0E8" />
     <link rel="icon" type="image/webp" href="favicon.webp" />
     <link rel="canonical" href="https://wewinvt.com/album" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="WewinVT" />
+    <meta property="og:title" content="Álbum de colección | WewinVT" />
+    <meta property="og:description" content="Explora las cartas de la comunidad, revisa tu progreso y descubre cada rareza del álbum de WewinVT." />
+    <meta property="og:image" content="https://wewinvt.com/img/og-wewin.webp?v=2" />
+    <meta property="og:image:type" content="image/webp" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="WewinVT y su avatar en pixel art, con la frase «Un pequeño universo, una gran comunidad» y enlace a Twitch." />
+    <meta property="og:locale" content="es_MX" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://wewinvt.com/img/og-wewin.webp?v=2" />
+    <meta name="twitter:image:alt" content="WewinVT y su avatar en pixel art, con la frase «Un pequeño universo, una gran comunidad» y enlace a Twitch." />
+    <meta name="twitter:title" content="Álbum de colección | WewinVT" />
+    <meta name="twitter:description" content="Cartas coleccionables de la comunidad, rarezas y progreso de colección." />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=JetBrains+Mono:wght@700;800&family=Space+Grotesk:wght@700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400..700&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="css/paleta-chocolate.css" />
+    <link rel="stylesheet" href="css/paleta-editorial.css" />
     <link rel="stylesheet" href="css/sobre.css" />
     <link rel="stylesheet" href="css/album.css" />
   </head>
-  <body>
+  <body class="album-page">
     <!--
       ÁLBUM DE COLECCIÓN
       Lee la colección (localStorage unida con la nube vía /api/coleccion)
@@ -45,7 +61,7 @@
         <nav class="nav-menu" id="nav-menu" aria-label="Navegación principal">
           <ul class="nav-list">
             <li><a class="nav-link" href="index.html">Inicio</a></li>
-            <li><a class="nav-link" href="emotes.html">Emotes y fanarts</a></li>
+            <li><a class="nav-link" href="emotes.html">Galería</a></li>
             <li><span class="nav-link is-active" aria-current="page">Álbum</span></li>
           </ul>
         </nav>
@@ -55,7 +71,7 @@
     <main id="album-contenido">
       <div class="album-shell">
         <header class="album-head">
-          <p class="eyebrow">Serie 1 · Emotes y fanarts</p>
+          <p class="eyebrow">Serie 1 · Colección de la comunidad</p>
           <h1>Álbum de colección</h1>
           <p class="album-sub">
             Todas las cartas coleccionables del canal, hechas por la comunidad.

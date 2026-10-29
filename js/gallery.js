@@ -170,6 +170,21 @@
       step(-1);
     } else if (event.key === 'ArrowRight') {
       step(1);
+    } else if (event.key === 'Tab') {
+      var focusable = Array.prototype.slice.call(
+        lightbox.querySelectorAll('button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"])')
+      );
+      if (focusable.length === 0) return;
+
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     }
   }
 

@@ -195,33 +195,6 @@
     });
   }
 
-  /* Tilt 3D que sigue al puntero (también mueve el holo) */
-  function conectarTilt(card, inclinacionX = 11, inclinacionY = 13) {
-    let limites;
-    const entrar = () => {
-      limites = card.getBoundingClientRect();
-    };
-    const mover = (evento) => {
-      limites ??= card.getBoundingClientRect();
-      const px = (evento.clientX - limites.left) / limites.width - 0.5;
-      const py = (evento.clientY - limites.top) / limites.height - 0.5;
-      card.style.setProperty("--rx", `${(-py * inclinacionX).toFixed(2)}deg`);
-      card.style.setProperty("--ry", `${(px * inclinacionY).toFixed(2)}deg`);
-      card.style.setProperty("--mx", px.toFixed(3));
-      card.style.setProperty("--my", py.toFixed(3));
-    };
-    const salir = () => {
-      limites = null;
-      card.style.setProperty("--rx", "0deg");
-      card.style.setProperty("--ry", "0deg");
-      card.style.setProperty("--mx", "0");
-      card.style.setProperty("--my", "0");
-    };
-    card.addEventListener("pointerenter", entrar);
-    card.addEventListener("pointermove", mover);
-    card.addEventListener("pointerleave", salir);
-  }
-
   function cartaObtenida(datos, indice, clickeable = true) {
     const btn = document.createElement("button");
     btn.type = "button";
@@ -256,7 +229,6 @@
         </span>
       </span>
     `;
-    conectarTilt(btn, clickeable ? 11 : 17, clickeable ? 13 : 19);
     if (clickeable) btn.addEventListener("click", () => abrirDetalle(datos));
     return btn;
   }

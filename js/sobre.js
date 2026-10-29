@@ -701,7 +701,6 @@
     setTimeout(() => {
       btn.classList.add("is-revealed");
       AudioFX.sting(datos.rareza);
-      conectarTilt(btn);
       efectosRareza(datos.rareza, btn);
       coleccionGuardar(datos.id);
       subirColeccion([datos.id]);
@@ -820,7 +819,6 @@
 
     setTimeout(() => {
       btn.classList.add("is-revealed");
-      conectarTilt(btn);
       AudioFX.sting(datos.rareza);
       efectosRareza(datos.rareza, btn);
       /* En el overlay las cartas son del viewer que canjeó:
@@ -1001,29 +999,6 @@
       console.warn("[Twitch] no se pudo conectar:", error);
       actualizarEstadoTwitch("error", error.message);
     }
-  }
-
-  /* =========================================================
-     TILT 3D + HOLO que sigue el puntero
-     ========================================================= */
-  function conectarTilt(card) {
-    const mover = (e) => {
-      const r = card.getBoundingClientRect();
-      const px = (e.clientX - r.left) / r.width - 0.5;
-      const py = (e.clientY - r.top) / r.height - 0.5;
-      card.style.setProperty("--rx", `${(-py * 10).toFixed(2)}deg`);
-      card.style.setProperty("--ry", `${(px * 12).toFixed(2)}deg`);
-      card.style.setProperty("--mx", px.toFixed(3));
-      card.style.setProperty("--my", py.toFixed(3));
-    };
-    const salir = () => {
-      card.style.setProperty("--rx", "0deg");
-      card.style.setProperty("--ry", "0deg");
-      card.style.setProperty("--mx", "0");
-      card.style.setProperty("--my", "0");
-    };
-    card.addEventListener("pointermove", mover);
-    card.addEventListener("pointerleave", salir);
   }
 
   /* =========================================================

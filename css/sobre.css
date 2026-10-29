@@ -5,7 +5,7 @@
    ========================================================= */
 
 :root {
-  /* Paleta chocolate (copiada de css/paleta-chocolate.css) */
+  /* Paleta independiente para el prototipo interactivo y el overlay. */
   --bg: #17110f;
   --bg-deep: #100b0a;
   --text: #f6ebdd;
@@ -17,6 +17,11 @@
   --mint: #a8e6d4;      /* Monster blanco */
   --rubor: #ff9eb1;
 
+  /* Fuentes propias del motor de cartas; el álbum puede sobrescribirlas. */
+  --font-engine-body: "Inter", system-ui, sans-serif;
+  --font-engine-display: "Space Grotesk", sans-serif;
+  --font-engine-mono: "JetBrains Mono", monospace;
+
   /* Tamaño de carta */
   --cw: clamp(160px, 30vw, 280px);
 }
@@ -27,7 +32,7 @@ html, body { height: 100%; }
 
 body {
   margin: 0;
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: var(--font-engine-body);
   color: var(--text);
   background:
     repeating-linear-gradient(-55deg, rgb(246 235 221 / 2.2%) 0 2px, transparent 2px 26px),
@@ -192,7 +197,7 @@ body {
 }
 
 .pack__strip-label {
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 3px;
@@ -210,7 +215,7 @@ body {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-engine-display);
   font-weight: 700;
   font-size: 22px;
   color: #2a1a0f;
@@ -241,7 +246,7 @@ body {
 }
 
 .pack__brand {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-engine-display);
   font-weight: 700;
   font-size: clamp(58px, 16vw, 84px);
   line-height: 1;
@@ -261,7 +266,7 @@ body {
 .pack__dots { color: var(--caramelo); font-size: 12px; letter-spacing: 8px; }
 
 .pack__count {
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 11px;
   color: var(--muted);
 }
@@ -275,7 +280,7 @@ body {
   padding: 7px 0;
   border-radius: 8px;
   background: linear-gradient(180deg, var(--rojo-vivo), var(--rojo));
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 4px;
@@ -295,7 +300,7 @@ body {
   border: 1px solid rgb(242 178 99 / 45%);
   background: rgb(23 17 15 / 85%);
   color: var(--caramelo);
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 12px;
   font-weight: 800;
   animation: hint-pulse 1.6s ease-in-out infinite;
@@ -482,7 +487,7 @@ body {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-engine-display);
   font-weight: 700;
   font-size: calc(var(--cw) * 0.19);
   color: #2a1a0f;
@@ -670,7 +675,7 @@ body {
 }
 
 .card__name {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-engine-display);
   font-weight: 700;
   font-size: clamp(11px, calc(var(--cw) * 0.085), 20px);
   color: #fff8ed;
@@ -681,7 +686,7 @@ body {
 }
 
 .card__num {
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-weight: 800;
   font-size: clamp(8px, calc(var(--cw) * 0.042), 11px);
   color: #fff8ed;
@@ -701,7 +706,7 @@ body {
 }
 
 .card__tipo {
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: clamp(7px, calc(var(--cw) * 0.038), 10px);
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -723,7 +728,7 @@ body {
 }
 
 .card__rareza-nombre {
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: clamp(7px, calc(var(--cw) * 0.039), 10px);
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -869,7 +874,7 @@ body {
 
 .hint {
   margin: 0;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 13px;
   color: var(--muted);
   text-align: center;
@@ -928,14 +933,14 @@ body {
 .hud__btn:hover { transform: scale(1.1); border-color: rgb(242 178 99 / 50%); }
 
 .hud__count {
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 12px;
   color: var(--muted);
 }
 .hud__count b { color: var(--caramelo); }
 
 .hud__album {
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 1px;
@@ -971,7 +976,7 @@ body {
   bottom: 10px;
   left: 12px;
   z-index: 6;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 11px;
   color: rgb(191 168 153 / 55%);
 }
@@ -1145,7 +1150,7 @@ body {
 
 .demo-note {
   margin: 0;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 11px;
   color: rgb(191 168 153 / 60%);
   text-align: center;
@@ -1171,7 +1176,7 @@ body.modo-overlay.is-transparente .back-link { display: none; }
   border-radius: 10px;
   border: 1px solid rgb(242 178 99 / 40%);
   background: rgb(16 11 10 / 92%);
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 11px;
   line-height: 1.6;
   color: var(--muted);
@@ -1210,7 +1215,7 @@ body.modo-overlay.is-transparente .back-link { display: none; }
 
 /* Estado de conexión de Twitch (HUD) */
 .estado-twitch {
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 11px;
   color: var(--muted);
   padding: 4px 10px;
@@ -1336,7 +1341,7 @@ body.modo-overlay.is-transparente .back-link { display: none; }
 }
 .rarity-splash.is-out { opacity: 0; }
 .rarity-splash span {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-engine-display);
   font-weight: 700;
   font-style: italic;
   text-transform: uppercase;
@@ -1380,7 +1385,7 @@ body.modo-overlay.is-transparente .back-link { display: none; }
 .final-splash.is-out { opacity: 0; }
 
 .final-label {
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-weight: 800;
   font-size: clamp(12px, 2.2vw, 16px);
   letter-spacing: 4px;
@@ -1389,7 +1394,7 @@ body.modo-overlay.is-transparente .back-link { display: none; }
 }
 
 .final-rareza {
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-engine-display);
   font-weight: 700;
   font-style: italic;
   text-transform: uppercase;

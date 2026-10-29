@@ -1,7 +1,7 @@
 /* =========================================================
    WewinVT · Álbum de colección (prototipo)
    Reutiliza el motor visual de css/sobre.css (cartas, botones, paleta)
-   Carga DESPUÉS de styles.css, paleta-chocolate.css y sobre.css
+   Carga DESPUÉS de styles.css, paleta-editorial.css y sobre.css
    ========================================================= */
 
 body {
@@ -23,7 +23,7 @@ body.sin-scroll { overflow: hidden !important; }
 
 .eyebrow {
   margin: 0 0 10px;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 3px;
@@ -33,7 +33,7 @@ body.sin-scroll { overflow: hidden !important; }
 
 .album-head h1 {
   margin: 0 0 10px;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-engine-display);
   font-weight: 700;
   font-size: clamp(32px, 6vw, 54px);
 }
@@ -48,7 +48,7 @@ body.sin-scroll { overflow: hidden !important; }
 
 .album-identidad {
   margin: 0 auto 16px;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 12px;
   color: var(--muted);
 }
@@ -85,7 +85,7 @@ body.sin-scroll { overflow: hidden !important; }
 
 .barra-texto {
   margin: 10px 0 0;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 12px;
   color: var(--muted);
 }
@@ -107,7 +107,7 @@ body.sin-scroll { overflow: hidden !important; }
   border-radius: 999px;
   border: 1px solid rgb(246 235 221 / 16%);
   background: rgb(23 17 15 / 80%);
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 11px;
   color: var(--muted);
 }
@@ -150,7 +150,7 @@ body.sin-scroll { overflow: hidden !important; }
 }
 .album-rareza h2 {
   margin: 0;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-engine-display);
   font-weight: 700;
   font-size: clamp(20px, 3.2vw, 28px);
   text-transform: uppercase;
@@ -164,7 +164,7 @@ body.sin-scroll { overflow: hidden !important; }
   text-shadow: 0 0 14px color-mix(in srgb, var(--c) 65%, transparent);
 }
 .album-rareza .conteo {
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 13px;
   color: var(--muted);
   padding: 4px 10px;
@@ -256,7 +256,7 @@ body.sin-scroll { overflow: hidden !important; }
 }
 .detalle-info h3 {
   margin: 0 0 4px;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-engine-display);
   font-size: clamp(22px, 4vw, 30px);
 }
 .detalle-dato {
@@ -267,7 +267,7 @@ body.sin-scroll { overflow: hidden !important; }
   font-size: 14px;
 }
 .detalle-dato span {
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 1.5px;
@@ -296,7 +296,7 @@ body.sin-scroll { overflow: hidden !important; }
   flex-wrap: wrap;
   gap: 24px;
   margin-top: 44px;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-engine-mono);
   font-size: 12px;
   color: rgb(191 168 153 / 65%);
 }
@@ -317,4 +317,270 @@ body.sin-scroll { overflow: hidden !important; }
   .album-rareza .conteo { padding: 4px 8px; font-size: 11px; }
   .album-grid { gap: 10px; }
   .detalle-dato { grid-template-columns: 74px 1fr; }
+}
+
+/* ---------- Tratamiento editorial del álbum público ---------- */
+
+body.album-page {
+  --bg: var(--color-bg);
+  --bg-deep: #eee7dc;
+  --text: var(--color-ink);
+  --muted: var(--color-muted);
+  --font-engine-body: var(--font-body);
+  --font-engine-display: var(--font-heading);
+  --font-engine-mono: var(--font-mono);
+  --caramelo: #825a21;
+  --rojo: var(--color-accent);
+  --rojo-vivo: var(--color-accent-hover);
+  --rubor: var(--color-accent-hover);
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+
+body.album-page .site-header {
+  background: var(--color-bg);
+}
+
+body.album-page .album-shell {
+  max-width: var(--content-width);
+  padding: clamp(3.5rem, 7vw, 6rem) var(--page-gutter) 5rem;
+}
+
+body.album-page .album-head {
+  max-width: 58rem;
+  margin: 0 0 2rem;
+  text-align: left;
+}
+
+body.album-page .eyebrow {
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+}
+
+body.album-page .album-head .eyebrow {
+  margin-bottom: 1.35rem;
+}
+
+body.album-page .album-head h1 {
+  max-width: 14ch;
+  margin-top: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(2.8rem, 6vw, 4.8rem);
+  font-weight: 500;
+  line-height: 0.98;
+}
+
+body.album-page .album-sub {
+  margin: 0 0 1.5rem;
+  color: var(--color-muted);
+  font-size: 1rem;
+}
+
+body.album-page .album-vacio {
+  color: var(--color-accent-hover);
+}
+
+body.album-page .album-identidad {
+  margin: 0 0 0.75rem;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+body.album-page .album-identidad b,
+body.album-page .barra-texto b {
+  color: var(--color-accent-hover);
+}
+
+body.album-page .album-progreso {
+  margin: 0 0 1rem;
+}
+
+body.album-page .barra {
+  height: 0.55rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-accent-soft);
+}
+
+body.album-page .barra i {
+  border-radius: 0;
+  background: var(--color-accent);
+  box-shadow: none;
+  transition: width 500ms ease;
+}
+
+body.album-page .barra-texto {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+body.album-page .album-stats {
+  justify-content: flex-start;
+  gap: 0.5rem;
+  margin: 0 0 1.25rem;
+}
+
+body.album-page .stat {
+  padding: 0.35rem 0.55rem;
+  border-color: var(--color-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+}
+
+body.album-page .stat i {
+  box-shadow: none;
+}
+
+body.album-page .stat b {
+  color: var(--color-ink);
+}
+
+body.album-page .album-acciones {
+  justify-content: flex-start;
+}
+
+body.album-page .btn {
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  box-shadow: none;
+}
+
+body.album-page .btn--ghost {
+  border-color: var(--color-border);
+  background: transparent;
+  color: var(--color-ink);
+}
+
+body.album-page .btn--ghost:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+body.album-page .btn--primary {
+  background: var(--color-accent);
+  color: #fffdf9;
+}
+
+body.album-page .album-seccion {
+  margin: 2rem 0;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  border: 1px solid color-mix(in srgb, var(--c) 32%, var(--color-border));
+  border-radius: 0.2rem;
+  background: var(--color-surface);
+  box-shadow: none;
+}
+
+body.album-page .album-rareza h2 {
+  color: var(--color-ink);
+  font-family: var(--font-heading);
+  font-size: clamp(1.35rem, 2.5vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+body.album-page .album-rareza h2::before {
+  color: var(--c, var(--color-accent));
+  text-shadow: none;
+}
+
+body.album-page .album-rareza .conteo {
+  padding: 0.3rem 0.5rem;
+  border-color: color-mix(in srgb, var(--c) 40%, var(--color-border));
+  border-radius: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-size: 0.68rem;
+}
+
+body.album-page .album-rareza .linea {
+  background: var(--color-border);
+  opacity: 1;
+}
+
+body.album-page .album-seccion .card {
+  color: #f6ebdd;
+  --text: #f6ebdd;
+  --muted: #bfa899;
+  --mint: #a8e6d4;
+  --caramelo: #f2b263;
+}
+
+body.album-page .album-seccion .card__face {
+  box-shadow: 0 10px 20px rgb(36 35 33 / 18%);
+}
+
+body.album-page .detalle .card {
+  color: #f6ebdd;
+  --text: #f6ebdd;
+  --muted: #bfa899;
+  --mint: #a8e6d4;
+  --caramelo: #f2b263;
+}
+
+body.album-page .detalle .card__face {
+  box-shadow: 0 12px 24px rgb(0 0 0 / 32%);
+}
+
+body.album-page .album-seccion .card.is-revealed .card__face--front {
+  animation: none;
+}
+
+body.album-page .album-pie {
+  justify-content: flex-start;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted);
+  font-size: 0.67rem;
+}
+
+body.album-page .album-pie b {
+  color: var(--color-accent-hover);
+}
+
+body.album-page .detalle {
+  background: rgb(36 35 33 / 82%);
+}
+
+body.album-page .detalle-info {
+  color: #fffcf6;
+}
+
+body.album-page .detalle-info h3,
+body.album-page .detalle-dato b {
+  color: #fffcf6;
+}
+
+body.album-page .detalle-dato span {
+  color: #d9c8b5;
+}
+
+body.album-page .detalle-dato a {
+  color: #f0dfda;
+}
+
+body.album-page .detalle-cerrar {
+  color: #fffcf6;
+}
+
+@media (max-width: 640px) {
+  body.album-page .album-head {
+    margin-bottom: 1.5rem;
+  }
+
+  body.album-page .album-stats {
+    justify-content: flex-start;
+  }
+
+  body.album-page .album-acciones {
+    justify-content: flex-start;
+  }
 }

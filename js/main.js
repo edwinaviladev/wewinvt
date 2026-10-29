@@ -328,10 +328,19 @@
     }
 
     if (logo && status.logo) {
+      logo.hidden = true;
+      logo.onload = function () {
+        logo.hidden = false;
+      };
+      logo.onerror = function () {
+        logo.hidden = true;
+      };
       logo.src = status.logo;
-      logo.hidden = false;
     } else if (logo) {
       logo.hidden = true;
+      logo.onload = null;
+      logo.onerror = null;
+      logo.removeAttribute('src');
     }
   }
 

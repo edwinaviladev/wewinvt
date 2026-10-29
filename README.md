@@ -10,7 +10,7 @@ wewinvt/
 ├── index.html            Inicio: hero, "Quién es Wewin", panel "en vivo" con horario,
 │                         y redes sociales (incluye Discord, Ko-fi y Streamloots)
 ├── emotes.html           Galería de emotes y fanarts (lightbox + créditos de artista)
-├── cartas.html           Sección de cartas: en construcción (sin enlace en la nav)
+├── album.html            Álbum interactivo de cartas coleccionables
 ├── 404.html              Página de error (la sirven GitHub Pages y Cloudflare Pages)
 ├── favicon.webp          Favicon del sitio
 ├── .gitignore            Ignora old/, cachés de herramientas y basura del sistema
@@ -18,14 +18,15 @@ wewinvt/
 ├── sitemap.xml           Mapa de páginas para buscadores (URLs limpias)
 ├── css/
 │   ├── styles.css        Layout: tarjetas, hero, galerías, lightbox, nuevas secciones
-│   └── paleta-chocolate.css  Paleta "Chocolate y playera roja" (se carga después)
+│   └── paleta-editorial.css  Tokens y dirección Warm Editorial Manga
 ├── js/
 │   ├── data.js           Datos: emotes, fanarts (con artista/enlace), horario del canal
 │   ├── main.js           Menú, animaciones, panel "en vivo" (timeout + respaldo),
 │   │                     reproductor de Twitch y tarjeta de horario
 │   └── gallery.js        Render de galerías, créditos y lightbox (solo en emotes.html)
 ├── img/
-│   ├── og-wewin.webp     Imagen 1200×630 para compartir en redes
+│   ├── og-wewin.webp     Imagen OG 1200×630 con la dirección editorial nueva
+│   ├── avatar.webp       Avatar sin fondo usado en el hero (original: avatar.png)
 │   ├── emotes/           Emotes optimizados en WebP
 │   └── fanarts/          Fanarts optimizados en WebP
 └── fanarts y emotes/     Carpeta original con los archivos fuente (respaldo, sin referencias)
@@ -33,17 +34,16 @@ wewinvt/
 
 ## Paleta
 
-La paleta activa es **"Chocolate y playera roja"**: cacao oscuro de fondo, crema de texto,
-rojo playera para botones y acentos, caramelo para metas, Monster blanco para enlaces.
-Definida en `css/paleta-chocolate.css` (se carga después de `styles.css`, que mantiene el layout).
-Twitch conserva su morado oficial (`#a970ff`).
+La dirección visual es **Warm Editorial Manga**: papel crema, tinta carbón, rojo apagado,
+arena y blush. Los tokens y alias de compatibilidad están en `css/paleta-editorial.css`;
+el layout compartido se conserva en `css/styles.css`. Twitch mantiene su morado oficial.
 
 ## Cómo verlo en local
 
 - Abrir `index.html` directamente en el navegador, o
 - Servir la carpeta: `python -m http.server 8000` y visitar `http://localhost:8000`.
-- Los enlaces internos son relativos (`index.html`, `emotes.html`): funcionan igual
-  en local (file://) que desplegados. Las URLs limpias (`/`, `/emotes`, `/cartas`)
+- Los enlaces internos son relativos (`index.html`, `emotes.html`, `album.html`): funcionan igual
+  en local (file://) que desplegados. Las URLs limpias (`/`, `/emotes`, `/album`)
   también responden en producción y ahí apuntan el sitemap y los `canonical`.
 
 ## Cómo desplegar
@@ -57,7 +57,7 @@ Twitch conserva su morado oficial (`#a970ff`).
    - **Build command:** *(vacío)*
    - **Build output directory:** `/`
 4. Deploy. Cloudflare Pages sirve `404.html` en rutas que no existen y responde
-   `https://wewinvt.com/emotes` y `/cartas` directamente.
+   `https://wewinvt.com/emotes` y `/album` directamente.
 5. En *Custom domains* agrega `wewinvt.com` y `www.wewinvt.com`.
 
 Si despliegas el Worker con Wrangler y `assets.directory` apunta a la raíz,

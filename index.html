@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -9,18 +9,18 @@
       name="description"
       content="WewinVT es el hub de la comunidad de Wewin: streams, fanarts, emotes, cartas y recuerdos del canal en un solo lugar."
     />
-    <meta name="theme-color" content="#17110F" />
+    <meta name="theme-color" content="#F5F0E8" />
     <link rel="icon" type="image/webp" href="favicon.webp" />
     <link rel="canonical" href="https://wewinvt.com/" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=JetBrains+Mono:wght@700;800&family=Space+Grotesk:wght@700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400..700&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="css/paleta-chocolate.css" />
+    <link rel="stylesheet" href="css/paleta-editorial.css" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="WewinVT" />
@@ -29,12 +29,15 @@
       property="og:description"
       content="El universo visual de Wewin: streams, fanarts, emotes, cartas y recuerdos de la comunidad."
     />
-    <meta property="og:image" content="https://wewinvt.com/img/og-wewin.webp" />
+    <meta property="og:image" content="https://wewinvt.com/img/og-wewin.webp?v=2" />
     <meta property="og:image:type" content="image/webp" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="WewinVT y su avatar en pixel art, con la frase «Un pequeño universo, una gran comunidad» y enlace a Twitch." />
     <meta property="og:locale" content="es_MX" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://wewinvt.com/img/og-wewin.webp?v=2" />
+    <meta name="twitter:image:alt" content="WewinVT y su avatar en pixel art, con la frase «Un pequeño universo, una gran comunidad» y enlace a Twitch." />
     <meta name="twitter:title" content="WewinVT | Comunidad, fanarts y streams" />
     <meta
       name="twitter:description"
@@ -60,7 +63,7 @@
         <nav class="nav-menu" id="nav-menu" aria-label="Navegación principal">
           <ul class="nav-list">
             <li><span class="nav-link is-active" aria-current="page">Inicio</span></li>
-            <li><a class="nav-link" href="emotes.html">Emotes y fanarts</a></li>
+            <li><a class="nav-link" href="emotes.html">Galería</a></li>
             <li><a class="nav-link" href="album.html">Álbum</a></li>
           </ul>
         </nav>
@@ -71,7 +74,7 @@
       <!-- Inicio: descripción breve, señal en vivo y redes sociales -->
       <section class="hero" aria-labelledby="hero-titulo">
         <div class="hero-copy">
-          <p class="eyebrow" data-animate>Twitch · Comunidad · WewinVT</p>
+          <p class="eyebrow" data-animate>01 / VTuber · Twitch · Comunidad</p>
           <h1 id="hero-titulo" data-animate>Un pequeño universo, una gran comunidad.</h1>
           <p class="hero-text" data-animate>
             WewinVT es el espacio donde viven los streams, los fanarts, los emotes y los
@@ -79,23 +82,37 @@
           </p>
           <div class="hero-actions" data-animate>
             <a class="button button-primary" href="https://www.twitch.tv/wewinvt" target="_blank" rel="noreferrer">Ver en Twitch</a>
-            <a class="button button-secondary" href="https://discord.gg/C6X7KWMaZc" target="_blank" rel="noreferrer">Unirme al Discord</a>
+            <a class="button button-secondary" href="emotes.html">Explorar la galería</a>
           </div>
         </div>
 
         <div class="hero-stage">
-          <aside class="signal-panel signal-loading" data-signal data-animate aria-label="Estado de la transmisión de Wewin" aria-live="polite">
-            <div class="signal-header">
-              <span class="signal-dot" aria-hidden="true"></span>
-              <span data-signal-label>Consultando señal</span>
-            </div>
-            <strong class="signal-strong" data-signal-strong>Revisando el canal…</strong>
-            <p class="signal-text" data-signal-text>Un momento, estamos viendo si Wewin está transmitiendo.</p>
-            <div class="signal-meta" data-signal-meta></div>
-            <img class="signal-logo" data-signal-logo hidden alt="Avatar del canal de Twitch" />
-            <a class="signal-cta" data-signal-cta href="https://www.twitch.tv/wewinvt" target="_blank" rel="noreferrer">Ir al canal</a>
-          </aside>
-          <div class="schedule-slot" data-schedule-slot></div>
+          <figure class="hero-figure" data-animate>
+            <img
+              src="img/avatar.webp"
+              alt="Avatar de Wewin en pixel art con lentes de estrella y playera roja"
+              width="1198"
+              height="1423"
+              fetchpriority="high"
+            />
+            <figcaption>
+              <span>Avatar · WewinVT</span>
+              <span>Modelo y rig: <a href="https://x.com/Mr_pokati" target="_blank" rel="noreferrer">@Mr_pokati</a></span>
+            </figcaption>
+          </figure>
+          <div class="hero-live" data-animate>
+            <aside class="signal-panel signal-loading" data-signal aria-label="Estado de la transmisión de Wewin" aria-live="polite">
+              <div class="signal-header">
+                <span class="signal-dot" aria-hidden="true"></span>
+                <span data-signal-label>Consultando señal</span>
+              </div>
+              <strong class="signal-strong" data-signal-strong>Revisando el canal…</strong>
+              <p class="signal-text" data-signal-text>Un momento, estamos viendo si Wewin está transmitiendo.</p>
+              <div class="signal-meta" data-signal-meta></div>
+              <a class="signal-cta" data-signal-cta href="https://www.twitch.tv/wewinvt" target="_blank" rel="noreferrer">Ir al canal</a>
+            </aside>
+            <div class="schedule-slot" data-schedule-slot></div>
+          </div>
         </div>
       </section>
 
@@ -103,7 +120,7 @@
       <section class="section section-about" id="quien-es-wewin" aria-labelledby="about-titulo">
         <div class="about-inner">
           <div class="about-copy">
-            <p class="eyebrow" data-animate>Quién es Wewin</p>
+            <p class="eyebrow" data-animate>02 / Quién es Wewin</p>
             <h2 id="about-titulo" data-animate>Lentes, <span class="highlight">playera roja</span> y mucho chocolate.</h2>
             <p class="lead" data-animate>
               Soy Wewin: VTuber, fan de las cosas dulces y del Monster blanco, y alguien que (aunque
@@ -128,30 +145,74 @@
                 Una comunidad que no es demasiado rara
               </li>
             </ul>
-            <!-- TODO: confirmar los enlaces de @shinyvibes_art y @VtKairo antes de publicar -->
-            <p class="about-artist" data-animate>
-              El que hizo posible este avatar:
-              <a class="artist-link" href="https://x.com/Mr_pokati" target="_blank" rel="noreferrer" title="Perfil de Mr_pokati en X">@Mr_pokati</a>
-              <span class="artist-role">modelo y rig en pixel</span> ✨
-            </p>
             <p class="about-credits" data-animate>
               Overlays y emotes por <strong>@shinyvibes_art</strong> · Emotes por <strong>@VtKairo</strong>
             </p>
           </div>
-          <div class="about-figure" data-animate>
-            <img
-              src="img/avatar-preview.webp"
-              alt="Vista previa del avatar de Wewin: chibi en pixel art con lentes y playera roja, con sus caritas disponibles"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
+        </div>
+      </section>
+
+      <section class="section" id="galeria-comunidad" aria-labelledby="galeria-home-titulo">
+        <div class="section-heading" data-animate>
+          <p class="eyebrow">03 / Archivo de comunidad</p>
+          <h2 id="galeria-home-titulo">Fanarts y momentos del canal.</h2>
+          <p class="lead">
+            Ilustraciones hechas por la comunidad y emotes del canal, reunidos con sus créditos.
+          </p>
+        </div>
+
+        <div class="home-gallery-grid">
+          <figure class="home-gallery-item home-gallery-item--feature" data-animate>
+            <a href="emotes.html" aria-label="Abrir la galería: retrato de Wewin con playera roja">
+              <img src="img/fanarts/retrato-pintado.webp" alt="Retrato pintado de Wewin con playera roja" loading="lazy" decoding="async" />
+            </a>
+            <figcaption>
+              <span>Retrato · comunidad</span>
+              <a href="https://www.twitch.tv/vtkairo" target="_blank" rel="noreferrer">@vtkairo</a>
+            </figcaption>
+          </figure>
+          <figure class="home-gallery-item" data-animate>
+            <a href="emotes.html" aria-label="Abrir la galería: cómic de la comunidad">
+              <img src="img/fanarts/comic-comunidad.webp" alt="Cómic de la comunidad: conversación entre amigos" loading="lazy" decoding="async" />
+            </a>
+            <figcaption>
+              <span>Cómic · comunidad</span>
+              <a href="https://www.twitch.tv/eclipsenoctis" target="_blank" rel="noreferrer">@eclipsenoctis</a>
+            </figcaption>
+          </figure>
+          <figure class="home-gallery-item" data-animate>
+            <a href="emotes.html" aria-label="Abrir la galería: Wewin bailando bachata">
+              <img src="img/fanarts/pongan-bachata.webp" alt="Fanart: Wewin bailando con la frase «Pongan Bachata»" loading="lazy" decoding="async" />
+            </a>
+            <figcaption>
+              <span>Un momento del stream</span>
+              <a href="https://www.twitch.tv/ryonikku" target="_blank" rel="noreferrer">@ryonikku</a>
+            </figcaption>
+          </figure>
+        </div>
+        <p class="home-gallery-action" data-animate>
+          <a class="button button-secondary" href="emotes.html">Ver la galería completa</a>
+        </p>
+      </section>
+
+      <section class="section album-teaser" id="coleccion" aria-labelledby="album-home-titulo">
+        <figure class="album-teaser__art" data-animate>
+          <img src="img/fanarts/pixel-guerrero.webp" alt="Pixel art de un guerrero con espada, creado por la comunidad" loading="lazy" decoding="async" />
+          <figcaption>Ilustración de <a href="https://www.twitch.tv/loki_vt_" target="_blank" rel="noreferrer">@loki_vt_</a></figcaption>
+        </figure>
+        <div class="album-teaser__copy" data-animate>
+          <p class="eyebrow">04 / Colección</p>
+          <h2 id="album-home-titulo">Cada carta guarda un momento de la comunidad.</h2>
+          <p>
+            Revisa tu progreso, descubre las rarezas y recorre las cartas creadas para el canal.
+          </p>
+          <a class="button button-primary" href="album.html">Entrar al álbum</a>
         </div>
       </section>
 
       <section class="section" id="redes" aria-labelledby="redes-titulo">
         <div class="section-heading" data-animate>
-          <p class="eyebrow">Redes sociales</p>
+          <p class="eyebrow">05 / Comunidad</p>
           <h2 id="redes-titulo">Dónde encontrar al Wewin.</h2>
           <p class="lead">
             Toda la actividad del canal pasa por aquí: directos, clips, comunidad y anuncios.
@@ -160,7 +221,7 @@
         </div>
 
         <div class="card-grid" data-social-grid>
-          <a class="social-card" data-animate href="https://www.twitch.tv/wewinvt" target="_blank" rel="noreferrer" style="--accent: #a970ff">
+          <a class="social-card" data-animate href="https://www.twitch.tv/wewinvt" target="_blank" rel="noreferrer">
             <span class="social-icon" aria-hidden="true">
               <svg viewBox="-2.5 -2.5 27 27"><path d="M11.571 4.714h1.715v.928h-1.715zM4.071 1H1v17.143h4.715V21h3l2.57-2.857h3.857L21 15V1H4.071zm15.214 12.857-3.214 3.214h-3.857L10 19.643v-2.572H6.071V2.714h13.214v11.143zM10.429 6.071H12v5.5h-1.571v-5.5zm4.286 0h1.57v5.5h-1.57v-5.5z" /></svg>
             </span>
@@ -169,7 +230,7 @@
               <span>Streams / wewinvt</span>
             </span>
           </a>
-          <a class="social-card" data-animate href="https://discord.gg/C6X7KWMaZc" target="_blank" rel="noreferrer" style="--accent: #ff5a6a">
+          <a class="social-card" data-animate href="https://discord.gg/C6X7KWMaZc" target="_blank" rel="noreferrer">
             <span class="social-icon" aria-hidden="true">
               <svg viewBox="-3.5 -3.5 31 31"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277 10.2989 10.2989 0 00.4134-.3318.0743.0743 0 01.0775-.0103c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1322.1085.2664.2137.4133.3318a.0769.0769 0 01-.0066.1276 12.2992 12.2992 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3627 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z" /></svg>
             </span>
@@ -178,7 +239,7 @@
               <span>Únete a la comunidad</span>
             </span>
           </a>
-          <a class="social-card" data-animate href="https://www.tiktok.com/@godwineitor" target="_blank" rel="noreferrer" style="--accent: #a8e6d4">
+          <a class="social-card" data-animate href="https://www.tiktok.com/@godwineitor" target="_blank" rel="noreferrer">
             <span class="social-icon" aria-hidden="true">
               <svg viewBox="-3.5 -3.5 31 31"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z" /></svg>
             </span>
@@ -187,7 +248,7 @@
               <span>@godwineitor</span>
             </span>
           </a>
-          <a class="social-card" data-animate href="https://www.instagram.com/wewineitor/" target="_blank" rel="noreferrer" style="--accent: #ff9eb1">
+          <a class="social-card" data-animate href="https://www.instagram.com/wewineitor/" target="_blank" rel="noreferrer">
             <span class="social-icon" aria-hidden="true">
               <svg viewBox="-3.5 -3.5 31 31"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.645-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
             </span>
@@ -196,7 +257,7 @@
               <span>@wewineitor</span>
             </span>
           </a>
-          <a class="social-card" data-animate href="https://x.com/wewineitor" target="_blank" rel="noreferrer" style="--accent: #f6ebdd">
+          <a class="social-card" data-animate href="https://x.com/wewineitor" target="_blank" rel="noreferrer">
             <span class="social-icon" aria-hidden="true">
               <svg viewBox="-1.96 -2 28 28"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
             </span>
@@ -211,7 +272,7 @@
       <!-- Donaciones -->
       <section class="section" id="apoyo" aria-labelledby="apoyo-titulo">
         <div class="section-heading" data-animate>
-          <p class="eyebrow">Apoyo</p>
+          <p class="eyebrow">06 / Apoyo</p>
           <h2 id="apoyo-titulo">Financia decisiones cuestionables.</h2>
           <p class="lead">
             Todo apoyo es voluntario: con estar aquí ya ayudas muchísimo. Pero si te sobra un
@@ -220,7 +281,7 @@
         </div>
 
         <div class="donate-grid">
-          <a class="social-card" data-animate href="https://ko-fi.com/wewinvt" target="_blank" rel="noreferrer" style="--accent: #f2b263">
+          <a class="social-card" data-animate href="https://ko-fi.com/wewinvt" target="_blank" rel="noreferrer">
             <span class="social-icon" aria-hidden="true">
               <svg viewBox="0.95 -0.75 23 23"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 7.4a2.4 2.4 0 0 1 2.4-2.4h8.8a2.4 2.4 0 0 1 2.4 2.4v6.9a5.2 5.2 0 0 1-5.2 5.2h-3.2a5.2 5.2 0 0 1-5.2-5.2V7.4zm6.85 7.1-2.45-2.35a1.72 1.72 0 1 1 2.45-2.42 1.72 1.72 0 1 1 2.45 2.42zM17.6 8.5h.75a2.55 2.55 0 0 1 0 5.1h-.75v-1.7h.75a.85.85 0 0 0 0-1.7h-.75z" /><path d="M7.5 3.2c0-.66.45-1.2 1-1.2s1 .54 1 1.2c0 .8-1 1.2-1 2.3h-1c0-.8 1-1.5 1-2.3zm3.4 0c0-.66.45-1.2 1-1.2s1 .54 1 1.2c0 .8-1 1.2-1 2.3h-1c0-.8 1-1.5 1-2.3z" /></svg>
             </span>
@@ -229,7 +290,7 @@
               <span>Invítame un cafecito</span>
             </span>
           </a>
-          <a class="social-card" data-animate href="https://www.streamloots.com/wewinvt" target="_blank" rel="noreferrer" style="--accent: #ff9eb1">
+          <a class="social-card" data-animate href="https://www.streamloots.com/wewinvt" target="_blank" rel="noreferrer">
             <span class="social-icon" aria-hidden="true">
               <svg viewBox="1.43 1.1 21.8 21.8"><path fill-rule="evenodd" clip-rule="evenodd" d="M17.25 3.75H6.75A1.8 1.8 0 0 0 4.95 5.55v12.9a1.8 1.8 0 0 0 1.8 1.8h10.5a1.8 1.8 0 0 0 1.8-1.8V5.55a1.8 1.8 0 0 0-1.8-1.8zm-5.25 3L14.7 12 12 17.25 9.3 12z" /><path d="M18.6 5.4h1.1v1.1h-1.1zM5 19h1.1v1.1H5z" /></svg>
             </span>
