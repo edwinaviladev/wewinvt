@@ -1504,3 +1504,18 @@ body.modo-overlay.is-transparente .bg-float { display: none; }
   from { transform: translateY(28px) scale(0.6); opacity: 0; }
   to { transform: translateY(0) scale(1); opacity: 1; }
 }
+
+/* El browser source comparte el acabado sobrio de las cartas del Álbum. */
+.modo-overlay {
+  --font-engine-body: "DM Sans", system-ui, sans-serif;
+  --font-engine-display: "Newsreader", Georgia, serif;
+  --font-engine-mono: "Space Mono", monospace;
+}
+
+.modo-overlay .card__face {
+  box-shadow: 0 10px 20px rgb(36 35 33 / 18%);
+}
+
+.modo-overlay .card.is-revealed .card__face--front {
+  animation: none;
+}
