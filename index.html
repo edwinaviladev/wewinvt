@@ -16,11 +16,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400..700&family=Space+Mono:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400..700&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="css/sobre.css" />
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/paleta-editorial.css" />
+    <link rel="stylesheet" href="css/home-cards.css" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="WewinVT" />
@@ -44,7 +46,7 @@
       content="El hub de Wewin para seguir el canal, ver fanarts y descubrir lo próximo de la comunidad."
     />
   </head>
-  <body>
+  <body class="home-page">
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
     <header class="site-header">
@@ -75,10 +77,10 @@
       <section class="hero" aria-labelledby="hero-titulo">
         <div class="hero-copy">
           <p class="eyebrow" data-animate>01 / VTuber · Twitch · Comunidad</p>
-          <h1 id="hero-titulo" data-animate>Un pequeño universo, una gran comunidad.</h1>
+          <h1 id="hero-titulo" data-animate>Un pequeño universo de decisiones cuestionables.</h1>
           <p class="hero-text" data-animate>
-            WewinVT es el espacio donde viven los streams, los fanarts, los emotes y los
-            recuerdos del canal. Un lugar hecho por y para la comunidad: entra, mira y acompáñanos.
+            Streams, fanarts y emotes de Wewin en un mismo rincón. Pasa por curiosidad; quédate
+            hasta que alguien proponga «una partida más».
           </p>
           <div class="hero-actions" data-animate>
             <a class="button button-primary" href="https://www.twitch.tv/wewinvt" target="_blank" rel="noreferrer">Ver en Twitch</a>
@@ -196,15 +198,19 @@
       </section>
 
       <section class="section album-teaser" id="coleccion" aria-labelledby="album-home-titulo">
-        <figure class="album-teaser__art" data-animate>
-          <img src="img/fanarts/pixel-guerrero.webp" alt="Pixel art de un guerrero con espada, creado por la comunidad" loading="lazy" decoding="async" />
-          <figcaption>Ilustración de <a href="https://www.twitch.tv/loki_vt_" target="_blank" rel="noreferrer">@loki_vt_</a></figcaption>
-        </figure>
+        <div
+          class="album-teaser__cards home-card-fan"
+          data-home-cards
+          data-animate
+          role="group"
+          aria-label="Tres cartas destacadas; cada una abre el álbum"
+        ></div>
         <div class="album-teaser__copy" data-animate>
           <p class="eyebrow">04 / Colección</p>
-          <h2 id="album-home-titulo">Cada carta guarda un momento de la comunidad.</h2>
+          <h2 id="album-home-titulo">Cartas para presumir; duplicados para culpar al RNG.</h2>
           <p>
-            Revisa tu progreso, descubre las rarezas y recorre las cartas creadas para el canal.
+            Explora las rarezas, cuenta tus hallazgos y culpa al azar cuando vuelva a salir ese
+            emote que ya conoces demasiado bien. El álbum lleva la cuenta; el RNG no acepta quejas.
           </p>
           <a class="button button-primary" href="album.html">Entrar al álbum</a>
         </div>
@@ -315,5 +321,8 @@
 
     <script src="js/data.js" defer></script>
     <script src="js/main.js" defer></script>
+    <script src="js/sobre-data.js" defer></script>
+    <script src="js/carta.js" defer></script>
+    <script src="js/home-cards.js" defer></script>
   </body>
 </html>
