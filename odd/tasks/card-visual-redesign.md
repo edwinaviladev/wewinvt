@@ -25,9 +25,9 @@ Accepted by the user: the "Tinta y brasa" direction, as shown in the interactive
 - Receipt-driven development: on (global).
 
 ## Tasks
-- [ ] T1 Cards, back and Holo Prisma with a shared engine (`js/carta.js`, card section of `css/sobre.css`, fonts in the three pages). Route: delegated (writer trigger, 2+ non-trivial files).
-- [ ] T2 Pack, tear sequence, canvas particles and rarity reveal (`js/sobre.js`, `sobre.html`, `overlay.html`, pack and effect sections of `css/sobre.css`). Also fixes the "← Volver al álbum" overlap on mobile. Route: delegated.
-- [ ] T3 Album integration, overlay sequence and reduced motion (`js/album.js`, `css/album.css`, overlay rules). Route: delegated.
+- [x] T1 Cards, back and Holo Prisma with a shared engine (`js/carta.js`, card section of `css/sobre.css`, fonts in the three pages). Route: delegated (writer trigger, 2+ non-trivial files). Commit: `328c9b0`, shared with T2 because the card and pack rewrite only works as one change.
+- [x] T2 Pack, tear sequence, canvas particles and rarity reveal (`js/sobre.js`, `sobre.html`, `overlay.html`, pack and effect sections of `css/sobre.css`). Also fixes the "← Volver al álbum" overlap on mobile. Route: delegated. Commit: `328c9b0`.
+- [x] T3 Album integration, overlay sequence and reduced motion (`js/album.js`, `css/album.css`, overlay rules). Route: delegated. Commits: `328c9b0` (overlay, reduced motion in `css/sobre.css`), `217c8eb` (album).
 - [ ] T4 Browser verification on desktop and mobile with captures of each key state. Route: inline by the parent.
 
 ## Acceptance criteria
@@ -43,7 +43,7 @@ Accepted by the user: the "Tinta y brasa" direction, as shown in the interactive
 - `gentle-ai review assess` after each work-unit commit.
 
 ## Progress
-Worktree and branch created. T1 is next.
+T1 to T3 written and smoke-checked by the writer: `node --test` 18 pass; `/sobre`, `/overlay` and `/album` run on desktop and mobile width, and the overlay sequence returned to idle. `/album` is stale between `328c9b0` and `217c8eb`.
 
 ## Next step
-Delegate T1 to T3 to one writer, then verify in the browser.
+T4: parent verifies in the browser and captures each key state.
