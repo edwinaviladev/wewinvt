@@ -25,6 +25,48 @@
   /* Render de las galerías                                              */
   /* ------------------------------------------------------------------ */
 
+  var thumbnailWidths = {
+    emote: [64, 128, 256],
+    fanart: [320, 640],
+  };
+
+  function thumbnailPath(src, width) {
+    var directory = src.slice(0, src.lastIndexOf('/') + 1);
+    var filename = src.slice(src.lastIndexOf('/') + 1).replace(/\.webp$/i, '');
+    return directory + 'thumbs/' + filename + '-' + width + '.webp';
+  }
+
+  function configureImage(img, item, listName) {
+    img.alt = item.alt;
+    img.loading = 'lazy';
+    img.decoding = 'async';
+
+    if (typeof item.width !== 'number' || typeof item.height !== 'number') {
+      img.src = item.src;
+      return;
+    }
+
+    var candidates = thumbnailWidths[listName]
+      .filter(function (width) {
+        return width < item.width;
+      })
+      .map(function (width) {
+        return thumbnailPath(item.src, width) + ' ' + width + 'w';
+      });
+
+    img.width = item.width;
+    img.height = item.height;
+    if (!candidates.length) {
+      img.src = item.src;
+      return;
+    }
+    img.srcset = candidates.join(', ');
+    img.sizes = listName === 'emote'
+      ? '(max-width: 480px) 30vw, 96px'
+      : '(max-width: 600px) calc(100vw - 3rem), (max-width: 900px) 45vw, 290px';
+    img.src = candidates[0].split(' ')[0];
+  }
+
   function buildItem(item, listName, index) {
     var li = document.createElement('li');
     li.className = listName === 'emote' ? 'emote-tile' : 'fanart-card';
@@ -39,10 +81,7 @@
     });
 
     var img = document.createElement('img');
-    img.src = item.src;
-    img.alt = item.alt;
-    img.loading = 'lazy';
-    img.decoding = 'async';
+    configureImage(img, item, listName);
 
     button.appendChild(img);
 

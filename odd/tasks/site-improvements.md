@@ -2,7 +2,7 @@
 
 File locator: `odd/tasks/site-improvements.md`. Engram mirror: `odd/site-improvements/tasks`.
 
-Audited against the current branch on 2026-11-03. P1, P2, P3, C1, L1 and A5 are implemented; unchecked items remain pending. The user chooses what to build next.
+Audited against the current branch on 2026-11-03. P1-P4, C1, L1 and A5 are implemented; unchecked items remain pending. The user chooses what to build next.
 
 ## Starting point
 - `origin/master` includes the hardening work (PR #7). In production, `/worker.js`, `/README.md` and the image originals answer 404, `boceto-lapiz.webp` is 303924 bytes, and security and cache headers are live.
@@ -21,7 +21,7 @@ These ideas come from the code and the published text. The pages were not review
 - [x] P1 Remove "Prototipo" from the `sobre.html` title and description and the `overlay.html` back link.
 - [x] P2 Show three real catalog cards in the home "Colección" section, fanned with `js/carta.js`.
 - [x] P3 Fix the overlay URL in `js/overlay-config.js`: use the clean `/overlay` route on Cloudflare and retain `.html` for the local static server.
-- [ ] P4 Serve real thumbnails in the gallery with `srcset`. Fanarts of up to 1600 px display at about 290 px, and 1024 px emotes at about 63 px. Keep full size for the lightbox.
+- [x] P4 Serve responsive gallery thumbnails with `srcset`: 320/640 px fanart and 64/128/256 px emote candidates where source dimensions allow. The lightbox still loads each original image.
 
 ## Copy
 - [x] C1 Unify the voice. Rewrote the hero and "Colección" copy to match the humor in "Financia decisiones cuestionables" and "Quién es Wewin".
@@ -62,4 +62,4 @@ These touch the server redemption and existing collections, so design them caref
 - [ ] H3 Four non-blocking review findings on `test/site-config.test.mjs`: the inline-handler regex can give false positives and miss cases; an image prefix stored in a constant goes unseen; a header repeated inside one rule is not detected; the ignore-rule matcher accepts unsupported syntax silently. The recommendation was to leave them unless one causes trouble.
 
 ## Next step
-The user chooses which pending items to start next. The first batch (P1, P2, P3 and C1) is complete.
+The first batch (P1, P2, P3 and C1) and P4 are complete. The next pending item by order is C2; the user chooses what to build next.
