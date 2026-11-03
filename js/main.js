@@ -85,12 +85,85 @@
   /* Horario de streams                                                  */
   /* ------------------------------------------------------------------ */
 
+  function partesFechaEnZona(fecha, zona) {
+    var partes = new Intl.DateTimeFormat('en-US', {
+      timeZone: zona,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(fecha);
+    var valores = {};
+    partes.forEach(function (parte) {
+      if (parte.type !== 'literal') valores[parte.type] = Number(parte.value);
+    });
+    return valores;
+  }
+
+  function instanteEnZona(fechaLocal, hora, zona) {
+    var horaObjetivo = Date.UTC(fechaLocal.year, fechaLocal.month - 1, fechaLocal.day, hora, 0, 0);
+    var instante = horaObjetivo;
+    for (var intento = 0; intento < 3; intento++) {
+      var local = partesFechaEnZona(new Date(instante), zona);
+      var horaRepresentada = Date.UTC(
+        local.year,
+        local.month - 1,
+        local.day,
+        local.hour,
+        local.minute,
+        local.second
+      );
+      var siguiente = instante + horaObjetivo - horaRepresentada;
+      if (siguiente === instante) break;
+      instante = siguiente;
+    }
+    return new Date(instante);
+  }
+
+  function horasEnZona(horas, zonaOrigen, zonaDestino, ahora) {
+    var fechaOrigen = partesFechaEnZona(ahora, zonaOrigen);
+    var formateador = new Intl.DateTimeFormat('es-MX', {
+      timeZone: zonaDestino,
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+    return horas.map(function (hora) {
+      return formateador.format(instanteEnZona(fechaOrigen, hora, zonaOrigen));
+    });
+  }
+
+  function listaHoras(horas) {
+    if (horas.length < 2) return horas[0] || '';
+    return horas.slice(0, -1).join(', ') + ' o ' + horas[horas.length - 1];
+  }
+
+  function lineasHorario(zonaVisitante, ahora) {
+    if (!Array.isArray(horario.horas) || !horario.horas.length || !horario.zonaIana) {
+      return horario.texto ? [horario.texto] : [];
+    }
+
+    var fecha = ahora || new Date();
+    var zonaLocal = zonaVisitante || Intl.DateTimeFormat().resolvedOptions().timeZone || horario.zonaIana;
+    var horasMexico = horasEnZona(horario.horas, horario.zonaIana, horario.zonaIana, fecha);
+    var horasLocales = horasEnZona(horario.horas, horario.zonaIana, zonaLocal, fecha);
+    var lineas = ['Todos los días, entre ' + listaHoras(horasMexico) + ' (' + horario.zona + ')'];
+
+    if (horasLocales.some(function (hora, index) { return hora !== horasMexico[index]; })) {
+      lineas.push('En tu hora local: ' + listaHoras(horasLocales));
+    }
+    if (horario.texto) lineas.push(horario.texto);
+    return lineas;
+  }
+
   function proximoStreamTexto() {
     if (horario.dias && horario.dias.length > 0) {
       var proximo = horario.dias[0];
       return 'Próximo stream: ' + proximo.dia + ' ' + proximo.hora + ' (' + horario.zona + ')';
     }
-    return horario.texto ? horario.texto : '';
+    return lineasHorario().join('. ');
   }
 
   function renderScheduleSlot() {
@@ -102,8 +175,8 @@
       horario.dias.forEach(function (dia) {
         lines.push(dia.dia + ' · ' + dia.hora + ' (' + horario.zona + ')');
       });
-    } else if (horario.texto) {
-      lines.push(horario.texto);
+    } else {
+      lines = lineasHorario();
     }
     if (lines.length === 0) return;
 

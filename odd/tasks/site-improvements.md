@@ -2,7 +2,7 @@
 
 File locator: `odd/tasks/site-improvements.md`. Engram mirror: `odd/site-improvements/tasks`.
 
-Audited against the current branch on 2026-11-03. P1-P4, C1-C3, L1 and A5 are implemented; unchecked items remain pending. The user chooses what to build next.
+Audited against the current branch on 2026-11-03. P1-P4, C1-C4, L1 and A5 are implemented; unchecked items remain pending. The user chooses what to build next.
 
 ## Starting point
 - `origin/master` includes the hardening work (PR #7). In production, `/worker.js`, `/README.md` and the image originals answer 404, `boceto-lapiz.webp` is 303924 bytes, and security and cache headers are live.
@@ -27,7 +27,7 @@ These ideas come from the code and the published text. The pages were not review
 - [x] C1 Unify the voice. Rewrote the hero and "Colección" copy to match the humor in "Financia decisiones cuestionables" and "Quién es Wewin".
 - [x] C2 Add a line of lore to the card detail. The approved Modo cool line appears in the album; other cards without lore show no placeholder.
 - [x] C3 Keep the album's playful empty-state copy and give channel status errors a distinct voice: "Fuera de aire" when offline and "Interferencia" when Twitch cannot be queried.
-- [ ] C4 Show the stream schedule converted to the visitor's time zone, keeping the current joke.
+- [x] C4 Convert the daily 5–7 p.m. Mexico schedule to the visitor's local time using `America/Mexico_City`, while keeping the joke.
 
 ## Page composition
 - [x] L1 Make the hero change when the channel is live, with the player in front and a clear indicator. `js/main.js` updates the signal panel and inserts the Twitch player when live.
@@ -62,4 +62,4 @@ These touch the server redemption and existing collections, so design them caref
 - [ ] H3 Four non-blocking review findings on `test/site-config.test.mjs`: the inline-handler regex can give false positives and miss cases; an image prefix stored in a constant goes unseen; a header repeated inside one rule is not detected; the ignore-rule matcher accepts unsupported syntax silently. The recommendation was to leave them unless one causes trouble.
 
 ## Next step
-The first batch (P1, P2, P3 and C1), P4, C2 and C3 are complete. The next pending item by order is C4; the user chooses what to build next.
+The first batch (P1, P2, P3 and C1), P4 and C2-C4 are complete. The next pending item by order is L2; the user chooses what to build next.

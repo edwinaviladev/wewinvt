@@ -9,16 +9,18 @@ window.WEWIN = {
   twitchUrl: "https://www.twitch.tv/wewinvt",
 
   /**
-   * Horario de streams.
-   * TODO: si Wewin define un horario fijo de días/horas, usar la lista `dias`.
+   * Posibles horas de inicio diarias en formato 24h; `zonaIana` permite
+   * convertirlas a la zona local de quien visita el sitio.
+   * TODO: si Wewin define días fijos, usar la lista `dias`.
    */
   horario: {
     zona: "hora de México",
+    zonaIana: "America/Mexico_City",
     dias: [
       // { dia: 'Martes', hora: '20:00' },
     ],
-    texto:
-      "Entre 5, 6 o 7 de la tarde (hora de México), todos los días. Si pasa de esa hora… probablemente ya no prendí. 🔌",
+    horas: [17, 18, 19],
+    texto: "Si pasa de esa hora… probablemente ya no prendí. 🔌",
   },
 
   /** Emotes del canal */
