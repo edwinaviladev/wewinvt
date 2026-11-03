@@ -40,7 +40,10 @@ a 1.8 MB image on `emotes.html`, no CSP, HSTS, `X-Content-Type-Options` or `Refe
 `node --test`; pages load under `wrangler dev` with no CSP errors; excluded paths answer 404.
 
 ## Progress and evidence
-- `node --test`: 23 pass, 0 fail.
+- `node --test`: 26 pass, 0 fail.
+- Review of 669c61c approved with three non-blocking findings on `test/site-config.test.mjs`, all fixed at the
+  user's request: references checked against the real ignore rules, overlap check tolerant of CRLF and
+  covering every header, inline handlers detected. Each check failed when its defect was injected.
 - `wrangler dev` (4.156.2): 23 excluded paths answer 404; headers present on assets and on the 404 page;
   `/api/config` is unchanged and carries none of them.
 - Browser: `/`, `/album`, `/sobre`, `/overlay`, `/overlay-config`, `/emotes` and the 404 page load with no CSP

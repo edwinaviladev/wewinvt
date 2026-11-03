@@ -63,7 +63,7 @@ el layout compartido se conserva en `css/styles.css`. Twitch mantiene su morado 
 Si despliegas el Worker con Wrangler y `assets.directory` apunta a la raíz,
 `.assetsignore` deja fuera del paquete estático todo lo que no es del sitio: código del servidor, configuración, documentación, `odd/`, `test/` y los originales de imagen (las páginas solo cargan `.webp`).
 
-`_headers` define los headers de seguridad y la caché de los assets. Si agregas un script inline o un origen externo, actualiza su CSP; `node --test` falla si un script inline no tiene su hash.
+`_headers` define los headers de seguridad y la caché de los assets. Si agregas un script inline o un origen externo, actualiza su CSP; `node --test` falla si un script inline no tiene su hash, si aparece un handler inline (`onclick=`) o si una página referencia una imagen excluida.
 
 ### Colección en línea y canjes
 
