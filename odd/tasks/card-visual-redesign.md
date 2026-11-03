@@ -20,7 +20,7 @@ Accepted by the user: the "Tinta y brasa" direction, as shown in the interactive
 
 ## Configuration
 - TDD: off (source: no project configuration). Runner: `node --test`.
-- Delivery strategy: `ask-on-risk`. Forecast: above 400 authored changed lines, because the card, pack and effect layers are rewritten. Chain strategy pending: to be asked when the user requests a pull request. Commits stay local until then.
+- Delivery strategy: `ask-on-risk`. Forecast: above 400 authored changed lines, because the card, pack and effect layers are rewritten. Chain strategy: none. The user accepted `size:exception` and one pull request to `master`: `328c9b0` alone is 2989 changed lines and only works as one change, and the album commit cannot land before it.
 - Branch: `feat/card-visual-redesign`, from `origin/master`, in the worktree `../wewinvt-worktrees/card-visual-redesign`.
 - Receipt-driven development: on (global).
 
