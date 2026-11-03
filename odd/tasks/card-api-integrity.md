@@ -45,5 +45,15 @@ T1 to T4 complete on the branch. Not pushed or deployed.
 - Not tested: a real redemption with a live broadcaster token, and a signed-in album against real data.
 - Runner correction: `node --test test/` fails on Node 24; the working command is `node --test`.
 
+- Native review: medium risk, reliability lens, approved and acknowledged on lineage review-1436c4b3a78f37fb.
+
+## Open advisory findings
+Non-blocking and not fixed:
+- A failed idempotency marker write returns 500 after cards are saved, so the overlay retry can award a second pack (worker.js:196-202). This conflicts with the replay criterion.
+- Any non-OK Twitch validate response becomes 401, so a transient outage skips the retry (worker.js:81).
+- A canjeId is marked seen before the queue capacity check, so a dropped redemption cannot be redelivered (js/sobre.js:893-898).
+- KV has no atomic check, so concurrent replays can both pass (worker.js:181).
+- The real redemption path in the overlay has no runtime proof (js/sobre.js:758-774).
+
 ## Next step
-User decision on push and deploy. Existing KV data is not cleaned.
+User decision on the advisory fixes, then push and deploy. Existing KV data is not cleaned.
