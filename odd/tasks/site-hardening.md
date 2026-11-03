@@ -16,7 +16,8 @@ a 1.8 MB image on `emotes.html`, no CSP, HSTS, `X-Content-Type-Options` or `Refe
 - The card redesign the brief warned about is already merged in `origin/master` (PR #6), so the
   card files are current here; they are still not edited.
 - TDD: no project or session configuration found, so ordinary functional checks. Runner: `node --test`.
-- Delivery: `ask-on-risk`; forecast under 400 authored lines (binary images excluded).
+- Delivery: `ask-on-risk`. Forecast was under 400 lines; the result is 523 changed lines without images, 255 of them
+  a verbatim script move. Chain strategy: none. The user accepted `size:exception` and one pull request to `master`.
 
 ## Tasks
 - [x] T1 `.assetsignore`: exclude non-site files and unused originals. Route: inline (one mechanical file).
@@ -55,4 +56,4 @@ a 1.8 MB image on `emotes.html`, no CSP, HSTS, `X-Content-Type-Options` or `Refe
 - Only confirmable after deploy: HSTS over HTTPS, edge cache behavior, production 404s.
 
 ## Next step
-User decides on push, pull request and deploy.
+Pull request review, then the user decides on merge and deploy.
