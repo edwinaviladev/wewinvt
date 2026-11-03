@@ -307,24 +307,26 @@
       if (cta) cta.textContent = 'Entrar a la transmisión';
       insertarReproductor(panel);
     } else if (status.state === 'offline') {
-      if (label) label.textContent = 'Sin transmisión por ahora';
-      if (strong) strong.textContent = 'Wewin no está en vivo';
+      if (label) label.textContent = 'Fuera de aire';
+      if (strong) strong.textContent = 'Wewin anda en pausa';
       if (text) {
         text.textContent = status.lastTitle
-          ? 'Última transmisión: «' + status.lastTitle + '». Cuando inicie un directo, este panel se actualizará.'
-          : 'Cuando el canal inicie una transmisión, este panel cambiará automáticamente.';
+          ? 'Último stream: «' + status.lastTitle + '». La próxima decisión cuestionable se cocina a su ritmo; este panel se actualiza cuando vuelva.'
+          : 'Ahora toca descanso. Sigue el canal para que Twitch avise cuando vuelva el caos.';
       }
-      if (cta) cta.textContent = 'Ir al canal';
+      if (cta) cta.textContent = 'Ver el canal';
     } else {
       // Estado de respaldo: la consulta falló o expiró.
-      if (label) label.textContent = 'Sin transmisión por ahora';
-      if (strong) strong.textContent = 'Wewin no está en vivo';
+      if (label) label.textContent = 'Interferencia';
+      if (strong) strong.textContent = 'No pudimos consultar Twitch';
       if (text) {
         var proximo = proximoStreamTexto();
         text.textContent =
-          proximo || 'Síguelo en Twitch para enterarte cuando empiece.';
+          proximo
+            ? 'La bola de cristal de la web se desconectó. ' + proximo + ' Mientras tanto, confirma el directo en Twitch.'
+            : 'La bola de cristal de esta web se desconectó. Entra al canal para comprobar si Wewin está en vivo.';
       }
-      if (cta) cta.textContent = 'Ir al canal';
+      if (cta) cta.textContent = 'Comprobar en Twitch';
     }
 
     if (logo && status.logo) {
