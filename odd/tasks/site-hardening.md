@@ -19,11 +19,11 @@ a 1.8 MB image on `emotes.html`, no CSP, HSTS, `X-Content-Type-Options` or `Refe
 - Delivery: `ask-on-risk`; forecast under 400 authored lines (binary images excluded).
 
 ## Tasks
-- [ ] T1 `.assetsignore`: exclude non-site files and unused originals. Route: inline (one mechanical file).
-- [ ] T2 `_headers`: CSP, HSTS, nosniff, Referrer-Policy, cache policy; `js/overlay-config.js` extracted;
+- [x] T1 `.assetsignore`: exclude non-site files and unused originals. Route: inline (one mechanical file).
+- [x] T2 `_headers`: CSP, HSTS, nosniff, Referrer-Policy, cache policy; `js/overlay-config.js` extracted;
       `test/site-config.test.mjs`. Route: inline (design already resolved while exploring).
-- [ ] T3 Compress oversized images. Route: delegated (long-session backstop; visual comparison work).
-- [ ] T4 Verify under `wrangler dev` in the browser, confirm 404s.
+- [x] T3 Compress oversized images. Route: delegated (long-session backstop; visual comparison work).
+- [x] T4 Verify under `wrangler dev` in the browser, confirm 404s.
 
 ## Decisions
 - `_headers` over `worker.js`: Cloudflare applies it to static assets, and matched assets do not invoke
@@ -40,7 +40,16 @@ a 1.8 MB image on `emotes.html`, no CSP, HSTS, `X-Content-Type-Options` or `Refe
 `node --test`; pages load under `wrangler dev` with no CSP errors; excluded paths answer 404.
 
 ## Progress and evidence
-Pending.
+- `node --test`: 23 pass, 0 fail.
+- `wrangler dev` (4.156.2): 23 excluded paths answer 404; headers present on assets and on the 404 page;
+  `/api/config` is unchanged and carries none of them.
+- Browser: `/`, `/album`, `/sobre`, `/overlay`, `/overlay-config`, `/emotes` and the 404 page load with no CSP
+  violations and no broken images. Allowed in practice: ivr.fi, decapi.me, helix, channel logo, player
+  frame, EventSub WebSocket (`session_welcome`). Negative control: fetch to example.com was blocked and logged.
+- Images (bytes): boceto-lapiz 1843530 to 303924; abrazo 249730 to 41964; pensar-sonrojo 225186 to 126448
+  (8 frames kept); batalla-pokemon 214154 to 135908; dino-pijama 195674 to 65452; angel-halo 193696 to 129308.
+- Not exercised: a full Twitch login and real redemption events; the player frame with the channel live.
+- Only confirmable after deploy: HSTS over HTTPS, edge cache behavior, production 404s.
 
 ## Next step
-T1 and T2 commit, then T3.
+User decides on push, pull request and deploy.
