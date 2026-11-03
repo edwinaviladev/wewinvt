@@ -6,19 +6,27 @@
  *   "assets": { "directory": ".", "not_found_handling": "404-page", "binding": "ASSETS" },
  *   "kv_namespaces": [{ "binding": "COLECCIONES", "id": "<id del namespace KV>" }],
  *
- * SECRETOS (dashboard → Workers → wewinvt → Settings → Variables and Secrets):
- *   CLIENT_ID      · client id de la app de Twitch
- *   CLIENT_SECRET  · client secret de la app de Twitch
+ * VARIABLES Y SECRETOS (dashboard → Workers → wewinvt → Settings → Variables and Secrets):
+ *   CLIENT_ID       · client id de la app de Twitch (sin él, la API rechaza todo token)
+ *   CLIENT_SECRET   · client secret de la app de Twitch (Secret)
+ *   BROADCASTER_ID  · id de Twitch del dueño del canal; es el ÚNICO que puede registrar
+ *                     canjes. Sin él, /api/canje falla cerrado (500).
  *
  * ENDPOINTS:
  *   GET    /api/config      → { clientId } público (sin secret)
  *   POST   /api/login       → canjea el ?code= de OAuth (el secret vive aquí)
  *   POST   /api/refresh     → renueva el token con el refresh_token
  *   GET    /api/coleccion   → colección del usuario del token
- *   POST   /api/coleccion   → añade cartas/sobres al usuario del token
  *   DELETE /api/coleccion   → borra la colección del usuario del token
- *   POST   /api/canje       → (solo broadcaster) registra un canje del stream
+ *   POST   /api/canje       → (solo BROADCASTER_ID) { canjeId, usuarioId }: el servidor
+ *                             sortea el sobre y lo suma a la colección. Idempotente por canjeId.
+ *
+ * La colección en línea solo cambia por canjes del stream: no hay endpoint para
+ * que el cliente escriba cartas, y el sorteo ocurre aquí (js/sorteo.js).
  */
+
+import "./js/sobre-data.js";
+import "./js/sorteo.js";
 
 const TWITCH_VALIDATE = "https://id.twitch.tv/oauth2/validate";
 const TWITCH_TOKEN = "https://id.twitch.tv/oauth2/token";
@@ -30,23 +38,56 @@ const json = (datos, status = 200) =>
   });
 
 const claveColeccion = (userId) => `coleccion:${userId}`;
+const claveCanje = (canjeId) => `canje:${canjeId}`;
+const TTL_CANJE = 7 * 24 * 60 * 60; // segundos: ventana de idempotencia
+
+/* Error con código HTTP: el mensaje es seguro de mostrar al cliente */
+class ErrorHttp extends Error {
+  constructor(status, mensaje) {
+    super(mensaje);
+    this.status = status;
+  }
+}
+
+/* Lee el cuerpo JSON; si no es JSON válido o no es un objeto → 400 */
+async function leerJson(request) {
+  let cuerpo;
+  try {
+    cuerpo = await request.json();
+  } catch {
+    throw new ErrorHttp(400, "el cuerpo debe ser JSON válido");
+  }
+  if (!cuerpo || typeof cuerpo !== "object" || Array.isArray(cuerpo)) {
+    throw new ErrorHttp(400, "el cuerpo debe ser un objeto JSON");
+  }
+  return cuerpo;
+}
+
+/* Aleatoriedad criptográfica en [0, 1) para el sorteo del servidor */
+function azarSeguro() {
+  const buf = new Uint32Array(1);
+  crypto.getRandomValues(buf);
+  return buf[0] / 2 ** 32;
+}
 
 /* Valida un token de Twitch y devuelve { user_id, login, client_id, ... } */
 async function twitchTokenValido(request, env) {
   const token = (request.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "").trim();
-  if (!token) throw new Error("falta el token de Twitch");
+  if (!token) throw new ErrorHttp(401, "falta el token de Twitch");
+  /* Sin CLIENT_ID no se puede comprobar la app: falla cerrado */
+  if (!env.CLIENT_ID) throw new ErrorHttp(500, "el servidor no tiene CLIENT_ID configurado");
 
   const res = await fetch(TWITCH_VALIDATE, { headers: { Authorization: `OAuth ${token}` } });
-  if (!res.ok) throw new Error("token de Twitch inválido");
+  if (!res.ok) throw new ErrorHttp(401, "token de Twitch inválido");
   const datos = await res.json();
-  if (env.CLIENT_ID && datos.client_id !== env.CLIENT_ID) {
-    throw new Error("el token no pertenece a esta aplicación");
+  if (datos.client_id !== env.CLIENT_ID) {
+    throw new ErrorHttp(401, "el token no pertenece a esta aplicación");
   }
   return datos;
 }
 
 async function leerColeccionDe(env, userId) {
-  if (!env.COLECCIONES) throw new Error("almacenamiento no configurado");
+  if (!env.COLECCIONES) throw new ErrorHttp(500, "almacenamiento no configurado");
   const crudo = await env.COLECCIONES.get(claveColeccion(userId));
   return crudo ? JSON.parse(crudo) : { cartas: {}, sobres: 0 };
 }
@@ -68,7 +109,7 @@ export default {
         if (!env.CLIENT_SECRET) {
           return json({ error: "el servidor no tiene CLIENT_SECRET configurado (debe ser de tipo Secret)" }, 500);
         }
-        const cuerpo = await request.json();
+        const cuerpo = await leerJson(request);
         const res = await fetch(TWITCH_TOKEN, {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -89,7 +130,7 @@ export default {
         if (!env.CLIENT_SECRET) {
           return json({ error: "el servidor no tiene CLIENT_SECRET configurado (debe ser de tipo Secret)" }, 500);
         }
-        const cuerpo = await request.json();
+        const cuerpo = await leerJson(request);
         const res = await fetch(TWITCH_TOKEN, {
           method: "POST",
           headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -110,18 +151,6 @@ export default {
         return json({ coleccion });
       }
 
-      if (url.pathname === "/api/coleccion" && request.method === "POST") {
-        const usuario = await twitchTokenValido(request, env);
-        const cuerpo = await request.json();
-        const coleccion = await leerColeccionDe(env, usuario.user_id);
-        (cuerpo.anadir || []).forEach((id) => {
-          if (id) coleccion.cartas[id] = (coleccion.cartas[id] || 0) + 1;
-        });
-        if (cuerpo.sobres) coleccion.sobres = (coleccion.sobres || 0) + cuerpo.sobres;
-        await env.COLECCIONES.put(claveColeccion(usuario.user_id), JSON.stringify(coleccion));
-        return json({ ok: true, coleccion });
-      }
-
       if (url.pathname === "/api/coleccion" && request.method === "DELETE") {
         const usuario = await twitchTokenValido(request, env);
         if (env.COLECCIONES) await env.COLECCIONES.delete(claveColeccion(usuario.user_id));
@@ -129,27 +158,55 @@ export default {
       }
 
       if (url.pathname === "/api/canje" && request.method === "POST") {
+        /* Sin BROADCASTER_ID no hay a quién autorizar: falla cerrado */
+        if (!env.BROADCASTER_ID) throw new ErrorHttp(500, "el servidor no tiene BROADCASTER_ID configurado");
         const emisor = await twitchTokenValido(request, env);
-        const cuerpo = await request.json();
-        if (String(emisor.user_id) !== String(cuerpo.broadcasterId)) {
-          throw new Error("solo el dueño del canal puede registrar canjes del stream");
+        if (String(emisor.user_id) !== String(env.BROADCASTER_ID)) {
+          throw new ErrorHttp(403, "solo el dueño del canal puede registrar canjes del stream");
         }
-        const idDestino = String(cuerpo.usuarioId || "");
-        if (!idDestino) throw new Error("falta el usuario que canjeó");
-        const coleccion = await leerColeccionDe(env, idDestino);
-        const cartas = Array.isArray(cuerpo.cartas) ? cuerpo.cartas.filter(Boolean) : [];
+        if (!env.COLECCIONES) throw new ErrorHttp(500, "almacenamiento no configurado");
+
+        /* Solo se leen canjeId y usuarioId; cualquier otro campo se ignora */
+        const cuerpo = await leerJson(request);
+        const canjeId = cuerpo.canjeId;
+        const usuarioId = cuerpo.usuarioId;
+        if (typeof canjeId !== "string" || !/^[A-Za-z0-9_-]{1,128}$/.test(canjeId)) {
+          throw new ErrorHttp(400, "canjeId inválido");
+        }
+        if (typeof usuarioId !== "string" || !/^\d{1,20}$/.test(usuarioId)) {
+          throw new ErrorHttp(400, "usuarioId inválido");
+        }
+
+        /* Idempotencia: el mismo canje devuelve el resultado guardado */
+        const previo = await env.COLECCIONES.get(claveCanje(canjeId));
+        if (previo) {
+          const guardado = JSON.parse(previo);
+          if (guardado.usuarioId !== usuarioId) throw new ErrorHttp(409, "canjeId ya usado por otro usuario");
+          return json({ ok: true, cartas: guardado.cartas, nuevas: guardado.nuevas });
+        }
+
+        const sorteo = globalThis.SOBRE_SORTEO.construirCartas(globalThis.SOBRE_CATALOGO, { random: azarSeguro });
+        const cartas = sorteo.map((c) => c.id);
+        const coleccion = await leerColeccionDe(env, usuarioId);
         const nuevas = [...new Set(cartas.filter((id) => !Number(coleccion.cartas[id])))];
         cartas.forEach((id) => {
           coleccion.cartas[id] = (Number(coleccion.cartas[id]) || 0) + 1;
         });
         coleccion.sobres = (coleccion.sobres || 0) + 1;
-        await env.COLECCIONES.put(claveColeccion(idDestino), JSON.stringify(coleccion));
-        return json({ ok: true, nuevas });
+        /* Primero la colección, después la marca de idempotencia */
+        await env.COLECCIONES.put(claveColeccion(usuarioId), JSON.stringify(coleccion));
+        await env.COLECCIONES.put(
+          claveCanje(canjeId),
+          JSON.stringify({ usuarioId, cartas, nuevas }),
+          { expirationTtl: TTL_CANJE }
+        );
+        return json({ ok: true, cartas, nuevas });
       }
 
       return json({ error: "no encontrado" }, 404);
     } catch (error) {
-      return json({ error: error.message || "error interno" }, 500);
+      if (error instanceof ErrorHttp) return json({ error: error.message }, error.status);
+      return json({ error: "error interno" }, 500);
     }
   },
 };
