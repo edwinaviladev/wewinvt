@@ -766,7 +766,7 @@
         } else {
           debugLinea(
             resultado
-              ? "el servidor devolvió cartas desconocidas: el canje no se guardó"
+              ? "el servidor devolvió cartas desconocidas: lo que se ve en pantalla puede no coincidir con lo guardado"
               : "no se pudo guardar el canje en la nube: el canje no se guardó",
             "err"
           );
