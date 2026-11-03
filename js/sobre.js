@@ -375,7 +375,6 @@
       </span>
     `;
 
-    activarReflejoHolo(btn);
     if (MODO === "interactivo") btn.addEventListener("click", () => revelar(btn, datos));
     return btn;
   }
@@ -384,29 +383,6 @@
     const etiquetas = [datos.nombreVariante, nueva ? "Nueva" : ""].filter(Boolean);
     const detalle = etiquetas.length ? `, ${etiquetas.join(", ")}` : "";
     return `${datos.nombre}${detalle}, ${RAREZAS[datos.rareza].nombre} (${datos.tipo})`;
-  }
-
-  function activarReflejoHolo(btn) {
-    if (btn.dataset.variante !== "holo" || REDUCED) return;
-
-    btn.addEventListener("pointermove", (event) => {
-      if (event.pointerType === "touch") return;
-      const r = btn.getBoundingClientRect();
-      if (!r.width || !r.height) return;
-      const x = Math.max(0, Math.min(1, (event.clientX - r.left) / r.width));
-      const y = Math.max(0, Math.min(1, (event.clientY - r.top) / r.height));
-      btn.style.setProperty("--holo-x", `${(x * 100).toFixed(1)}%`);
-      btn.style.setProperty("--holo-y", `${(y * 100).toFixed(1)}%`);
-      btn.style.setProperty("--rx", `${((0.5 - y) * 7).toFixed(2)}deg`);
-      btn.style.setProperty("--ry", `${((x - 0.5) * 9).toFixed(2)}deg`);
-    });
-
-    btn.addEventListener("pointerleave", () => {
-      btn.style.setProperty("--holo-x", "50%");
-      btn.style.setProperty("--holo-y", "50%");
-      btn.style.setProperty("--rx", "0deg");
-      btn.style.setProperty("--ry", "0deg");
-    });
   }
 
   function pintarCartas() {
