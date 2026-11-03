@@ -25,7 +25,7 @@ These ideas come from the code and the published text. The pages were not review
 
 ## Copy
 - [x] C1 Unify the voice. Rewrote the hero and "Colección" copy to match the humor in "Financia decisiones cuestionables" and "Quién es Wewin".
-- [ ] C2 Add a line of lore to the card detail, written by the streamer or the community.
+- [x] C2 Add a line of lore to the card detail. The approved Modo cool line appears in the album; other cards without lore show no placeholder.
 - [ ] C3 Give empty and error states their own voice: the album's empty state already has custom copy, but the channel-offline message is still generic.
 - [ ] C4 Show the stream schedule converted to the visitor's time zone, keeping the current joke.
 
@@ -62,4 +62,4 @@ These touch the server redemption and existing collections, so design them caref
 - [ ] H3 Four non-blocking review findings on `test/site-config.test.mjs`: the inline-handler regex can give false positives and miss cases; an image prefix stored in a constant goes unseen; a header repeated inside one rule is not detected; the ignore-rule matcher accepts unsupported syntax silently. The recommendation was to leave them unless one causes trouble.
 
 ## Next step
-The first batch (P1, P2, P3 and C1) and P4 are complete. The next pending item by order is C2; the user chooses what to build next.
+The first batch (P1, P2, P3 and C1), P4 and C2 are complete. The next pending item by order is C3; the user chooses what to build next.

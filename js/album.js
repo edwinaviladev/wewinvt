@@ -243,6 +243,7 @@
 
     cajaInfo.innerHTML = `
       <h3>${datos.nombre}</h3>
+      ${datos.lore ? '<p class="detalle-lore"></p>' : ""}
       <p class="detalle-dato"><span>Tipo</span><b>${datos.tipo}</b></p>
       <p class="detalle-dato"><span>Rareza</span><b style="color: ${RAREZAS[datos.rareza].color}">${RAREZAS[datos.rareza].nombre}</b></p>
       ${datos.nombreVariante ? `<p class="detalle-dato"><span>Variante</span><b>${datos.nombreVariante}</b></p>` : ""}
@@ -250,6 +251,7 @@
       <p class="detalle-dato"><span>Artista</span><b>${enlaceArtista}</b></p>
       <p class="detalle-dato"><span>Obtenida</span><b>×${obtenidas(datos.id)}</b></p>
     `;
+    if (datos.lore) cajaInfo.querySelector(".detalle-lore").textContent = datos.lore;
 
     detalle.hidden = false;
     document.body.classList.add("sin-scroll");

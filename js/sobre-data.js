@@ -6,7 +6,7 @@
  */
 globalThis.SOBRE_CATALOGO = [
   /* ---------- Emotes ---------- */
-  { id: "lentes-oscuros", tipo: "emote", src: "img/emotes/lentes-oscuros.webp", nombre: "Modo cool", alt: "Emote de Wewin con lentes oscuros: modo cool", artista: "skyshinez_", rareza: "comun" },
+  { id: "lentes-oscuros", tipo: "emote", src: "img/emotes/lentes-oscuros.webp", nombre: "Modo cool", alt: "Emote de Wewin con lentes oscuros: modo cool", artista: "skyshinez_", rareza: "comun", lore: "Dicen que estos lentes aparecen justo antes de cada decisión cuestionable. Nadie sabe quién los deja ahí." },
   { id: "angustia", tipo: "emote", src: "img/emotes/angustia.webp", nombre: "Tristeza", alt: "Emote de Wewin llorando de angustia", artista: "skyshinez_", rareza: "comun" },
   { id: "mirada-vacia", tipo: "emote", src: "img/emotes/mirada-vacia.webp", nombre: "Mirada vacía", alt: "Emote de Wewin con mirada vacía de sorpresa", artista: "skyshinez_", rareza: "comun" },
   { id: "durmiendo", tipo: "emote", src: "img/emotes/durmiendo.webp", nombre: "Cansao", alt: "Emote de Wewin durmiendo plácidamente", artista: "skyshinez_", rareza: "comun" },
