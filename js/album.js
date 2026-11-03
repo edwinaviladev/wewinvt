@@ -11,11 +11,12 @@
 
   const CATALOGO = window.SOBRE_CATALOGO || [];
   const ORDEN = ["legendaria", "epica", "rara", "comun"];
+  const Carta = window.CartaWewin;
   const RAREZAS = {
-    comun: { nombre: "Común", color: "#bfa78f", simbolo: "●" },
-    rara: { nombre: "Rara", color: "#a8e6d4", simbolo: "◆" },
-    epica: { nombre: "Épica", color: "#b994ff", simbolo: "★" },
-    legendaria: { nombre: "Legendaria", color: "#f2b263", simbolo: "★" },
+    comun: { nombre: "Común", color: "#bfa78f" },
+    rara: { nombre: "Rara", color: "#a8e6d4" },
+    epica: { nombre: "Épica", color: "#b994ff" },
+    legendaria: { nombre: "Legendaria", color: "#f2b263" },
   };
 
   let coleccion = {};
@@ -30,7 +31,7 @@
   sobres = Number(localStorage.getItem("wewinvt_sobres") || 0);
 
   const obtenidas = (id) => coleccion[id] || 0;
-  const numeroDe = (datos) => "#" + String(CATALOGO.indexOf(datos) + 1).padStart(2, "0");
+  const numeroDe = (datos) => "#" + String(CATALOGO.indexOf(datos) + 1).padStart(3, "0");
 
   /* =========================================================
      NUBE: configuración, login y sincronización
@@ -172,8 +173,8 @@
       `;
 
       const grid = seccion.querySelector(".album-grid");
-      grupo.forEach((datos, i) => {
-        grid.append(obtenidas(datos.id) > 0 ? cartaObtenida(datos, i) : cartaBloqueada(i));
+      grupo.forEach((datos) => {
+        grid.append(obtenidas(datos.id) > 0 ? cartaObtenida(datos) : cartaBloqueada());
       });
       album.append(seccion);
     });
@@ -182,7 +183,7 @@
     if (destacada) {
       destacada.innerHTML = "";
       const carta = CATALOGO.find((c) => c.id === "proyectado");
-      if (carta) destacada.append(cartaObtenida(carta, 0));
+      if (carta) destacada.append(cartaObtenida(carta));
     }
 
     const todasLasVariantesHolo = CATALOGO.filter((c) => c.variante === "holo");
@@ -192,65 +193,29 @@
     const carruselHolo = $(`[data-novedades-holo]`);
     if (carruselHolo) {
       carruselHolo.innerHTML = "";
-      variantesHolo.forEach((carta, i) => carruselHolo.append(cartaObtenida(carta, i)));
+      variantesHolo.forEach((carta) => carruselHolo.append(cartaObtenida(carta)));
     }
 
     const totalHolo = $(`[data-novedades-holo-count]`);
     if (totalHolo) totalHolo.textContent = `${variantesHolo.length} de ${todasLasVariantesHolo.length}`;
   }
 
-  function cartaObtenida(datos, indice, clickeable = true) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "card is-flip is-revealed";
-    btn.style.setProperty("--d", `${indice * 0.04}s`);
-    btn.dataset.rareza = datos.rareza;
-    btn.dataset.tipo = datos.tipo;
-    btn.dataset.variante = datos.variante || "base";
-    const variante = datos.nombreVariante ? `, ${datos.nombreVariante}` : "";
-    btn.setAttribute("aria-label", `${datos.nombre}${variante}, ${RAREZAS[datos.rareza].nombre} (${datos.tipo})`);
-    btn.innerHTML = `
-      <span class="card__bob">
-        <span class="card__inner">
-          <span class="card__face card__face--front">
-            <img class="card__arte" src="${datos.src}" alt="${datos.alt}" loading="lazy" decoding="async" draggable="false" />
-            <i class="card__foil"></i>
-            <i class="card__holo"></i>
-            <i class="card__spark"></i>
-            <span class="card__scrim card__scrim--top">
-              <span class="card__name">${datos.nombre}</span>
-              <span class="card__num">${numeroDe(datos)}</span>
-            </span>
-            <span class="card__scrim card__scrim--base">
-              <span class="card__fila">
-                <span class="card__tipo">${datos.tipo}</span>
-                <span class="card__rareza-lado">
-                  <span class="card__rareza-nombre">${RAREZAS[datos.rareza].nombre}</span>
-                  <span class="card__simbolo">${RAREZAS[datos.rareza].simbolo}</span>
-                </span>
-              </span>
-              ${datos.nombreVariante ? `<span class="card__variante">${datos.nombreVariante}</span>` : ""}
-              <span class="card__credito">Illus. ${datos.artista || "Anónimo"}</span>
-            </span>
-          </span>
-        </span>
-      </span>
-    `;
-    if (clickeable) btn.addEventListener("click", () => abrirDetalle(datos));
+  /* En la cuadrícula la carta queda plana y quieta; solo se inclina la que se toca */
+  function cartaObtenida(datos, opciones = { plana: true }) {
+    const btn = Carta.crearCarta(datos, { soloFrente: true, ...opciones });
+    btn.setAttribute("aria-label", Carta.etiquetaCarta(datos));
+    if (opciones.plana) btn.addEventListener("click", () => abrirDetalle(datos));
     return btn;
   }
 
-  function cartaBloqueada(indice) {
+  function cartaBloqueada() {
     const div = document.createElement("div");
     div.className = "card card--locked";
-    div.style.setProperty("--d", `${indice * 0.04}s`);
     div.setAttribute("aria-label", "Carta sin descubrir");
     div.innerHTML = `
-      <span class="card__bob">
+      <span class="card__incl">
         <span class="card__inner">
-          <span class="card__face card__face--back">
-            <span class="card__emblem">?</span>
-          </span>
+          <span class="card__face card__face--back"></span>
         </span>
       </span>
     `;
@@ -263,6 +228,7 @@
   const detalle = $("[data-detalle]");
   const cajaCarta = $("[data-detalle-carta]");
   const cajaInfo = $("[data-detalle-info]");
+  let dejarDeInclinar = () => {};
 
   function abrirDetalle(datos) {
     const enlaceArtista = datos.enlace
@@ -270,7 +236,10 @@
       : datos.artista || "Anónimo";
 
     cajaCarta.innerHTML = "";
-    cajaCarta.append(cartaObtenida(datos, 0, false));
+    const carta = cartaObtenida(datos, { mece: datos.variante === "holo" });
+    cajaCarta.append(carta);
+    dejarDeInclinar();
+    dejarDeInclinar = Carta.seguirInclinacion(carta);
 
     cajaInfo.innerHTML = `
       <h3>${datos.nombre}</h3>
@@ -287,6 +256,9 @@
   }
 
   function cerrarDetalle() {
+    dejarDeInclinar();
+    dejarDeInclinar = () => {};
+    cajaCarta.innerHTML = "";
     detalle.hidden = true;
     document.body.classList.remove("sin-scroll");
   }

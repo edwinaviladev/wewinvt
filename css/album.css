@@ -1,6 +1,6 @@
 /* =========================================================
    WewinVT · Álbum de colección (prototipo)
-   Reutiliza el motor visual de css/sobre.css (cartas, botones, paleta)
+   Reutiliza las cartas de css/sobre.css (cartas, botones, paleta)
    Carga DESPUÉS de styles.css, paleta-editorial.css y sobre.css
    ========================================================= */
 
@@ -186,26 +186,28 @@ body.sin-scroll { overflow: hidden !important; }
   grid-template-columns: repeat(auto-fit, var(--album-card-size));
   justify-content: center;
   gap: clamp(14px, 2vw, 22px);
-  perspective: 1100px;
 }
 
 .album-seccion .card {
   --cw: var(--album-card-size);
-  width: var(--cw);
-  animation-name: card-album-in;
+  --sombra-carta: 0 10px 20px rgb(36 35 33 / 24%);
 }
 
-@keyframes card-album-in {
-  from { transform: translateY(22px) scale(0.9); opacity: 0; }
+/* El catálogo fuera de pantalla no se pinta */
+#catalogo-cartas .album-seccion {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1100px;
 }
 
-/* Cartas aún sin descubrir */
+/* Cartas aún sin descubrir: el reverso apagado, plano y sin brillo */
 .card--locked { cursor: default; }
-.card--locked .card__face--back { opacity: 0.5; }
-.card--locked .card__emblem {
-  background: radial-gradient(circle at 32% 30%, #93816d, #6f5c4b 55%, #4c3e32);
-  color: #241813;
+.card--locked .card__incl,
+.card--locked .card__inner { transform: none; }
+.card--locked .card__face--back {
   box-shadow: none;
+  background-color: #2b2624;
+  background-blend-mode: luminosity;
+  opacity: 0.42;
 }
 
 /* ---------- Detalle de carta ---------- */
@@ -234,20 +236,13 @@ body.sin-scroll { overflow: hidden !important; }
   width: 100%;
   max-width: min(980px, 94vw);
   margin-block: auto;
-  perspective: 1300px;
   animation: detalle-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 .detalle .card {
   --cw: min(460px, 78vw, 48vh);
-  --tilt: 0deg;
-  cursor: grab;
+  cursor: default;
 }
-.detalle .card.is-revealed {
-  will-change: transform;
-  transition: transform 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-.detalle .card.is-revealed:active { cursor: grabbing; }
 
 .detalle-info {
   display: grid;
@@ -449,6 +444,10 @@ body.album-page .album-acciones {
 body.album-page .btn {
   border-radius: var(--radius-sm);
   font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: none;
   box-shadow: none;
 }
 
@@ -505,18 +504,6 @@ body.album-page .album-rareza .linea {
   opacity: 1;
 }
 
-body.album-page .album-seccion .card {
-  color: #f6ebdd;
-  --text: #f6ebdd;
-  --muted: #bfa899;
-  --mint: #a8e6d4;
-  --caramelo: #f2b263;
-}
-
-body.album-page .album-seccion .card__face {
-  box-shadow: 0 10px 20px rgb(36 35 33 / 18%);
-}
-
 body.album-page .album-novedades {
   --c: var(--color-accent);
 }
@@ -562,28 +549,12 @@ body.album-page .album-novedades__variantes > p {
 
 .album-novedades__carrusel .card {
   --cw: var(--holo-card-size);
-  width: var(--cw);
   scroll-snap-align: start;
+  touch-action: pan-x;
 }
 
 body.album-page .album-novedades__acciones {
   margin: 1.25rem 0 0;
-}
-
-body.album-page .detalle .card {
-  color: #f6ebdd;
-  --text: #f6ebdd;
-  --muted: #bfa899;
-  --mint: #a8e6d4;
-  --caramelo: #f2b263;
-}
-
-body.album-page .detalle .card__face {
-  box-shadow: 0 12px 24px rgb(0 0 0 / 32%);
-}
-
-body.album-page .album-seccion .card.is-revealed .card__face--front {
-  animation: none;
 }
 
 body.album-page .album-pie {
@@ -640,4 +611,12 @@ body.album-page .detalle-cerrar {
   .album-novedades__carrusel {
     --holo-card-size: clamp(126px, 40vw, 160px);
   }
+}
+
+/* ---------- Movimiento reducido ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .barra i,
+  body.album-page .barra i { transition: none; }
+  .detalle-caja { animation: none; }
 }
