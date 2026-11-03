@@ -1,0 +1,22 @@
+# Applied by Cloudflare to static asset responses. /api/* is answered by worker.js.
+# Overlapping rules join repeated headers with a comma, so each header is set by one rule only.
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-/x7W7R75k8Roq0WaVRQX9blP4OufE5xbAdzklGxsgpw='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://static-cdn.jtvnw.net; connect-src 'self' https://api.twitch.tv https://id.twitch.tv wss://eventsub.wss.twitch.tv https://api.ivr.fi https://decapi.me; frame-src https://player.twitch.tv; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Strict-Transport-Security: max-age=31536000
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Names have no content hash, so lifetimes stay short enough for updates to arrive.
+# HTML keeps the default (always revalidate). CSS and JS ship together with it, so they get minutes.
+/css/*
+  Cache-Control: public, max-age=600
+
+/js/*
+  Cache-Control: public, max-age=600
+
+/img/*
+  Cache-Control: public, max-age=86400
+
+/favicon.webp
+  Cache-Control: public, max-age=86400
