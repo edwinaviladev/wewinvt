@@ -891,12 +891,13 @@
      ========================================================= */
   function encolarCanje(opciones = {}) {
     /* Twitch puede reentregar un evento: un canjeId ya visto no se repite */
+    if (opciones.canjeId && canjesVistos.has(opciones.canjeId)) return false;
+    if (colaCanjes.length >= MAX_COLA) return false;
+    /* Se marca solo si entra en la cola: uno descartado aún puede reentregarse */
     if (opciones.canjeId) {
-      if (canjesVistos.has(opciones.canjeId)) return false;
       canjesVistos.add(opciones.canjeId);
       if (canjesVistos.size > MAX_VISTOS) canjesVistos.delete(canjesVistos.values().next().value);
     }
-    if (colaCanjes.length >= MAX_COLA) return false;
     colaCanjes.push(opciones);
     procesarCola();
     return true;

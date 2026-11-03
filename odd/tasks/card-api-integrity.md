@@ -15,11 +15,12 @@ Accepted by the user: online collections change only through stream redemptions.
 - No dependencies and no build step. Tests use `node --test`.
 
 ## Configuration
-- TDD: off (source: no project configuration). Runner: `node --test test/`.
+- TDD: off (source: no project configuration). Runner: `node --test`.
 - Delivery strategy: `ask-on-risk`. Forecast: about 400 authored changed lines.
 - Branch: `fix/card-api-integrity`, based on `feat/card-holo-showcase`.
 
 ## Tasks
+- [x] T5 Fix accepted review findings: redemption write order, Twitch outage status, seen-after-capacity. Route: inline (one design decision, one mechanical second file).
 - [x] T1 Share the pack roll between browser and Worker. Route: delegated (writer trigger, 2+ non-trivial files).
 - [x] T2 Harden the Worker: fixed broadcaster, server-side roll, idempotent redemptions, no client writes. Route: delegated.
 - [x] T3 Adapt overlay and album to the new contract. Route: delegated.
@@ -47,13 +48,14 @@ T1 to T4 complete on the branch. Not pushed or deployed.
 
 - Native review: medium risk, reliability lens, approved and acknowledged on lineage review-1436c4b3a78f37fb.
 
+## T5 evidence
+- `node --test`: 18 pass, 0 fail, including injected KV write failures on both keys and a Twitch 503.
+- Browser, overlay on the local server: a redemption dropped by a full queue was refused, accepted when redelivered after the queue drained (15 s), then refused as a duplicate.
+
 ## Open advisory findings
 Non-blocking and not fixed:
-- A failed idempotency marker write returns 500 after cards are saved, so the overlay retry can award a second pack (worker.js:196-202). This conflicts with the replay criterion.
-- Any non-OK Twitch validate response becomes 401, so a transient outage skips the retry (worker.js:81).
-- A canjeId is marked seen before the queue capacity check, so a dropped redemption cannot be redelivered (js/sobre.js:893-898).
-- KV has no atomic check, so concurrent replays can both pass (worker.js:181).
-- The real redemption path in the overlay has no runtime proof (js/sobre.js:758-774).
+- KV has no atomic check, so concurrent replays of one canjeId can both pass (worker.js).
+- The real redemption path in the overlay has no runtime proof (js/sobre.js).
 
 ## Next step
-User decision on the advisory fixes, then push and deploy. Existing KV data is not cleaned.
+User decision on push and deploy. Existing KV data is not cleaned. Collections gain a bounded `canjes` list.

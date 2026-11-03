@@ -28,6 +28,7 @@ globalThis.fetch = async (url, init) => {
   assert.equal(String(url), "https://id.twitch.tv/oauth2/validate");
   const token = init.headers.Authorization.replace("OAuth ", "");
   if (token === "tok-ajeno") return Response.json({ user_id: BROADCASTER, client_id: "otra-app" });
+  if (token === "tok-caida") return new Response("{}", { status: 503 });
   if (token.startsWith("tok-")) return Response.json({ user_id: token.slice(4), client_id: CLIENT });
   return new Response("{}", { status: 401 });
 };
@@ -84,6 +85,60 @@ test("repetir el canje devuelve lo mismo sin sumar cartas", async () => {
   const b = await (await canje({ canjeId: "c1", usuarioId: "111" })).json();
   assert.deepEqual(b, a);
   assert.equal(kv.mapa.get("coleccion:111"), antes);
+});
+
+test("si falla guardar la colección, reintentar da las mismas cartas una sola vez", async () => {
+  const putReal = kv.put;
+  kv.put = async (k, v, o) => {
+    if (k === "coleccion:111") throw new Error("KV caído");
+    return putReal(k, v, o);
+  };
+  assert.equal((await canje({ canjeId: "c1", usuarioId: "111" })).status, 500);
+  assert.equal(kv.mapa.has("coleccion:111"), false);
+  const sorteado = JSON.parse(kv.mapa.get("canje:c1")).cartas;
+
+  kv.put = putReal;
+  const datos = await (await canje({ canjeId: "c1", usuarioId: "111" })).json();
+  assert.deepEqual(datos.cartas, sorteado);
+  const guardada = JSON.parse(kv.mapa.get("coleccion:111"));
+  assert.equal(guardada.sobres, 1);
+  assert.equal(Object.values(guardada.cartas).reduce((a, b) => a + b, 0), 3);
+
+  await canje({ canjeId: "c1", usuarioId: "111" });
+  assert.equal(JSON.parse(kv.mapa.get("coleccion:111")).sobres, 1);
+});
+
+test("si falla guardar el sorteo no se suma nada y reintentar funciona", async () => {
+  const putReal = kv.put;
+  kv.put = async (k, v, o) => {
+    if (k === "canje:c1") throw new Error("KV caído");
+    return putReal(k, v, o);
+  };
+  assert.equal((await canje({ canjeId: "c1", usuarioId: "111" })).status, 500);
+  assert.equal(kv.mapa.has("coleccion:111"), false);
+
+  kv.put = putReal;
+  assert.equal((await canje({ canjeId: "c1", usuarioId: "111" })).status, 200);
+  assert.equal(JSON.parse(kv.mapa.get("coleccion:111")).sobres, 1);
+});
+
+test("los canjes aplicados quedan acotados y no salen en GET", async () => {
+  kv.mapa.set(
+    "coleccion:111",
+    JSON.stringify({ cartas: {}, sobres: 0, canjes: Array.from({ length: 200 }, (_, i) => `v${i}`) })
+  );
+  await canje({ canjeId: "c1", usuarioId: "111" });
+  const guardada = JSON.parse(kv.mapa.get("coleccion:111"));
+  assert.equal(guardada.canjes.length, 200);
+  assert.equal(guardada.canjes.at(-1), "c1");
+  const { coleccion } = await (await llamar("GET", "/api/coleccion", { token: "tok-111" })).json();
+  assert.equal("canjes" in coleccion, false);
+});
+
+test("una caída de Twitch da 502, no 401", async () => {
+  const res = await canje({ canjeId: "c1", usuarioId: "111" }, "tok-caida");
+  assert.equal(res.status, 502);
+  assert.equal(kv.mapa.size, 0);
 });
 
 test("el mismo canjeId con otro usuarioId da 409", async () => {

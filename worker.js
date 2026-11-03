@@ -40,6 +40,7 @@ const json = (datos, status = 200) =>
 const claveColeccion = (userId) => `coleccion:${userId}`;
 const claveCanje = (canjeId) => `canje:${canjeId}`;
 const TTL_CANJE = 7 * 24 * 60 * 60; // segundos: ventana de idempotencia
+const MAX_CANJES_APLICADOS = 200; // por colección: últimos canjes ya sumados
 
 /* Error con código HTTP: el mensaje es seguro de mostrar al cliente */
 class ErrorHttp extends Error {
@@ -78,7 +79,9 @@ async function twitchTokenValido(request, env) {
   if (!env.CLIENT_ID) throw new ErrorHttp(500, "el servidor no tiene CLIENT_ID configurado");
 
   const res = await fetch(TWITCH_VALIDATE, { headers: { Authorization: `OAuth ${token}` } });
-  if (!res.ok) throw new ErrorHttp(401, "token de Twitch inválido");
+  if (res.status === 401) throw new ErrorHttp(401, "token de Twitch inválido");
+  /* Otro error es un fallo de Twitch, no del token: 5xx para que el cliente reintente */
+  if (!res.ok) throw new ErrorHttp(502, "no se pudo validar el token con Twitch");
   const datos = await res.json();
   if (datos.client_id !== env.CLIENT_ID) {
     throw new ErrorHttp(401, "el token no pertenece a esta aplicación");
@@ -147,8 +150,8 @@ export default {
 
       if (url.pathname === "/api/coleccion" && request.method === "GET") {
         const usuario = await twitchTokenValido(request, env);
-        const coleccion = await leerColeccionDe(env, usuario.user_id);
-        return json({ coleccion });
+        const { cartas, sobres } = await leerColeccionDe(env, usuario.user_id);
+        return json({ coleccion: { cartas, sobres } });
       }
 
       if (url.pathname === "/api/coleccion" && request.method === "DELETE") {
@@ -177,30 +180,33 @@ export default {
           throw new ErrorHttp(400, "usuarioId inválido");
         }
 
-        /* Idempotencia: el mismo canje devuelve el resultado guardado */
+        /* Idempotencia en dos pasos, para que un fallo a mitad se pueda reintentar:
+           1) el resultado del sorteo se guarda antes de tocar la colección;
+           2) la colección registra el canje en la misma escritura que suma las cartas. */
+        const coleccion = await leerColeccionDe(env, usuarioId);
         const previo = await env.COLECCIONES.get(claveCanje(canjeId));
-        if (previo) {
-          const guardado = JSON.parse(previo);
-          if (guardado.usuarioId !== usuarioId) throw new ErrorHttp(409, "canjeId ya usado por otro usuario");
-          return json({ ok: true, cartas: guardado.cartas, nuevas: guardado.nuevas });
+        let resultado = previo ? JSON.parse(previo) : null;
+        if (resultado && resultado.usuarioId !== usuarioId) {
+          throw new ErrorHttp(409, "canjeId ya usado por otro usuario");
+        }
+        if (!resultado) {
+          const sorteo = globalThis.SOBRE_SORTEO.construirCartas(globalThis.SOBRE_CATALOGO, { random: azarSeguro });
+          const ids = sorteo.map((c) => c.id);
+          const nuevas = [...new Set(ids.filter((id) => !Number(coleccion.cartas[id])))];
+          resultado = { usuarioId, cartas: ids, nuevas };
+          await env.COLECCIONES.put(claveCanje(canjeId), JSON.stringify(resultado), { expirationTtl: TTL_CANJE });
         }
 
-        const sorteo = globalThis.SOBRE_SORTEO.construirCartas(globalThis.SOBRE_CATALOGO, { random: azarSeguro });
-        const cartas = sorteo.map((c) => c.id);
-        const coleccion = await leerColeccionDe(env, usuarioId);
-        const nuevas = [...new Set(cartas.filter((id) => !Number(coleccion.cartas[id])))];
-        cartas.forEach((id) => {
-          coleccion.cartas[id] = (Number(coleccion.cartas[id]) || 0) + 1;
-        });
-        coleccion.sobres = (coleccion.sobres || 0) + 1;
-        /* Primero la colección, después la marca de idempotencia */
-        await env.COLECCIONES.put(claveColeccion(usuarioId), JSON.stringify(coleccion));
-        await env.COLECCIONES.put(
-          claveCanje(canjeId),
-          JSON.stringify({ usuarioId, cartas, nuevas }),
-          { expirationTtl: TTL_CANJE }
-        );
-        return json({ ok: true, cartas, nuevas });
+        const aplicados = coleccion.canjes || [];
+        if (!aplicados.includes(canjeId)) {
+          resultado.cartas.forEach((id) => {
+            coleccion.cartas[id] = (Number(coleccion.cartas[id]) || 0) + 1;
+          });
+          coleccion.sobres = (coleccion.sobres || 0) + 1;
+          coleccion.canjes = [...aplicados, canjeId].slice(-MAX_CANJES_APLICADOS);
+          await env.COLECCIONES.put(claveColeccion(usuarioId), JSON.stringify(coleccion));
+        }
+        return json({ ok: true, cartas: resultado.cartas, nuevas: resultado.nuevas });
       }
 
       return json({ error: "no encontrado" }, 404);
