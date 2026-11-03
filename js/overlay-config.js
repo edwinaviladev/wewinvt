@@ -11,8 +11,15 @@
   const cajaError = $("[data-error]");
 
   $("#redirect-uri").textContent = redirectUri;
-  $("[data-url-overlay]").textContent =
-    location.origin + location.pathname.replace("overlay-config.html", "overlay.html") + "?transparente=1";
+  const overlayUrl = new URL(location.href);
+  const sourcePath = overlayUrl.pathname.replace(/\/+$/, "");
+  const extension = sourcePath.endsWith(".html") ? ".html" : "";
+  const directory = sourcePath.slice(0, sourcePath.lastIndexOf("/") + 1);
+  overlayUrl.pathname = `${directory}overlay${extension}`;
+  overlayUrl.search = "";
+  overlayUrl.hash = "";
+  overlayUrl.searchParams.set("transparente", "1");
+  $("[data-url-overlay]").textContent = overlayUrl.href;
 
   $("[data-copiar]").addEventListener("click", async (e) => {
     try {
