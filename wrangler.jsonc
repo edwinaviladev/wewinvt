@@ -3,7 +3,8 @@
   "main": "worker.js",
   "compatibility_date": "2026-01-01",
   "vars": {
-    "CLIENT_ID": "op28ng6zg78d56abgmhbqj3dgr9t90"
+    "CLIENT_ID": "op28ng6zg78d56abgmhbqj3dgr9t90",
+    "BROADCASTER_ID": "523494003"
   },
   "assets": {
     "directory": ".",

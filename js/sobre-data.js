@@ -4,7 +4,7 @@
  * Al final, cada carta se expande en una versión base (90) y una Holo (10).
  * Rarezas: comun | rara | epica | legendaria (misma paleta del sitio).
  */
-window.SOBRE_CATALOGO = [
+globalThis.SOBRE_CATALOGO = [
   /* ---------- Emotes ---------- */
   { id: "lentes-oscuros", tipo: "emote", src: "img/emotes/lentes-oscuros.webp", nombre: "Modo cool", alt: "Emote de Wewin con lentes oscuros: modo cool", artista: "skyshinez_", rareza: "comun" },
   { id: "angustia", tipo: "emote", src: "img/emotes/angustia.webp", nombre: "Tristeza", alt: "Emote de Wewin llorando de angustia", artista: "skyshinez_", rareza: "comun" },

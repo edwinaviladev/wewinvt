@@ -1,8 +1,8 @@
 /*
  * Álbum de colección · WewinVT
- * - Pinta el catálogo por rareza desde la colección (localStorage, unida con la nube).
- * - Login de viewers con Twitch: la colección se guarda en línea vía /api/coleccion.
- * - Al conectarse, une local y nube (máximo por carta) y sube lo jugado offline.
+ * - Sin sesión: pinta la colección local (localStorage) de la demo /sobre.
+ * - Con sesión de Twitch: pinta la colección en línea (GET /api/coleccion), que solo
+ *   cambia por canjes reales del stream. No se sube nada y no se pisa el localStorage.
  */
 (() => {
   "use strict";
@@ -61,26 +61,10 @@
       const datos = await res.json();
       const nube = datos.coleccion || { cartas: {}, sobres: 0 };
 
-      /* Une local y nube; lo jugado offline se sube a la nube */
-      const deltas = [];
-      for (const carta of CATALOGO) {
-        const localN = coleccion[carta.id] || 0;
-        const nubeN = nube.cartas?.[carta.id] || 0;
-        for (let i = 0; i < localN - nubeN; i++) deltas.push(carta.id);
-        coleccion[carta.id] = Math.max(localN, nubeN);
-      }
-      sobres = Math.max(sobres, nube.sobres || 0);
-
-      if (deltas.length) {
-        await fetch("/api/coleccion", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ anadir: deltas }),
-        });
-      }
-
-      localStorage.setItem("wewinvt_coleccion", JSON.stringify(coleccion));
-      localStorage.setItem("wewinvt_sobres", String(sobres));
+      /* Con sesión se muestra la nube, solo en memoria: la colección local de la
+         demo sigue intacta en localStorage y vuelve a verse al cerrar sesión */
+      coleccion = { ...(nube.cartas || {}) };
+      sobres = Number(nube.sobres) || 0;
       return true;
     } catch {
       return false;
@@ -109,7 +93,7 @@
           nombre = "";
         }
       }
-      linea.innerHTML = `Colección en línea ✅${nombre ? ` · <b>${nombre}</b>` : ""}`;
+      linea.innerHTML = `Colección en línea ✅ (solo cambia con canjes del stream)${nombre ? ` · <b>${nombre}</b>` : ""}`;
       btnConectar.hidden = true;
       btnSalir.hidden = false;
     } else {

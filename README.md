@@ -61,7 +61,19 @@ el layout compartido se conserva en `css/styles.css`. Twitch mantiene su morado 
 5. En *Custom domains* agrega `wewinvt.com` y `www.wewinvt.com`.
 
 Si despliegas el Worker con Wrangler y `assets.directory` apunta a la raíz,
-`.assetsignore` excluye `.git` del paquete estático.
+`.assetsignore` excluye `.git`, `odd/` y `test/` del paquete estático.
+
+### Colección en línea y canjes
+
+- La colección en línea solo cambia por canjes reales del stream: `POST /api/canje` lo puede
+  llamar únicamente el usuario cuyo id sea `BROADCASTER_ID` (variable en `wrangler.jsonc`;
+  si falta, el endpoint falla cerrado). El servidor sortea el sobre y es idempotente por
+  `canjeId`. `/sobre` es una demo local y no escribe en la nube.
+- `CLIENT_ID` también es obligatorio: sin él la API rechaza cualquier token.
+
+### Pruebas
+
+`node --test` (Node 20+, sin dependencias).
 
 ### GitHub Pages (alternativa)
 
