@@ -738,7 +738,7 @@ body {
   text-overflow: ellipsis;
 }
 
-/* Holo TCGP (épica y legendaria) */
+/* Capa holográfica: permanece apagada salvo para la variante Holo. */
 .card__holo {
   position: absolute;
   inset: 0;
@@ -752,12 +752,6 @@ body {
   opacity: 0;
   transition: opacity 0.4s;
 }
-
-.card.is-revealed[data-rareza="epica"] .card__holo { opacity: 0.24; }
-.card[data-rareza="legendaria"] .card__holo {
-  background: linear-gradient(115deg, transparent 22%, rgb(255 255 255 / 22%) 40%, rgb(255 207 91 / 38%) 50%, rgb(255 248 224 / 24%) 58%, transparent 78%);
-}
-.card.is-revealed[data-rareza="legendaria"] .card__holo { opacity: 0.3; }
 
 /* Variante holo: color prismático fijo, movido por el puntero (sin destello periódico) */
 .card[data-variante="holo"] .card__foil {
@@ -820,10 +814,6 @@ body {
 
 .card.is-revealed[data-rareza="legendaria"]:not([data-variante="holo"]) .card__foil {
   animation: brillo-legendaria-ocasional 8s ease-in-out infinite;
-}
-
-.card.is-revealed[data-rareza="legendaria"]:not([data-variante="holo"]) .card__holo {
-  opacity: 0;
 }
 
 .card.is-revealed[data-rareza="legendaria"]:not([data-variante="holo"]) .card__spark {
