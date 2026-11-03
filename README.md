@@ -61,7 +61,9 @@ el layout compartido se conserva en `css/styles.css`. Twitch mantiene su morado 
 5. En *Custom domains* agrega `wewinvt.com` y `www.wewinvt.com`.
 
 Si despliegas el Worker con Wrangler y `assets.directory` apunta a la raíz,
-`.assetsignore` excluye `.git`, `odd/` y `test/` del paquete estático.
+`.assetsignore` deja fuera del paquete estático todo lo que no es del sitio: código del servidor, configuración, documentación, `odd/`, `test/` y los originales de imagen (las páginas solo cargan `.webp`).
+
+`_headers` define los headers de seguridad y la caché de los assets. Si agregas un script inline o un origen externo, actualiza su CSP; `node --test` falla si un script inline no tiene su hash.
 
 ### Colección en línea y canjes
 

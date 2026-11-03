@@ -1,3 +1,41 @@
+# Allowlist by exclusion: everything in the repo root is published unless listed here.
+
+# Repository and tooling
 /.git
+/.gitignore
+/.wrangler
+/.claude
+/.codegraph
+/.atl
+/.vscode
+/.idea
+/node_modules
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Secrets, in case they ever exist locally
+/.env*
+/.dev.vars*
+
+# Server code, configuration and docs
+/worker.js
+/wrangler.jsonc
+/servidor.mjs
+/servidor.cmd
+/README.md
+/upgrades.md
+
+# Not part of the site
 /odd
 /test
+/old
+/fanarts y emotes
+
+# Image originals and unused images: pages only load the .webp versions below
+/favicon.png
+/img/avatar-preview.webp
+/img/**/*.png
+/img/**/*.jpg
+/img/**/*.jpeg
+/img/**/*.gif

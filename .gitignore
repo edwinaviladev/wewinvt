@@ -3,8 +3,9 @@
 # Versión anterior del sitio (React/Vite) que ya no se despliega
 /old/
 
-# Estado/caché de herramientas locales (skills, editores)
+# Estado/caché de herramientas locales (skills, editores, wrangler)
 /.atl/
+/.wrangler/
 
 # Doc de planeación personal (no se publica)
 /upgrades.md
@@ -32,3 +33,4 @@ dist/
 # Envs por si algún día se agregan claves (ej. API de Twitch)
 .env
 .env.*
+.dev.vars*
