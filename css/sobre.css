@@ -1022,7 +1022,7 @@ body.modo-overlay.is-transparente .velo {
 /* Banner: quién canjeó el sobre */
 .canje-banner {
   position: absolute;
-  top: clamp(64px, 15vh, 130px);
+  top: clamp(10px, 2.5vh, 22px);
   left: 50%;
   translate: -50% 0;
   z-index: 7;
@@ -1085,6 +1085,8 @@ body.modo-overlay.is-transparente .velo {
   pointer-events: none;
 }
 .rarity-splash[hidden] { display: none; }
+/* En el overlay deja libre la franja superior del banner de quién canjeó */
+.modo-overlay .rarity-splash { top: clamp(64px, 10vh, 84px); }
 
 .rarity-splash::before {
   content: "";
