@@ -777,6 +777,16 @@ body {
   filter: saturate(1.35);
 }
 
+.card.is-revealed[data-variante="holo"] .card__foil,
+.card.is-revealed[data-variante="holo"] .card__holo {
+  animation: tonos-holo 7s ease-in-out infinite alternate;
+}
+
+@keyframes tonos-holo {
+  from { filter: hue-rotate(-10deg) saturate(1.3); }
+  to { filter: hue-rotate(70deg) saturate(1.65); }
+}
+
 .card.is-revealed[data-variante="holo"] .card__spark { opacity: 0; animation: none; }
 
 .card[data-variante="holo"] .card__holo::after {
