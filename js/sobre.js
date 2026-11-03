@@ -36,6 +36,9 @@
   /* Cola de canjes: si varios viewers canjean seguido, los sobres salen en fila */
   const colaCanjes = [];
   const MAX_COLA = 10;
+  /* Canjes ya recibidos en esta sesión de página (acotado) */
+  const canjesVistos = new Set();
+  const MAX_VISTOS = 200;
   /* Tiempo que cada carta se muestra antes de salir de pantalla */
   const HOLD_MS = { comun: 1400, rara: 1400, epica: 1900, legendaria: 2500 };
 
@@ -50,10 +53,10 @@
      ========================================================= */
   const ORDEN = ["comun", "rara", "epica", "legendaria"];
   const RAREZAS = {
-    comun: { nombre: "Común", peso: 55, simbolo: "●" },
-    rara: { nombre: "Rara", peso: 25, simbolo: "◆" },
-    epica: { nombre: "Épica", peso: 15, simbolo: "★" },
-    legendaria: { nombre: "Legendaria", peso: 5, simbolo: "★" },
+    comun: { nombre: "Común", simbolo: "●" },
+    rara: { nombre: "Rara", simbolo: "◆" },
+    epica: { nombre: "Épica", simbolo: "★" },
+    legendaria: { nombre: "Legendaria", simbolo: "★" },
   };
   const COLOR_RAREZA = {
     comun: "#bfa78f",
@@ -61,8 +64,7 @@
     epica: "#b994ff",
     legendaria: "#f2b263",
   };
-  /* El tercer sobre garantiza Rara o mejor (estilo TCGP) */
-  const PESOS_SLOT3 = { comun: 0, rara: 70, epica: 22, legendaria: 8 };
+  /* Los pesos del sorteo viven en js/sorteo.js (compartido con el Worker) */
 
   const CATALOGO = window.SOBRE_CATALOGO || [];
 
@@ -195,22 +197,6 @@
   const azar = (n) => Math.floor(Math.random() * n);
   const elegir = (lista) => lista[azar(lista.length)];
 
-  function rollPeso(pesos) {
-    const total = Object.values(pesos).reduce((a, b) => a + b, 0);
-    let r = Math.random() * total;
-    for (const [clave, peso] of Object.entries(pesos)) {
-      r -= peso;
-      if (r <= 0) return clave;
-    }
-    return Object.keys(pesos).at(-1);
-  }
-
-  function rollRarity(minTier = 0) {
-    const pesos = {};
-    ORDEN.forEach((k, i) => { if (i >= minTier) pesos[k] = RAREZAS[k].peso; });
-    return rollPeso(pesos);
-  }
-
   /* =========================================================
      ESTADO
      ========================================================= */
@@ -219,7 +205,6 @@
   let reveladas = 0;
   let idsNuevosCanje = new Set();
   /* Contexto del canje en curso (modo overlay) y del canal conectado */
-  let canalId = null;
   let usuarioActual = "";
   let usuarioIdActual = "";
 
@@ -241,43 +226,34 @@
     }
   }
 
-  /* Sube cartas/pack a la colección en línea del usuario con sesión iniciada */
-  async function subirColeccion(ids, sobres = 0) {
-    try {
-      const token = await window.TwitchAuth?.tokenValido?.();
-      if (!token) return;
-      await fetch("/api/coleccion", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ anadir: ids, sobres }),
-      });
-    } catch {
-      /* offline: queda guardado localmente */
+  /* Registra en la nube un canje del stream. El servidor sortea las cartas
+     y las suma al coleccionista; aquí solo se envía qué canje y de quién.
+     Devuelve { cartas, nuevas } o null si no se pudo registrar.
+     Es idempotente por canjeId, así que reintentar una vez es seguro. */
+  async function registrarCanjeNube(canjeId, usuarioId) {
+    const token = await window.TwitchAuth?.tokenValido?.().catch(() => null);
+    if (!token || !canjeId || !usuarioId) return null;
+    for (let intento = 0; intento < 2; intento++) {
+      try {
+        const res = await fetch("/api/canje", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ canjeId, usuarioId }),
+        });
+        if (res.ok) {
+          const resultado = await res.json();
+          if (!Array.isArray(resultado.cartas)) return null;
+          return {
+            cartas: resultado.cartas,
+            nuevas: Array.isArray(resultado.nuevas) ? resultado.nuevas : [],
+          };
+        }
+        if (res.status < 500) return null; // 4xx: reintentar no cambia nada
+      } catch {
+        /* red caída: se reintenta una vez */
+      }
     }
-  }
-
-  /* Registra en la nube un canje del stream: las cartas van al coleccionista */
-  async function registrarCanjeNube() {
-    try {
-      const token = await window.TwitchAuth?.tokenValido?.();
-      if (!token || !canalId || !usuarioIdActual) return [];
-      const res = await fetch("/api/canje", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          broadcasterId: canalId,
-          usuarioId: usuarioIdActual,
-          usuarioLogin: usuarioActual,
-          cartas: cartasActuales.map((c) => c.id),
-        }),
-      });
-      if (!res.ok) return [];
-      const resultado = await res.json();
-      return Array.isArray(resultado.nuevas) ? resultado.nuevas : [];
-    } catch {
-      /* silencioso: el evento en pantalla no depende de la nube */
-      return [];
-    }
+    return null;
   }
 
   function pintarContador() {
@@ -289,39 +265,7 @@
      ========================================================= */
   function construirSobre() {
     const forzado = forceSel.value; // "" | rara | epica | legendaria
-    const usadas = new Set();
-    cartasActuales = [];
-    const cartasBase = CATALOGO.filter((c) => !c.variante || c.variante === "base");
-    const grupoDe = (carta) => carta.grupoId || carta.id;
-
-    for (let i = 0; i < 3; i++) {
-      let tier;
-      if (i === 2) {
-        if (forzado) tier = forzado;
-        else if (Math.random() < 0.08) tier = rollPeso({ rara: 1, epica: 2, legendaria: 1 });
-        else tier = rollPeso(PESOS_SLOT3);
-      } else {
-        tier = rollRarity();
-      }
-
-      const sinRepetir = (lista) => lista.filter((c) => !usadas.has(grupoDe(c)));
-      let pool = sinRepetir(cartasBase.filter((c) => c.rareza === tier));
-      if (!pool.length) pool = sinRepetir(cartasBase.filter((c) => ORDEN.indexOf(c.rareza) >= ORDEN.indexOf(tier)));
-      if (!pool.length) pool = sinRepetir(cartasBase);
-
-      const cartaBase = elegir(pool);
-      const grupoId = grupoDe(cartaBase);
-      const variantes = CATALOGO.filter((c) => grupoDe(c) === grupoId && c.rareza === cartaBase.rareza);
-      const pesosVariantes = Object.fromEntries(variantes.map((c) => [
-        c.id,
-        c.pesoVariante ?? (!c.variante || c.variante === "base" ? 100 : 0),
-      ]));
-      const idVariante = rollPeso(pesosVariantes);
-      const carta = variantes.find((c) => c.id === idVariante) || cartaBase;
-
-      usadas.add(grupoId);
-      cartasActuales.push(carta);
-    }
+    cartasActuales = window.SOBRE_SORTEO.construirCartas(CATALOGO, { forzado });
   }
 
   /* =========================================================
@@ -733,7 +677,6 @@
       btn.setAttribute("aria-label", ariaLabelCarta(datos, nueva));
       AudioFX.sting(datos.rareza);
       efectosRareza(datos.rareza, btn);
-      subirColeccion([datos.id]);
 
       reveladas++;
       if (reveladas === cartasActuales.length) terminar();
@@ -745,7 +688,6 @@
     btnRevealAll.hidden = true;
     hint.textContent = elegir(FRASES);
     setTimeout(() => AudioFX.fanfare(), 380);
-    subirColeccion([], 1);
 
     const abiertos = contarAbiertos() + 1;
     localStorage.setItem("wewinvt_sobres", String(abiertos));
@@ -775,7 +717,7 @@
      Aparece el sobre → se rasga solo → las cartas salen una por
      una, se destapan, se muestran un momento y salen de pantalla.
      ========================================================= */
-  function secuenciaCanje(forzar = "", usuario = "", usuarioId = "") {
+  function secuenciaCanje(forzar = "", usuario = "", usuarioId = "", canjeId = "") {
     if (MODO !== "overlay" || secuencia || estado !== "idle") return;
     idsNuevosCanje = new Set();
     secuencia = true;
@@ -813,7 +755,23 @@
       pack.hidden = true;
       pack.classList.remove("is-entering", "is-winding", "is-open");
       construirSobre();
-      idsNuevosCanje = new Set(await registrarCanjeNube());
+      /* Solo los canjes reales (con canjeId y usuarioId) tocan la nube; el
+         servidor decide las cartas y aquí se muestran esas */
+      if (canjeId && usuarioId) {
+        const resultado = await registrarCanjeNube(canjeId, usuarioId);
+        const otorgadas = resultado?.cartas.map((id) => CATALOGO.find((c) => c.id === id));
+        if (otorgadas && otorgadas.every(Boolean)) {
+          cartasActuales = otorgadas;
+          idsNuevosCanje = new Set(resultado.nuevas);
+        } else {
+          debugLinea(
+            resultado
+              ? "el servidor devolvió cartas desconocidas: el canje no se guardó"
+              : "no se pudo guardar el canje en la nube: el canje no se guardó",
+            "err"
+          );
+        }
+      }
       soltarCartas();
     }, 1800);
   }
@@ -932,6 +890,12 @@
      COLA DE CANJES
      ========================================================= */
   function encolarCanje(opciones = {}) {
+    /* Twitch puede reentregar un evento: un canjeId ya visto no se repite */
+    if (opciones.canjeId) {
+      if (canjesVistos.has(opciones.canjeId)) return false;
+      canjesVistos.add(opciones.canjeId);
+      if (canjesVistos.size > MAX_VISTOS) canjesVistos.delete(canjesVistos.values().next().value);
+    }
     if (colaCanjes.length >= MAX_COLA) return false;
     colaCanjes.push(opciones);
     procesarCola();
@@ -942,7 +906,7 @@
     if (secuencia || estado !== "idle") return;
     const siguiente = colaCanjes.shift();
     if (!siguiente) return;
-    secuenciaCanje(siguiente.rareza || "", siguiente.usuario || "", siguiente.usuarioId || "");
+    secuenciaCanje(siguiente.rareza || "", siguiente.usuario || "", siguiente.usuarioId || "", siguiente.canjeId || "");
   }
 
   /* =========================================================
@@ -1011,7 +975,6 @@
       const canal = await window.TwitchAuth.obtenerUsuario(token, config.clientId, config.canal);
       if (!canal) throw new Error("no se encontró el canal configurado");
       debugLinea(`canal: ${canal.display_name} (@${canal.login})`, "ok");
-      canalId = canal.id;
 
       window.TwitchEvents.conectar({
         clientId: config.clientId,
@@ -1026,6 +989,7 @@
           encolarCanje({
             usuario: evento.user_login || "",
             usuarioId: evento.user_id || "",
+            canjeId: evento.id || "",
             rareza: "",
           });
         },
@@ -1056,6 +1020,8 @@
       canjear: (opciones = {}) => encolarCanje(opciones), // alias
     };
     window.addEventListener("message", (evento) => {
+      /* Solo mensajes de la misma página/origen (p. ej. el panel de pruebas) */
+      if (evento.origin !== location.origin) return;
       if (evento.data && evento.data.type === "wewinvt:canje") {
         encolarCanje({
           rareza: evento.data.rareza || "",
