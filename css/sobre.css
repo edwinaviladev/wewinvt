@@ -1,29 +1,33 @@
 /* =========================================================
-   WewinVT · Prototipo "Sobre coleccionable"
-   Estilo: Pokémon TCGP (foil, revelado) × Balatro (jugoso, wobble)
-   Se sirve junto a sobre.html (página independiente del sitio).
+   WewinVT · Cartas y sobre coleccionable · "Tinta y brasa"
+   Marco de laca negra, metal por rareza y arte como panel de manga.
+   Se sirve con sobre.html y overlay.html; el álbum lo reutiliza para las cartas.
    ========================================================= */
 
 :root {
-  /* Paleta independiente para el prototipo interactivo y el overlay. */
-  --bg: #17110f;
-  --bg-deep: #100b0a;
-  --text: #f6ebdd;
-  --muted: rgb(191 168 153 / 92%);
-  --rojo: #d7263d;      /* playera roja */
-  --rojo-vivo: #ff5a6a; /* acentos */
-  --caramelo: #f2b263;  /* dorado */
-  --epica: #b994ff;     /* violeta */
-  --mint: #a8e6d4;      /* Monster blanco */
+  /* Paleta independiente para el modo interactivo y el overlay. */
+  --bg: #120c0d;
+  --bg-deep: #090607;
+  --text: #f7efe0;
+  --muted: #c9bdb0;
+  --rojo: #d3142f;
+  --rojo-vivo: #ff4b3e;
+  --caramelo: #f2b263;
+  --mint: #9fecd6;
   --rubor: #ff9eb1;
 
-  /* Fuentes propias del motor de cartas; el álbum puede sobrescribirlas. */
-  --font-engine-body: "Inter", system-ui, sans-serif;
-  --font-engine-display: "Space Grotesk", sans-serif;
-  --font-engine-mono: "JetBrains Mono", monospace;
+  /* Fuentes de la interfaz; el álbum las sobrescribe. */
+  --font-engine-body: "DM Sans", system-ui, sans-serif;
+  --font-engine-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --font-engine-mono: "Space Mono", ui-monospace, monospace;
+
+  /* Fuentes de la carta: iguales en cualquier página. */
+  --font-carta: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --font-carta-cuerpo: "DM Sans", system-ui, sans-serif;
+  --font-carta-dato: "Space Mono", ui-monospace, monospace;
 
   /* Tamaño de carta */
-  --cw: clamp(160px, 30vw, 280px);
+  --cw: min(clamp(170px, 24vw, 280px), 44vh);
 }
 
 * { box-sizing: border-box; }
@@ -34,9 +38,7 @@ body {
   margin: 0;
   font-family: var(--font-engine-body);
   color: var(--text);
-  background:
-    repeating-linear-gradient(-55deg, rgb(246 235 221 / 2.2%) 0 2px, transparent 2px 26px),
-    radial-gradient(120% 90% at 50% 30%, #201612 0%, var(--bg) 55%, var(--bg-deep) 100%);
+  background: radial-gradient(90% 70% at 50% 45%, #2a1215, var(--bg) 62%, var(--bg-deep));
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
 }
@@ -59,928 +61,702 @@ body {
 }
 .layer > * { pointer-events: auto; }
 
-/* ---------- Emotes de fondo ---------- */
+.pack-layer { z-index: 5; }
+.hand-layer { z-index: 4; }
 
-.bg-float img {
+/* ---------- Velo y rayos de la legendaria ---------- */
+
+.velo {
   position: absolute;
-  width: clamp(90px, 14vw, 180px);
-  opacity: 0.05;
-  filter: saturate(0.6);
-  animation: bg-drift 14s ease-in-out infinite;
+  inset: 0;
+  z-index: 2;
+  background: rgb(4 2 3 / 72%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  pointer-events: none;
 }
-.bg-float img:nth-child(1) { top: 12%; left: 8%; rotate: -10deg; }
-.bg-float img:nth-child(2) { top: 58%; right: 7%; animation-delay: -5s; rotate: 8deg; }
-.bg-float img:nth-child(3) { bottom: 10%; left: 16%; animation-delay: -9s; rotate: -6deg; }
-
-@keyframes bg-drift {
-  0%, 100% { translate: 0 0; }
-  50% { translate: 0 -26px; }
-}
-
-/* ---------- Rayos y flash ---------- */
+.velo.is-on { opacity: 1; }
 
 .rays {
   position: absolute;
-  inset: -35%;
-  background: repeating-conic-gradient(
-    from 0deg at 50% 50%,
-    rgb(242 178 99 / 10%) 0deg 5deg,
-    transparent 5deg 16deg
-  );
-  -webkit-mask: radial-gradient(circle, #000 12%, transparent 60%);
-  mask: radial-gradient(circle, #000 12%, transparent 60%);
+  left: 50%;
+  top: 50%;
+  width: 180vmax;
+  height: 180vmax;
+  margin: -90vmax 0 0 -90vmax;
+  z-index: 3;
+  background: repeating-conic-gradient(rgb(255 205 120 / 26%) 0 5deg, transparent 5deg 17deg);
+  -webkit-mask: radial-gradient(closest-side, #000 8%, transparent 34%);
+  mask: radial-gradient(closest-side, #000 8%, transparent 34%);
   opacity: 0;
-  transition: opacity 0.35s;
+  transition: opacity 0.5s;
   pointer-events: none;
-  z-index: 1;
 }
-.rays.is-on { opacity: 1; animation: ray-spin 7s linear infinite; }
+.rays.is-on { opacity: 1; animation: ray-spin 16s linear infinite; }
 
-@keyframes ray-spin { to { rotate: 360deg; } }
-
-.flash {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 50% 42%, rgb(246 235 221 / 85%), transparent 62%);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 4;
-}
-.flash.is-on { animation: flash 0.6s ease-out; }
-
-@keyframes flash {
-  0% { opacity: 0.9; }
-  100% { opacity: 0; }
-}
+@keyframes ray-spin { to { transform: rotate(360deg); } }
 
 /* =========================================================
    EL SOBRE
    ========================================================= */
 
 .pack {
+  --ancho: min(clamp(226px, 28vw, 290px), 46vh);
   position: relative;
-  width: clamp(235px, 56vw, 312px);
-  aspect-ratio: 5 / 7;
+  display: block;
+  width: var(--ancho);
+  aspect-ratio: 5 / 8;
   border: 0;
   padding: 0;
-  cursor: pointer;
   background: none;
   color: inherit;
   font: inherit;
-  animation: pack-float 4.2s ease-in-out infinite;
-  transition: filter 0.25s;
-  filter: drop-shadow(0 26px 40px rgb(0 0 0 / 55%));
+  cursor: pointer;
+  perspective: 1000px;
 }
-.pack:hover { filter: drop-shadow(0 30px 46px rgb(215 38 61 / 35%)); }
-.pack:active { scale: 0.98; }
+.pack[hidden] { display: none; }
+.pack:focus-visible { outline: 3px solid var(--caramelo); outline-offset: 8px; }
 
-@keyframes pack-float {
-  0%, 100% { transform: translateY(0) rotate(-1.2deg); }
-  50% { transform: translateY(-13px) rotate(1.2deg); }
+.pack__sombra {
+  position: absolute;
+  inset: 6% 2% -4%;
+  background: rgb(0 0 0 / 70%);
+  filter: blur(22px);
+  transition: opacity 0.3s;
 }
 
-/* Base de foil de cacao */
-.pack::before {
+.pack__halo {
+  position: absolute;
+  inset: -28%;
+  background: radial-gradient(closest-side, rgb(255 92 60 / 75%), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.pack__cuerpo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  transform-style: preserve-3d;
+  transform: rotateX(calc(var(--my, 0) * -8deg)) rotateY(calc(var(--mx, 0) * 12deg));
+  animation: pack-flota 4s ease-in-out infinite;
+}
+
+@keyframes pack-flota { 50% { translate: 0 -10px; } }
+
+.pack__pieza { position: absolute; inset: 0; display: block; }
+
+/* Foil rojo y negro con trama de puntos */
+.pack__arte {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  background: #0a0708;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgb(0 0 0 / 30%) 1.5px, transparent 2px),
+    linear-gradient(148deg, #e11a36 0 44%, transparent 44.3%),
+    linear-gradient(148deg, transparent 72%, #a50c23 72.3%);
+  background-size: 9px 9px, 100% 100%, 100% 100%;
+}
+
+/* Ribete termosellado arriba y abajo */
+.pack__arte::before {
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: 18px;
-  background:
-    radial-gradient(rgb(246 235 221 / 7%) 1px, transparent 1.4px) 0 0 / 13px 13px,
-    linear-gradient(160deg, #3f2c22 0%, #241813 55%, #180f0c 100%);
-  box-shadow:
-    inset 0 0 0 2px rgb(242 178 99 / 28%),
-    inset 0 0 34px rgb(0 0 0 / 55%);
-}
-
-/* Destello que barre el foil */
-.pack::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 18px;
-  background: linear-gradient(115deg, transparent 32%, rgb(255 255 255 / 22%) 46%, rgb(242 178 99 / 14%) 52%, transparent 66%);
-  background-size: 300% 300%;
-  animation: foil-sweep 3.4s ease-in-out infinite;
-  mix-blend-mode: screen;
-  pointer-events: none;
   z-index: 3;
-}
-
-@keyframes foil-sweep {
-  0%, 100% { background-position: 120% 0; }
-  55% { background-position: -60% 0; }
-}
-
-/* Tira superior (se rasga) */
-.pack__strip {
-  position: absolute;
-  top: -1px; left: -1px; right: -1px;
-  height: 21%;
   background:
-    radial-gradient(rgb(0 0 0 / 18%) 1px, transparent 1.3px) 0 0 / 9px 9px,
-    linear-gradient(180deg, #5a4128 0%, #46311d 70%, #33241543 100%),
-    linear-gradient(180deg, #4a3520, #2c1e12);
-  border-radius: 18px 18px 0 0;
-  box-shadow: inset 0 -2px 0 rgb(242 178 99 / 35%);
-  clip-path: polygon(
-    0 0, 100% 0, 100% 60%,
-    95% 100%, 90% 60%, 85% 100%, 80% 60%, 75% 100%,
-    70% 60%, 65% 100%, 60% 60%, 55% 100%, 50% 60%,
-    45% 100%, 40% 60%, 35% 100%, 30% 60%, 25% 100%,
-    20% 60%, 15% 100%, 10% 60%, 5% 100%, 0 60%
-  );
-  display: grid;
-  place-items: start center;
-  padding-top: 9px;
-  z-index: 2;
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 20%) 0 1px, rgb(0 0 0 / 22%) 1px 4px) top / 100% 6.5% no-repeat,
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 20%) 0 1px, rgb(0 0 0 / 22%) 1px 4px) bottom / 100% 6.5% no-repeat;
 }
 
-.pack__strip-label {
-  font-family: var(--font-engine-mono);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 3px;
-  color: var(--caramelo);
-}
-
-/* Sello */
-.pack__seal {
+.pack__sol {
   position: absolute;
-  top: calc(21% - 17px);
   left: 50%;
-  translate: -50% 0;
-  width: 44px;
-  height: 44px;
+  top: 60%;
+  width: 150%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: repeating-conic-gradient(rgb(255 74 62 / 42%) 0 4deg, transparent 4deg 13deg);
+  -webkit-mask: radial-gradient(closest-side, #000 30%, transparent 92%);
+  mask: radial-gradient(closest-side, #000 30%, transparent 92%);
+}
+
+.pack__disco {
+  position: absolute;
+  left: 50%;
+  top: 60%;
+  width: 62%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
   border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-family: var(--font-engine-display);
-  font-weight: 700;
-  font-size: 22px;
-  color: #2a1a0f;
-  background: radial-gradient(circle at 32% 30%, #ffdf9e, #f2b263 55%, #c98a3e);
-  box-shadow: 0 4px 12px rgb(0 0 0 / 45%), inset 0 -2px 4px rgb(0 0 0 / 25%);
-  z-index: 3;
+  background-color: #f7efe0;
+  background-image: radial-gradient(circle, rgb(211 20 47 / 22%) 26%, transparent 29%);
+  background-size: 8px 8px;
+  box-shadow: 0 0 0 5px #0a0708, 0 0 0 8px #e11a36;
 }
 
-/* Cuerpo */
-.pack__body {
+.pack__mascota {
   position: absolute;
-  top: 21%; left: 0; right: 0; bottom: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 16px 46px;
-  text-align: center;
+  left: 50%;
+  top: 60%;
+  width: 56%;
+  translate: -50% -50%;
 }
 
-.pack__frame {
+.pack__marca {
   position: absolute;
-  inset: 12px 12px 16px;
-  border: 2px dashed rgb(242 178 99 / 30%);
-  border-radius: 10px;
-  pointer-events: none;
-}
-
-.pack__brand {
-  font-family: var(--font-engine-display);
-  font-weight: 700;
-  font-size: clamp(58px, 16vw, 84px);
-  line-height: 1;
-  background: linear-gradient(180deg, #ffe3ad 10%, var(--caramelo) 45%, #b06a24 90%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 3px 0 rgb(0 0 0 / 40%));
-}
-
-.pack__title {
-  font-weight: 800;
-  font-size: clamp(15px, 3.4vw, 18px);
-  letter-spacing: 0.5px;
-}
-
-.pack__dots { color: var(--caramelo); font-size: 12px; letter-spacing: 8px; }
-
-.pack__count {
-  font-family: var(--font-engine-mono);
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.pack__band {
-  position: absolute;
-  bottom: 14px;
   left: 0;
   right: 0;
-  margin: 0 12px;
-  padding: 7px 0;
-  border-radius: 8px;
-  background: linear-gradient(180deg, var(--rojo-vivo), var(--rojo));
-  font-family: var(--font-engine-mono);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 4px;
+  top: 13.5%;
+  z-index: 2;
+  text-align: center;
+  font: 900 calc(var(--ancho) * 0.31) / 0.82 var(--font-carta);
+  color: #f7efe0;
+  letter-spacing: -0.005em;
+  transform: skewY(-5deg);
+  text-shadow: 3px 3px 0 #0a0708, 6px 6px 0 #a50c23;
+}
+
+.pack__marca small {
+  display: block;
+  margin-top: 6px;
+  font: 700 calc(var(--ancho) * 0.04) / 1 var(--font-carta-dato);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #fff7f0;
-  box-shadow: 0 6px 16px rgb(215 38 61 / 35%);
+  text-shadow: none;
 }
 
-.pack__hint {
+.pack__pie {
   position: absolute;
-  bottom: -46px;
-  left: 50%;
-  translate: -50% 0;
-  white-space: nowrap;
-  padding: 7px 16px;
-  border-radius: 999px;
-  border: 1px solid rgb(242 178 99 / 45%);
-  background: rgb(23 17 15 / 85%);
-  color: var(--caramelo);
-  font-family: var(--font-engine-mono);
-  font-size: 12px;
-  font-weight: 800;
-  animation: hint-pulse 1.6s ease-in-out infinite;
+  left: 8%;
+  right: 8%;
+  bottom: 8.5%;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 8px;
+  font: 700 calc(var(--ancho) * 0.04) / 1.2 var(--font-carta-dato);
+  text-transform: uppercase;
+  color: #f7efe0;
 }
 
-@keyframes hint-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.85; }
-  50% { transform: scale(1.07); opacity: 1; }
+.pack__pie span:last-child {
+  font: 400 calc(var(--ancho) * 0.036) / 1.2 var(--font-carta-dato);
+  text-transform: none;
+}
+
+.pack__foil {
+  position: absolute;
+  inset: -60%;
+  z-index: 4;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background: repeating-linear-gradient(112deg, transparent 0 10%, rgb(255 255 255 / 80%) 15%, transparent 20% 30%, rgb(255 190 120 / 60%) 34%, transparent 40%);
+  transform: translate3d(calc(var(--mx, 0) * 22%), calc(var(--my, 0) * 12%), 0);
+}
+
+.pack__corte {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 10%;
+  height: 3px;
+  z-index: 6;
+  background: linear-gradient(90deg, #fff5d6, #ffb24c);
+  box-shadow: 0 0 10px #ffd27a;
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.pack__luz {
+  position: absolute;
+  left: -18%;
+  right: -18%;
+  top: -10%;
+  height: 46%;
+  z-index: 0;
+  background: radial-gradient(closest-side, #fff2c7, rgb(255 180 80 / 60%) 40%, transparent);
+  opacity: 0;
 }
 
 /* --- Secuencia de apertura --- */
 
-.pack.is-winding { animation: pack-wind 0.55s ease-in-out forwards; }
-.pack.is-winding .pack__hint { animation: none; opacity: 0; transition: opacity 0.2s; }
+.pack.is-entering { animation: pack-entra 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 
-@keyframes pack-wind {
-  0% { transform: translate(0, 0) rotate(0); }
-  18% { transform: translate(-4px, 2px) rotate(-2deg) scale(1.02); }
-  36% { transform: translate(4px, -2px) rotate(2deg) scale(1.04); }
-  54% { transform: translate(-5px, 3px) rotate(-2.5deg) scale(1.06); }
-  72% { transform: translate(5px, -3px) rotate(2.5deg) scale(1.08); }
-  100% { transform: translate(0, -6px) rotate(0) scale(1.1); }
+@keyframes pack-entra {
+  from { transform: translateY(9vh) scale(0.3) rotate(-10deg); opacity: 0; }
+  to { transform: none; opacity: 1; }
 }
 
-/* Resplandor mientras se carga la apertura */
-.pack.is-winding::before {
-  box-shadow:
-    inset 0 0 0 2px rgb(242 178 99 / 60%),
-    inset 0 0 40px rgb(242 178 99 / 25%),
-    0 0 60px rgb(242 178 99 / 30%);
+.pack.is-winding { cursor: default; pointer-events: none; }
+.pack.is-winding .pack__cuerpo { animation: pack-tiembla 0.34s linear; }
+.pack.is-winding .pack__halo { opacity: 0.8; }
+
+@keyframes pack-tiembla {
+  25% { transform: rotate(-1.4deg) scale(1.03); }
+  75% { transform: rotate(1.4deg) scale(1.05); }
+  100% { transform: scale(1.05); }
 }
 
-.pack.is-open {
-  animation: pack-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+.pack.is-cortando .pack__corte {
+  transition: transform 0.46s cubic-bezier(0.5, 0, 0.3, 1);
+  transform: scaleX(1);
 }
 
-@keyframes pack-pop {
-  0% { transform: scale(1.08); }
-  45% { transform: scale(1.22); }
-  100% { transform: scale(1); }
+.pack.is-open .pack__cuerpo { animation: none; }
+.pack.is-open .pack__sombra,
+.pack.is-open .pack__corte { opacity: 0; }
+.pack.is-open .pack__luz { animation: pack-luz 0.7s ease-out forwards; }
+.pack.is-open .pack__pieza--tapa {
+  transform-origin: 90% 10%;
+  animation: pack-tapa 0.8s cubic-bezier(0.3, 0.1, 0.5, 1) forwards;
 }
 
-/* Luz que brota del interior al abrirse */
-.pack__light {
-  position: absolute;
-  inset: 6% 5% 10%;
-  border-radius: 16px;
-  background: radial-gradient(ellipse at 50% 58%, rgb(255 236 204 / 95%), rgb(242 178 99 / 55%) 46%, transparent 78%);
-  opacity: 0;
-  z-index: 2;
-  pointer-events: none;
+@keyframes pack-luz {
+  0% { opacity: 0; transform: scaleY(0.2); }
+  30% { opacity: 1; transform: scaleY(1); }
+  100% { opacity: 0; transform: scaleY(1.5); }
 }
 
-.pack.is-open .pack__light { animation: light-burst 0.55s ease-out forwards; }
-
-@keyframes light-burst {
-  0% { opacity: 0; transform: scale(0.3); }
-  30% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.6); }
+@keyframes pack-tapa {
+  20% { transform: translate(6%, -7%) rotate(7deg); opacity: 1; }
+  100% { transform: translate(52%, -55%) rotate(38deg); opacity: 0; }
 }
 
-.pack.is-open .pack__strip {
-  animation: strip-fly 0.7s cubic-bezier(0.3, 0.6, 0.6, 1) forwards;
-}
+.pack.is-soltando .pack__halo { opacity: 0; }
+.pack.is-soltando .pack__pieza--bolsa { animation: pack-bolsa 0.62s cubic-bezier(0.5, 0, 0.8, 0.5) forwards; }
 
-@keyframes strip-fly {
-  25% { transform: translate(0, -36px) rotate(-6deg); opacity: 1; }
-  100% { transform: translate(24vw, -90vh) rotate(44deg); opacity: 0; }
-}
-
-.pack.is-open .pack__seal { animation: seal-fly 0.7s 0.08s ease-in forwards; }
-
-@keyframes seal-fly {
-  40% { transform: translate(-50%, -30px) rotate(160deg); opacity: 1; }
-  100% { transform: translate(24vw, -60vh) rotate(520deg); opacity: 0; }
-}
-
-/* El sobre estalla: el foil entero se desintegra en luz */
-.pack.is-open::before,
-.pack.is-open .pack__body {
-  animation: pack-shatter 0.32s cubic-bezier(0.3, 0.7, 0.4, 1) forwards;
-}
-
-@keyframes pack-shatter {
-  0% { transform: scale(1); filter: brightness(1); opacity: 1; }
-  40% { transform: scale(1.22); filter: brightness(2.2); opacity: 1; }
-  100% { transform: scale(1.45); filter: brightness(3); opacity: 0; }
+@keyframes pack-bolsa {
+  to { transform: translateY(95%) rotate(-3deg); opacity: 0; }
 }
 
 /* =========================================================
    LAS CARTAS
    ========================================================= */
 
-.hand {
-  display: flex;
-  gap: clamp(12px, 3.4vw, 32px);
-  perspective: 1500px;
-}
-
 .card {
-  --rare: var(--muted);
-  --glow: rgb(191 168 153 / 35%);
-  --fire-ember: rgb(255 126 52 / 45%);
-  --fire-core: rgb(255 213 126 / 42%);
-  --fire-accent: rgb(255 152 64 / 38%);
-  --fire-low: 0.05;
-  --fire-mid: 0.12;
-  --fire-high: 0.2;
-  --ch: calc(var(--cw) * 1.4);
-  --card-radius: clamp(18px, calc(var(--cw) * 0.095), 30px);
-  --tilt: 0deg;
+  --marco: linear-gradient(150deg, #8d8279, #2e2927 38%, #6c625a 66%, #211d1c);
+  --rare: #d9cbb9;
+  --papel-arte: #f4ebda;
+  --tono-arte: rgb(120 100 80 / 26%);
+  --carta-tinta: #100c0d;
+  --carta-papel: #f7efe0;
+  --carta-hueso: #c9bdb0;
+  --sombra-carta: 0 calc(var(--cw) * 0.05) calc(var(--cw) * 0.1) rgb(0 0 0 / 55%);
+  --mx: 0;
+  --my: 0;
+  --luz: 0;
   position: relative;
+  display: block;
   width: var(--cw);
-  height: var(--ch);
   aspect-ratio: 5 / 7;
   border: 0;
   padding: 0;
   background: none;
-  color: inherit;
+  color: var(--carta-papel);
   font: inherit;
+  text-align: left;
   cursor: pointer;
-  animation: card-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-  animation-delay: var(--d, 0s);
-  transition: transform 0.25s ease;
-  transform: rotate(var(--tilt, 0deg));
+  container-type: inline-size;
+  perspective: 1100px;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.card:nth-child(1) { --tilt: -2.5deg; }
-.card:nth-child(2) { --tilt: 0deg; }
-.card:nth-child(3) { --tilt: 2.5deg; }
-
-@keyframes card-in {
-  from { transform: translateY(38vh) scale(0.2) rotate(var(--tilt)); opacity: 0; }
-  to { transform: translateY(0) scale(1) rotate(var(--tilt)); opacity: 1; }
+.card:focus-visible {
+  outline: 3px solid #f2b263;
+  outline-offset: 5px;
+  border-radius: calc(var(--cw) * 0.052);
 }
 
-.card__bob { display: block; width: 100%; height: 100%; animation: bob 3.4s ease-in-out infinite; animation-delay: var(--d, 0s); }
-.card:nth-child(2) .card__bob { animation-delay: -1.2s; }
-.card:nth-child(3) .card__bob { animation-delay: -2.3s; }
-
-@keyframes bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-7px); }
+.card[data-rareza="rara"] {
+  --marco: linear-gradient(150deg, #bdf3e2, #1d4d44 36%, #79d3bc 64%, #123029);
+  --rare: #9fecd6;
+  --papel-arte: #e9f6ee;
+  --tono-arte: rgb(36 150 124 / 28%);
+}
+.card[data-rareza="epica"] {
+  --marco: linear-gradient(150deg, #dac6ff, #3a2470 36%, #a584f2 62%, #1f1340);
+  --rare: #c8aefc;
+  --papel-arte: #f0e9fb;
+  --tono-arte: rgb(112 72 214 / 28%);
+}
+.card[data-rareza="legendaria"] {
+  --marco: linear-gradient(150deg, #fff0bb, #a26418 28%, #ffd67e 52%, #7a4510 76%, #ffe59b);
+  --rare: #ffd27a;
+  --papel-arte: #fbeecb;
+  --tono-arte: rgb(226 140 32 / 34%);
 }
 
-.card.is-flip .card__bob { animation: none; }
-
+/* Inclinación (--mx, --my) por fuera y giro por dentro */
+.card__incl,
 .card__inner {
-  position: relative;
+  position: absolute;
+  inset: 0;
   display: block;
-  width: 100%;
-  height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.55s cubic-bezier(0.3, 0.7, 0.3, 1);
 }
 
+.card__incl { transform: rotateX(calc(var(--my) * -9deg)) rotateY(calc(var(--mx) * 12deg)); }
+.card__inner { transition: transform 0.62s cubic-bezier(0.25, 0.8, 0.25, 1.05); }
 .card.is-flip .card__inner { transform: rotateY(180deg); }
+.card.is-lenta .card__inner { transition-duration: 0.95s; }
+
+.is-viva .card__prisma,
+.is-viva .card__brillo { will-change: transform; }
+
+/* En cuadrículas grandes la carta queda plana hasta que se activa */
+.card--plana:not(.is-viva) .card__incl { transform: none; }
+.card--plana .card__inner { transition: none; }
+.card--plana.is-flip:not(.is-viva) .card__inner,
+.card--plana:not(.is-viva) .card__face--front { transform: none; }
 
 .card__face {
   position: absolute;
   inset: 0;
-  border-radius: var(--card-radius, 18px);
+  display: block;
+  overflow: hidden;
+  border-radius: calc(var(--cw) * 0.052);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  overflow: hidden;
-  box-shadow: 0 20px 44px rgb(0 0 0 / 50%);
+  isolation: isolate;
+  box-shadow: var(--sombra-carta);
 }
 
-/* --- Dorso --- */
+/* --- Reverso: rojo y negro, líneas de foco y la W en su rombo --- */
 
 .card__face--back {
-  background:
-    radial-gradient(rgb(246 235 221 / 6%) 1px, transparent 1.3px) 0 0 / 11px 11px,
-    repeating-linear-gradient(45deg, #241813 0 12px, #1c120e 12px 24px),
-    #1c120e;
-  box-shadow: 0 20px 44px rgb(0 0 0 / 50%);
-  display: grid;
-  place-items: center;
+  background-color: #090607;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 700'%3E%3Cpath d='M0 0H500L0 330Z' fill='%23c30f2a'/%3E%3Cpath d='M500 700H0L500 370Z' fill='%23c30f2a'/%3E%3Crect x='17' y='17' width='466' height='666' rx='24' fill='none' stroke='%230a0708' stroke-width='9'/%3E%3Crect x='33' y='33' width='434' height='634' rx='14' fill='none' stroke='%23ff5a54' stroke-opacity='.55' stroke-width='2'/%3E%3Cg transform='translate(250 350)'%3E%3Cpath d='M0-146 146 0 0 146-146 0Z' fill='%23090607' stroke='%23d3142f' stroke-width='9'/%3E%3Cpath d='M0-122 122 0 0 122-122 0Z' fill='none' stroke='%23f2b263' stroke-opacity='.8' stroke-width='2.5'/%3E%3Cpath d='M-70-34-38 44-1-18 38 44 70-34' fill='none' stroke='%23f7efe0' stroke-width='20' stroke-linejoin='miter'/%3E%3C/g%3E%3C/svg%3E"),
+    radial-gradient(circle at 18% 12%, rgb(0 0 0 / 34%) 1.4px, transparent 1.8px),
+    repeating-conic-gradient(from 3deg at 50% 50%, rgb(211 20 47 / 34%) 0 2.5deg, transparent 2.5deg 9deg);
+  background-size: 100% 100%, 9px 9px, 100% 100%;
 }
 
-.card__emblem {
-  width: 46%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-family: var(--font-engine-display);
-  font-weight: 700;
-  font-size: calc(var(--cw) * 0.19);
-  color: #2a1a0f;
-  background: radial-gradient(circle at 32% 30%, #ffdf9e, var(--caramelo) 55%, #b06a24);
-  box-shadow: 0 6px 18px rgb(0 0 0 / 45%);
-}
-
-/* --- Frente full-art: la imagen ocupa toda la carta, info sobrepuesta --- */
+/* --- Frente: marco de metal, lámina negra y arte en papel --- */
 
 .card__face--front {
   transform: rotateY(180deg);
-  background: #1c120d;
-  isolation: isolate;
-  box-shadow: 0 22px 48px rgb(0 0 0 / 58%), 0 0 28px var(--glow);
+  background: var(--marco);
 }
 
-/* Luz de fuego suave en los extremos; el centro de la ilustración queda despejado */
-.card__face--front::after {
-  content: "";
+.card[data-variante="holo"] .card__face--front { background: #17131a; }
+
+.card__lamina {
   position: absolute;
-  inset: -5%;
+  inset: calc(var(--cw) * 0.03);
   z-index: 2;
-  border-radius: inherit;
-  background:
-    radial-gradient(ellipse 30% 19% at 1% 92%, var(--fire-ember) 0%, transparent 100%),
-    radial-gradient(ellipse 29% 19% at 98% 82%, var(--fire-core) 0%, transparent 100%),
-    radial-gradient(ellipse 17% 32% at 0% 48%, var(--fire-accent) 0%, transparent 100%),
-    radial-gradient(ellipse 15% 28% at 100% 34%, var(--fire-ember) 0%, transparent 100%),
-    radial-gradient(ellipse 34% 13% at 50% 0%, var(--fire-core) 0%, transparent 100%);
-  mix-blend-mode: screen;
-  filter: blur(10px) saturate(1.25);
-  opacity: 0;
-  pointer-events: none;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  border-radius: calc(var(--cw) * 0.03);
+  background: var(--carta-tinta);
 }
 
-.card.is-revealed .card__face--front { animation: rare-pulse 2.4s ease-in-out infinite; }
-
-@keyframes rare-pulse {
-  0%, 100% { box-shadow: 0 18px 40px rgb(0 0 0 / 56%), 0 0 22px var(--glow); }
-  50% { box-shadow: 0 22px 48px rgb(0 0 0 / 60%), 0 0 44px var(--glow); }
-}
-
-.card.is-revealed[data-rareza="epica"] .card__face--front::after {
-  animation: fire-flicker 1.9s ease-in-out infinite;
-}
-.card.is-revealed[data-rareza="legendaria"] .card__face--front::after {
-  animation: fire-flicker 1.25s ease-in-out infinite;
-}
-
-@keyframes fire-flicker {
-  0%, 100% {
-    opacity: var(--fire-low);
-    filter: blur(9px) saturate(1.15) brightness(0.96);
-    transform: scale(1);
-  }
-  42% {
-    opacity: var(--fire-mid);
-    filter: blur(13px) saturate(1.4) brightness(1.16);
-    transform: scale(1.025, 1.04) translateY(-0.5%);
-  }
-  68% {
-    opacity: var(--fire-high);
-    filter: blur(10px) saturate(1.5) brightness(1.28);
-    transform: scale(1.01, 1.055) translateY(-0.8%);
-  }
-}
-
-.card.is-revealed:not([data-rareza="epica"]):not([data-rareza="legendaria"]) .card__face--front::after {
-  opacity: var(--fire-low);
-}
-.card.is-revealed:not([data-rareza="epica"]):not([data-rareza="legendaria"]):hover .card__face--front::after,
-.solo .card.is-revealed:not([data-rareza="epica"]):not([data-rareza="legendaria"]) .card__face--front::after {
-  animation: fire-flicker 2.1s ease-in-out infinite;
-}
-
-.card.is-revealed[data-rareza="legendaria"] .card__face--front {
-  animation: rare-pulse-legendaria 1.8s ease-in-out infinite;
-}
-
-@keyframes rare-pulse-legendaria {
-  0%, 100% { box-shadow: 0 18px 42px rgb(0 0 0 / 58%), 0 0 24px var(--glow), 0 0 6px rgb(255 215 117 / 30%); }
-  50% { box-shadow: 0 22px 54px rgb(0 0 0 / 62%), 0 0 56px var(--glow), 0 0 22px rgb(255 215 117 / 65%); }
-}
-
-/* Textura de foil según la rareza (la legendaria brilla como carta dorada) */
-.card__foil {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0;
-  mix-blend-mode: screen;
-}
-
-.card[data-rareza="rara"] .card__foil {
-  opacity: 0.22;
-  background:
-    linear-gradient(115deg, transparent 30%, rgb(168 230 212 / 32%) 46%, transparent 60%) 0 0 / 220% 220%,
-    repeating-linear-gradient(45deg, rgb(168 230 212 / 8%) 0 8px, transparent 8px 16px);
-  animation: foil-desliza 5s ease-in-out infinite;
-}
-
-.card[data-rareza="epica"] .card__foil {
-  opacity: 0.28;
-  background:
-    linear-gradient(115deg, transparent 28%, rgb(185 148 255 / 42%) 44%, rgb(255 255 255 / 28%) 52%, transparent 66%) 0 0 / 240% 240%,
-    repeating-linear-gradient(50deg, rgb(185 148 255 / 10%) 0 7px, transparent 7px 15px);
-  animation: foil-desliza 4s ease-in-out infinite;
-}
-
-.card[data-rareza="legendaria"] .card__foil {
-  opacity: 0.34;
-  background:
-    linear-gradient(115deg, transparent 36%, rgb(255 244 194 / 62%) 46%, rgb(255 185 57 / 58%) 50%, rgb(255 255 255 / 68%) 54%, transparent 64%) 0 0 / 260% 260%,
-    repeating-linear-gradient(48deg, rgb(255 223 158 / 8%) 0 6px, rgb(242 178 99 / 5%) 6px 12px, transparent 12px 22px);
-  animation: foil-desliza 3.4s ease-in-out infinite;
-}
-
-@keyframes foil-desliza {
-  /* El destello cruza en una sola dirección y espera fuera hasta repetirse */
-  0% { background-position: 130% 0, 0 0; }
-  40% { background-position: -70% 0, 0 0; }
-  100% { background-position: -70% 0, 0 0; }
-}
-
-/* Arte a sangre completa */
-.card__arte {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-
-/* Emotes: pieza completa sobre chocolate con brillo cálido */
-.card[data-tipo="emote"] .card__arte {
-  object-fit: contain;
-  padding: calc(var(--cw) * 0.055);
-  background:
-    radial-gradient(circle at 50% 42%, rgb(242 178 99 / 12%), transparent 68%),
-    linear-gradient(180deg, #2e1e15 0%, #1a100b 100%);
-}
-
-/* Placas compactas de información para dejar respirar la ilustración */
-.card__scrim {
-  position: absolute;
-  left: 0;
-  right: 0;
-  z-index: 5;
+.card__franja {
+  position: relative;
+  z-index: 4;
   display: flex;
-  pointer-events: none;
-}
-
-.card__scrim--top {
-  top: clamp(6px, calc(var(--cw) * 0.035), 12px);
-  left: clamp(6px, calc(var(--cw) * 0.035), 12px);
-  right: clamp(6px, calc(var(--cw) * 0.035), 12px);
   align-items: center;
   justify-content: space-between;
-  gap: 7px;
-  padding: clamp(5px, calc(var(--cw) * 0.025), 10px) clamp(7px, calc(var(--cw) * 0.035), 13px);
-  border: 1px solid rgb(255 255 255 / 18%);
-  border-bottom-color: color-mix(in srgb, var(--rare) 65%, transparent);
-  border-radius: 14px;
-  background: linear-gradient(135deg, rgb(16 11 10 / 80%), rgb(16 11 10 / 55%));
-  box-shadow: 0 5px 16px rgb(0 0 0 / 26%);
-}
-
-.card__scrim--base {
-  bottom: clamp(6px, calc(var(--cw) * 0.035), 12px);
-  left: clamp(6px, calc(var(--cw) * 0.035), 12px);
-  right: clamp(6px, calc(var(--cw) * 0.035), 12px);
-  flex-direction: column;
-  align-items: stretch;
-  gap: 3px;
-  padding: clamp(5px, calc(var(--cw) * 0.026), 10px) clamp(7px, calc(var(--cw) * 0.035), 13px);
-  border: 1px solid color-mix(in srgb, var(--rare) 48%, rgb(255 255 255 / 18%));
-  border-top: 2px solid var(--rare);
-  border-radius: 14px;
-  background: linear-gradient(145deg, rgb(16 11 10 / 86%), rgb(16 11 10 / 72%));
-  box-shadow: 0 7px 20px rgb(0 0 0 / 28%), inset 0 1px 0 rgb(255 255 255 / 9%);
+  gap: 6px;
+  padding: calc(var(--cw) * 0.024) calc(var(--cw) * 0.04) calc(var(--cw) * 0.026);
+  background: var(--carta-tinta);
+  border-bottom: calc(var(--cw) * 0.007) solid var(--rare);
 }
 
 .card__name {
-  font-family: var(--font-engine-display);
-  font-weight: 700;
-  font-size: clamp(11px, calc(var(--cw) * 0.085), 20px);
-  color: #fff8ed;
-  text-shadow: 0 2px 7px rgb(0 0 0 / 75%);
-  white-space: nowrap;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 800 calc(var(--cw) * 0.112) / 1.05 var(--font-carta);
+  letter-spacing: 0.012em;
+  text-transform: uppercase;
+  color: var(--carta-papel);
 }
+.card[data-largo="1"] .card__name { font-size: calc(var(--cw) * 0.094); }
+.card[data-largo="2"] .card__name { font-size: calc(var(--cw) * 0.08); }
 
 .card__num {
-  font-family: var(--font-engine-mono);
-  font-weight: 800;
-  font-size: clamp(8px, calc(var(--cw) * 0.042), 11px);
-  color: #fff8ed;
-  letter-spacing: 0.04em;
-  padding: 3px 7px;
-  border: 1px solid color-mix(in srgb, var(--rare) 60%, transparent);
-  border-radius: 999px;
-  background: rgb(0 0 0 / 28%);
-  flex-shrink: 0;
-}
-
-.card__fila {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.card__tipo {
-  font-family: var(--font-engine-mono);
-  font-size: clamp(7px, calc(var(--cw) * 0.038), 10px);
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  flex: none;
+  font: 700 max(8px, calc(var(--cw) * 0.04)) / 1 var(--font-carta-dato);
   color: var(--rare);
-  padding: 4px 8px;
-  border: 1px solid color-mix(in srgb, var(--rare) 55%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--rare) 13%, rgb(16 11 10 / 85%));
-  flex-shrink: 0;
 }
 
-.card__rareza-lado {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: var(--rare);
-  min-width: 0;
-}
-
-.card__rareza-nombre {
-  font-family: var(--font-engine-mono);
-  font-size: clamp(7px, calc(var(--cw) * 0.039), 10px);
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
+.card__ventana {
+  position: relative;
+  z-index: 1;
+  display: block;
   overflow: hidden;
-  text-overflow: ellipsis;
+  background-color: var(--papel-arte);
+  background-image:
+    radial-gradient(circle, var(--tono-arte) 26%, transparent 29%),
+    repeating-conic-gradient(from 0deg at 50% 54%, var(--tono-arte) 0 3deg, transparent 3deg 11deg);
+  background-size: calc(var(--cw) * 0.03) calc(var(--cw) * 0.03), 100% 100%;
 }
 
-/* Capa holográfica: permanece apagada salvo para la variante Holo. */
-.card__holo {
+.card__arte {
   position: absolute;
   inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background:
-    linear-gradient(115deg, transparent 22%, rgb(255 255 255 / 24%) 40%, rgb(185 148 255 / 32%) 50%, rgb(168 230 212 / 24%) 60%, transparent 78%);
-  background-size: 260% 260%;
-  background-position: calc(50% + var(--mx, 0) * 60%) calc(50% + var(--my, 0) * 60%);
-  mix-blend-mode: color-dodge;
-  opacity: 0;
-  transition: opacity 0.4s;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-/* Variante holo: color prismático fijo, movido por el puntero (sin destello periódico) */
-.card[data-variante="holo"] .card__foil {
-  opacity: 0.3;
-  mix-blend-mode: normal;
-  background:
-    linear-gradient(120deg, rgb(255 81 186 / 32%) 0%, rgb(161 96 255 / 24%) 27%, rgb(70 207 255 / 30%) 52%, rgb(86 248 183 / 24%) 76%, rgb(255 222 98 / 30%) 100%),
-    repeating-linear-gradient(43deg, rgb(255 255 255 / 11%) 0 1px, transparent 1px 5px);
-  animation: none;
+/* Emotes: la figura completa sobre el papel, con el negro bien contrastado */
+.card[data-tipo="emote"] .card__arte {
+  object-fit: contain;
+  padding: calc(var(--cw) * 0.03);
 }
 
-.card[data-variante="holo"] .card__holo {
-  background:
-    radial-gradient(ellipse at center, rgb(255 255 255 / 38%) 0%, rgb(255 255 255 / 12%) 22%, transparent 54%) 0 0 / 180% 180%,
-    conic-gradient(from 35deg at 50% 50%, rgb(255 94 182 / 46%) 0deg 55deg, rgb(165 110 255 / 40%) 55deg 120deg, rgb(78 211 255 / 42%) 120deg 185deg, rgb(112 255 197 / 38%) 185deg 250deg, rgb(255 230 117 / 42%) 250deg 310deg, rgb(255 94 182 / 46%) 310deg 360deg) 0 0 / 180% 180%,
-    repeating-linear-gradient(115deg, rgb(255 255 255 / 7%) 0 1px, transparent 1px 5px);
-  background-position: center, center, center;
-  transition: opacity 0.2s ease;
+.card__placa {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: calc(var(--cw) * 0.012) 8px;
+  padding: calc(var(--cw) * 0.026) calc(var(--cw) * 0.04) calc(var(--cw) * 0.03);
+  background: var(--carta-tinta);
+  border-top: calc(var(--cw) * 0.007) solid var(--rare);
 }
 
-.card.is-revealed[data-variante="holo"] .card__holo {
-  opacity: 0.64;
-  filter: saturate(1.35);
+.card__chispas { display: inline-flex; gap: calc(var(--cw) * 0.012); }
+
+.card__chispas i {
+  width: max(7px, calc(var(--cw) * 0.052));
+  aspect-ratio: 1;
+  background: var(--rare);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
 }
 
-.card.is-revealed[data-variante="holo"] .card__foil,
-.card.is-revealed[data-variante="holo"] .card__holo {
-  animation: tonos-holo 7s ease-in-out infinite alternate;
+.card__etiquetas {
+  display: inline-flex;
+  justify-self: end;
+  align-items: center;
+  gap: 4px;
 }
 
-@keyframes tonos-holo {
-  from { filter: hue-rotate(-10deg) saturate(1.3); }
-  to { filter: hue-rotate(70deg) saturate(1.65); }
+.card__tipo,
+.card__variante {
+  font: 700 max(7.5px, calc(var(--cw) * 0.036)) / 1 var(--font-carta-dato);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.card.is-revealed[data-variante="holo"] .card__spark { opacity: 0; animation: none; }
-
-.card[data-variante="holo"] .card__holo::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(112deg, transparent 42%, rgb(255 255 255 / 48%) 48%, rgb(255 255 255 / 16%) 52%, transparent 58%);
-  background-size: 300% 100%;
-  background-position: 130% 0;
-  opacity: 0;
-  mix-blend-mode: screen;
-  pointer-events: none;
-}
-
-.card.is-revealed[data-variante="holo"] .card__holo::after {
-  animation: brillo-holo-sutil 8s ease-in-out infinite;
-}
-
-@keyframes brillo-holo-sutil {
-  0%, 76%, 100% { background-position: 130% 0; opacity: 0; }
-  82% { background-position: 70% 0; opacity: 0; }
-  86% { background-position: 5% 0; opacity: 0.3; }
-  91% { background-position: -70% 0; opacity: 0; }
-}
-
-/* La legendaria normal da un único barrido breve; queda oculta entre destellos. */
-.card[data-rareza="legendaria"]:not([data-variante="holo"]) .card__foil {
-  opacity: 0;
-  background:
-    linear-gradient(112deg, transparent 38%, rgb(255 255 255 / 92%) 47%, rgb(255 215 128 / 78%) 52%, rgb(255 255 255 / 86%) 57%, transparent 66%) 0 0 / 280% 100%,
-    repeating-linear-gradient(48deg, rgb(255 223 158 / 6%) 0 1px, transparent 1px 8px);
-  animation: none;
-}
-
-.card.is-revealed[data-rareza="legendaria"]:not([data-variante="holo"]) .card__foil {
-  animation: brillo-legendaria-ocasional 8s ease-in-out infinite;
-}
-
-.card.is-revealed[data-rareza="legendaria"]:not([data-variante="holo"]) .card__spark {
-  opacity: 0;
-  animation: chispas-legendaria-ocasionales 8s ease-in-out infinite;
-}
-
-@keyframes brillo-legendaria-ocasional {
-  0%, 72%, 100% { opacity: 0; background-position: 130% 0, 0 0; }
-  78% { opacity: 0; background-position: 75% 0, 0 0; }
-  82% { opacity: 0.68; background-position: 15% 0, 0 0; }
-  87% { opacity: 0.42; background-position: -45% 0, 0 0; }
-  91% { opacity: 0; background-position: -70% 0, 0 0; }
-}
-
-@keyframes chispas-legendaria-ocasionales {
-  0%, 72%, 100% { opacity: 0; }
-  81% { opacity: 0.85; }
-  87% { opacity: 0.28; }
-  92% { opacity: 0; }
-}
+.card__tipo { color: var(--carta-hueso); }
 
 .card__variante {
-  align-self: flex-start;
-  width: fit-content;
-  padding: 3px 8px;
-  border: 1px solid rgb(255 255 255 / 58%);
-  border-radius: 999px;
-  color: #28172f;
-  background: linear-gradient(105deg, #fff1b8 0%, #f4b4e8 28%, #c0afff 52%, #a9f0e8 76%, #fff0b2 100%);
-  box-shadow: 0 0 10px rgb(201 169 255 / 45%);
-  font-family: var(--font-engine-mono);
-  font-size: clamp(7px, calc(var(--cw) * 0.034), 9px);
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  line-height: 1;
-  text-transform: uppercase;
+  padding: calc(var(--cw) * 0.009) calc(var(--cw) * 0.016);
+  border-radius: 2px;
+  color: #150f18;
+  background: linear-gradient(100deg, #ffe89a, #ffa7dc 34%, #b5a6ff 58%, #9df2e3 82%, #fff0a6);
+}
+
+.card__credito {
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 500 max(9px, calc(var(--cw) * 0.047)) / 1.15 var(--font-carta-cuerpo);
+  color: var(--carta-papel);
+}
+.card__credito span { color: var(--carta-hueso); }
+
+.card__serie {
+  font: 400 max(7.5px, calc(var(--cw) * 0.034)) / 1 var(--font-carta-dato);
+  color: var(--carta-hueso);
+}
+
+/* En cartas pequeñas el crédito manda sobre la serie */
+@container (max-width: 170px) {
+  .card__credito { grid-column: 1 / -1; }
+  .card__serie { display: none; }
 }
 
 .card__nueva {
   display: none;
   position: absolute;
-  top: clamp(34px, calc(var(--cw) * 0.22), 62px);
-  right: clamp(7px, calc(var(--cw) * 0.035), 12px);
-  z-index: 6;
-  align-items: center;
-  padding: 5px 9px;
-  border: 1px solid rgb(255 235 221 / 82%);
-  border-radius: 999px;
+  top: calc(var(--cw) * 0.18);
+  right: calc(var(--cw) * 0.06);
+  z-index: 7;
+  padding: max(3px, calc(var(--cw) * 0.012)) max(6px, calc(var(--cw) * 0.03));
+  border: 1px solid #fff4e6;
+  border-radius: 2px;
   color: #fffaf4;
-  background: linear-gradient(120deg, #a91c32, #e04450);
-  box-shadow: 0 5px 16px rgb(36 8 13 / 42%), 0 0 12px rgb(255 90 106 / 38%);
-  font-family: var(--font-engine-mono);
-  font-size: clamp(7px, calc(var(--cw) * 0.04), 10px);
-  font-weight: 900;
-  letter-spacing: 0.1em;
-  line-height: 1;
+  background: #c30f2a;
+  font: 800 max(11px, calc(var(--cw) * 0.06)) / 1 var(--font-carta);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transform: rotate(4deg);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 40%);
+}
+.card.is-new.is-revealed .card__nueva { display: block; }
+
+/* Épica: doble filete */
+.card[data-rareza="epica"] .card__franja { padding-block: calc(var(--cw) * 0.018); }
+.card[data-rareza="epica"] .card__lamina::after {
+  content: "";
+  position: absolute;
+  inset: calc(var(--cw) * 0.008);
+  z-index: 5;
+  border: 1px solid color-mix(in srgb, var(--rare) 55%, transparent);
+  border-radius: inherit;
   pointer-events: none;
 }
 
-.card.is-new.is-revealed .card__nueva { display: inline-flex; }
+/* Legendaria: arte a sangre con placas sesgadas */
+.card[data-rareza="legendaria"] .card__lamina { display: block; }
+.card[data-rareza="legendaria"] .card__ventana { position: absolute; inset: 0; }
+.card[data-rareza="legendaria"] .card__franja,
+.card[data-rareza="legendaria"] .card__placa {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border: 0;
+}
+.card[data-rareza="legendaria"] .card__franja {
+  top: 0;
+  padding-bottom: calc(var(--cw) * 0.05);
+  clip-path: polygon(0 0, 100% 0, 100% 62%, 0 100%);
+}
+.card[data-rareza="legendaria"] .card__placa {
+  bottom: 0;
+  padding-top: calc(var(--cw) * 0.06);
+  clip-path: polygon(0 calc(var(--cw) * 0.036), 100% 0, 100% 100%, 0 100%);
+}
+.card[data-rareza="legendaria"] .card__name {
+  color: transparent;
+  background: linear-gradient(170deg, #fff4c9, #ffc95d 55%, #ff9d36);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
 
-/* Chispas de la legendaria */
-.card__spark {
+/* --- Holo Prisma: capas más grandes que la carta, movidas solo con transform.
+   "claro" (multiply) tiñe los fondos blancos y "oscuro" (color-dodge) enciende los
+   oscuros, así el efecto se ve sobre cualquier arte. --- */
+
+.card__prisma {
+  position: absolute;
+  inset: -70%;
+  display: block;
+  pointer-events: none;
+  transform: translate3d(calc(var(--mx) * 26%), calc(var(--my) * 15%), 0);
+}
+
+.card__prisma--aro {
+  z-index: 1;
+  background: repeating-linear-gradient(118deg, #ff6fb7, #ffb65c 6%, #fff27d 12%, #6df3b5 18%, #5fd1ff 24%, #a98bff 30%, #ff6fb7 36%);
+}
+
+.card__prisma--claro {
+  z-index: 2;
+  mix-blend-mode: multiply;
+  opacity: 0.62;
+  background: repeating-linear-gradient(118deg, #ff9ed1, #ffd59a 7%, #fff6a6 14%, #a8f5cf 21%, #a0e3ff 28%, #cdbcff 35%, #ff9ed1 42%);
+}
+
+/* En los emotes el arcoíris queda detrás de la figura */
+.card[data-tipo="emote"] .card__prisma--claro { z-index: 0; opacity: 1; }
+
+.card__prisma--oscuro {
+  z-index: 3;
+  mix-blend-mode: color-dodge;
+  opacity: 0.5;
+  background: repeating-linear-gradient(118deg, #5b1f54, #6a4a10 7%, #66620d 14%, #0f6444 21%, #0d4c70 28%, #3c2b80 35%, #5b1f54 42%);
+}
+
+/* Patrón de W y estrellas que se prende cuando pasa la luz */
+.card__patron {
   position: absolute;
   inset: 0;
   z-index: 3;
-  pointer-events: none;
-  opacity: 0;
-  background-image:
-    radial-gradient(circle, rgb(255 255 255 / 100%) 0 1.2px, transparent 2.3px),
-    radial-gradient(circle, rgb(255 223 145 / 95%) 0 1px, transparent 2.6px),
-    radial-gradient(circle, rgb(255 255 255 / 82%) 0 0.8px, transparent 2px);
-  background-size: 42px 42px, 59px 59px, 83px 83px;
-  background-position: 0 0, 20px 30px, 13px 8px;
-  filter: drop-shadow(0 0 3px rgb(255 203 92 / 55%));
-}
-
-.card.is-revealed[data-rareza="legendaria"] .card__spark {
-  opacity: 0.9;
-  animation: spark-twinkle 1.25s ease-in-out infinite;
-}
-
-@keyframes spark-twinkle {
-  0%, 100% { background-position: 0 0, 20px 30px, 13px 8px; opacity: 0.4; }
-  50% { background-position: 12px 8px, 34px 44px, 40px 24px; opacity: 0.95; }
-}
-
-/* Símbolo y crédito dentro del panel inferior */
-.card__simbolo {
-  font-size: clamp(10px, calc(var(--cw) * 0.055), 16px);
-  line-height: 1;
-  text-shadow: 0 0 10px var(--glow);
-  flex-shrink: 0;
-}
-
-.card[data-rareza="legendaria"] .card__simbolo {
-  transform-origin: center;
-  animation: simbolo-brillo 1.4s ease-in-out infinite;
-}
-
-@keyframes simbolo-brillo {
-  0%, 100% {
-    transform: scale(0.92) rotate(-6deg);
-    filter: drop-shadow(0 0 4px rgb(255 215 117 / 55%));
-    text-shadow: 0 0 8px var(--glow);
-  }
-  50% {
-    transform: scale(1.18) rotate(6deg);
-    filter: drop-shadow(0 0 7px rgb(255 232 163 / 90%)) drop-shadow(0 0 15px rgb(255 190 67 / 70%));
-    text-shadow: 0 0 16px var(--glow), 0 0 30px var(--glow);
-  }
-}
-
-.card__credito {
-  font-size: clamp(7px, calc(var(--cw) * 0.034), 9px);
-  font-style: normal;
-  letter-spacing: 0.02em;
-  color: rgb(255 248 239 / 70%);
-  white-space: nowrap;
+  display: block;
   overflow: hidden;
-  text-overflow: ellipsis;
+  pointer-events: none;
+  mix-blend-mode: hard-light;
+  opacity: 0.85;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58'%3E%3Cpath d='M15 5l2.2 7.8L25 15l-7.8 2.2L15 25l-2.2-7.8L5 15l7.8-2.2z'/%3E%3Cpath d='M33 37l4 12 4-8 4 8 4-12' fill='none' stroke='%23000' stroke-width='2.4'/%3E%3C/svg%3E");
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='58'%3E%3Cpath d='M15 5l2.2 7.8L25 15l-7.8 2.2L15 25l-2.2-7.8L5 15l7.8-2.2z'/%3E%3Cpath d='M33 37l4 12 4-8 4 8 4-12' fill='none' stroke='%23000' stroke-width='2.4'/%3E%3C/svg%3E");
+  -webkit-mask-size: calc(var(--cw) * 0.17);
+  mask-size: calc(var(--cw) * 0.17);
 }
 
-/* Colores por rareza (paleta del sitio) */
-.card[data-rareza="comun"] { --rare: #bfa78f; --glow: rgb(191 167 143 / 30%); }
-.card[data-rareza="rara"] { --rare: var(--mint); --glow: rgb(168 230 212 / 40%); }
-.card[data-rareza="epica"] {
-  --rare: var(--epica);
-  --glow: rgb(185 148 255 / 48%);
-  --fire-ember: rgb(255 112 49 / 68%);
-  --fire-core: rgb(255 214 140 / 62%);
-  --fire-accent: rgb(185 148 255 / 62%);
-  --fire-low: 0.12;
-  --fire-mid: 0.27;
-  --fire-high: 0.42;
-}
-.card[data-rareza="legendaria"] {
-  --rare: var(--caramelo);
-  --glow: rgb(255 187 69 / 68%);
-  --fire-ember: rgb(255 97 31 / 78%);
-  --fire-core: rgb(255 226 141 / 82%);
-  --fire-accent: rgb(242 178 99 / 76%);
-  --fire-low: 0.2;
-  --fire-mid: 0.4;
-  --fire-high: 0.62;
+.card__patron .card__prisma {
+  background: repeating-linear-gradient(118deg, transparent 0 8%, #fff 11%, #ffd0f0 13%, #bff6ff 15%, transparent 18% 36%);
 }
 
-/* Tilt 3D al revelar (JavaScript mueve --rx/--ry/--mx/--my) */
-.card.is-revealed {
-  transform: rotate(var(--tilt)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-  z-index: 2;
+/* Brillo: una luz blanca que sigue al puntero en toda la carta */
+.card__brillo {
+  position: absolute;
+  left: -50%;
+  top: -50%;
+  z-index: 6;
+  display: block;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 50% 50%, rgb(255 255 255 / 58%), rgb(255 255 255 / 12%) 22%, transparent 42%);
+  mix-blend-mode: soft-light;
+  opacity: var(--luz);
+  pointer-events: none;
+  transform: translate3d(calc(var(--mx) * 34%), calc(var(--my) * 34%), 0);
 }
-.card.is-revealed:hover {
-  transform: rotate(var(--tilt)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) scale(1.06);
-  z-index: 3;
+
+.card[data-rareza="legendaria"] .card__brillo,
+.card[data-variante="holo"] .card__brillo { mix-blend-mode: overlay; }
+
+/* Carga antes de revelar */
+.card.is-cargando::before {
+  content: "";
+  position: absolute;
+  inset: -22%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--rare), transparent);
+  pointer-events: none;
+  animation: aura 0.8s ease-in forwards;
 }
+.card.is-cargando .card__inner { animation: vibra 0.12s linear infinite; }
+
+@keyframes aura {
+  from { opacity: 0; transform: scale(0.7); }
+  to { opacity: 0.85; transform: scale(1.12); }
+}
+
+@keyframes vibra {
+  0%, 100% { translate: 0 0; }
+  25% { translate: -1.5px 1px; }
+  75% { translate: 1.5px -1px; }
+}
+
+/* --- La mano de /sobre --- */
+
+.hand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 3vw, 34px);
+  width: 100%;
+  padding-block: 34px;
+}
+
+.hand .card {
+  transform: translate(var(--px, 0), var(--py, 0)) scale(var(--e, 1)) rotate(var(--r, 0deg));
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1.1), opacity 0.25s;
+  flex: none;
+}
+
+.hand .card.is-quieta { transition: none; }
+.hand .card:nth-child(1) { --r: -2.5deg; }
+.hand .card:nth-child(3) { --r: 2.5deg; }
+.hand .card.is-apilada { --r: 0deg; }
+.hand .card.is-al-frente { z-index: 5; --e: 1.09; }
 
 /* =========================================================
    UI INFERIOR · HUD · DEV
@@ -994,7 +770,7 @@ body {
   display: grid;
   place-items: center;
   gap: 14px;
-  z-index: 5;
+  z-index: 8;
   pointer-events: none;
 }
 .bottom-ui > * { pointer-events: auto; }
@@ -1008,34 +784,38 @@ body {
   padding: 0 16px;
 }
 
-.actions { display: flex; gap: 12px; }
+.actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.actions[hidden] { display: none; }
 
 .btn {
-  border-radius: 999px;
-  padding: 12px 24px;
+  border-radius: 3px;
+  padding: 11px 22px;
+  font-family: var(--font-engine-display);
   font-weight: 800;
-  font-size: 15px;
-  font-family: inherit;
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.2s, filter 0.2s;
-  letter-spacing: 0.3px;
+  transition: transform 0.15s, background-color 0.2s;
 }
+.btn[hidden] { display: none; }
 .btn:active { transform: translateY(2px) scale(0.98); }
+.btn:focus-visible { outline: 3px solid var(--caramelo); outline-offset: 3px; }
 
 .btn--primary {
-  border: 2px solid rgb(246 235 221 / 25%);
-  background: linear-gradient(180deg, var(--rojo-vivo), var(--rojo));
-  color: #fff7f0;
-  box-shadow: 0 10px 26px rgb(215 38 61 / 40%);
+  border: 2px solid var(--text);
+  background: var(--rojo);
+  color: var(--text);
 }
-.btn--primary:hover { filter: brightness(1.1); box-shadow: 0 14px 32px rgb(215 38 61 / 50%); }
+.btn--primary:hover { background: var(--rojo-vivo); }
 
 .btn--ghost {
-  border: 2px solid rgb(242 178 99 / 45%);
-  background: rgb(23 17 15 / 80%);
-  color: var(--caramelo);
+  border: 2px solid rgb(247 239 224 / 45%);
+  background: rgb(9 6 7 / 80%);
+  color: var(--text);
 }
-.btn--ghost:hover { background: rgb(242 178 99 / 12%); }
+.btn--ghost:hover { background: rgb(247 239 224 / 12%); }
 
 .hud {
   position: absolute;
@@ -1044,15 +824,15 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  z-index: 6;
+  z-index: 9;
 }
 
 .hud__btn {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  border: 1px solid rgb(246 235 221 / 20%);
-  background: rgb(23 17 15 / 80%);
+  border: 1px solid rgb(247 239 224 / 20%);
+  background: rgb(9 6 7 / 80%);
   font-size: 17px;
   cursor: pointer;
   transition: transform 0.15s, border-color 0.2s;
@@ -1069,14 +849,14 @@ body {
 .hud__album {
   font-family: var(--font-engine-mono);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 1px;
   color: var(--muted);
   text-decoration: none;
   padding: 9px 16px;
   border-radius: 999px;
-  border: 1px solid rgb(246 235 221 / 20%);
-  background: rgb(23 17 15 / 80%);
+  border: 1px solid rgb(247 239 224 / 20%);
+  background: rgb(9 6 7 / 80%);
   transition: color 0.2s, border-color 0.2s, transform 0.15s;
 }
 .hud__album:hover {
@@ -1085,11 +865,30 @@ body {
   transform: scale(1.05);
 }
 
+.hud__config {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgb(247 239 224 / 20%);
+  background: rgb(9 6 7 / 80%);
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 17px;
+  transition: transform 0.15s, border-color 0.2s, color 0.2s;
+}
+.hud__config:hover {
+  transform: scale(1.1);
+  border-color: rgb(242 178 99 / 50%);
+  color: var(--caramelo);
+}
+
 .back-link {
   position: absolute;
   top: 22px;
   left: 22px;
-  z-index: 6;
+  z-index: 9;
   color: var(--muted);
   text-decoration: none;
   font-weight: 700;
@@ -1102,115 +901,28 @@ body {
   position: absolute;
   bottom: 10px;
   left: 12px;
-  z-index: 6;
+  z-index: 9;
   font-family: var(--font-engine-mono);
   font-size: 11px;
-  color: rgb(191 168 153 / 55%);
+  color: rgb(201 189 176 / 60%);
 }
 .dev select {
   font: inherit;
   color: var(--text);
-  background: rgb(23 17 15 / 85%);
-  border: 1px solid rgb(246 235 221 / 20%);
-  border-radius: 6px;
+  background: rgb(9 6 7 / 85%);
+  border: 1px solid rgb(247 239 224 / 20%);
+  border-radius: 3px;
   padding: 2px 4px;
 }
 
-/* =========================================================
-   PARTÍCULAS · CONFETI · TEMBLOR
-   ========================================================= */
-
+/* Canvas de chispas: transparente, así funciona igual en OBS */
 .fx {
   position: absolute;
   inset: 0;
-  overflow: hidden;
+  z-index: 6;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  z-index: 5;
-}
-
-/* Partículas: mezcla de chips de papel, gemas y estrellitas */
-.p {
-  position: absolute;
-  pointer-events: none;
-  background: var(--c, #f2b263);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--c, #f2b263) 60%, transparent);
-  animation: particle 1s cubic-bezier(0.16, 0.8, 0.4, 1) forwards;
-}
-
-.p--chip {
-  width: 11px;
-  height: 7px;
-  border-radius: 2px;
-  box-shadow: 0 0 0 1px rgb(0 0 0 / 12%);
-}
-
-.p--gema {
-  width: 9px;
-  height: 9px;
-  border-radius: 2px;
-  box-shadow: 0 0 9px var(--c, #f2b263);
-}
-
-.p--estrella {
-  width: 13px;
-  height: 13px;
-  clip-path: polygon(50% 0%, 63% 37%, 100% 50%, 63% 63%, 50% 100%, 37% 63%, 0% 50%, 37% 37%);
-  filter: drop-shadow(0 0 6px var(--c, #f2b263));
-}
-
-/* Salen con impulso y luego caen con gravedad, volteando en el aire */
-@keyframes particle {
-  0% { transform: translate(0, 0) rotate(0deg) rotateX(0deg) scale(0.3); opacity: 0; }
-  10% { transform: translate(calc(var(--dx, 0) * 0.15), calc(var(--dy, 0) * 0.15)) rotate(calc(var(--spin, 0) * 0.12)) rotateX(calc(var(--flip, 0) * 0.2)) scale(1); opacity: 1; }
-  55% { transform: translate(var(--dx, 0), var(--dy, 0)) rotate(calc(var(--spin, 0) * 0.7)) rotateX(calc(var(--flip, 0) * 0.7)) scale(1); opacity: 1; }
-  100% { transform: translate(calc(var(--dx, 0) * 1.12), calc(var(--dy, 0) + var(--fall, 140px))) rotate(var(--spin, 0deg)) rotateX(var(--flip, 0deg)) scale(0.5); opacity: 0; }
-}
-
-.cf {
-  position: absolute;
-  top: -4vh;
-  left: var(--x, 50%);
-  width: 9px;
-  height: 15px;
-  border-radius: 2px;
-  background: var(--c, #f2b263);
-  animation: cf-fall var(--t, 2s) linear var(--d, 0s) forwards;
-}
-
-@keyframes cf-fall {
-  to { transform: translateY(114vh) rotate(680deg); }
-}
-
-.stage.is-shake { animation: shake 0.6s ease-in-out; }
-
-@keyframes shake {
-  0%, 100% { transform: translate(0, 0); }
-  15% { transform: translate(-14px, 7px); }
-  30% { transform: translate(13px, -8px); }
-  45% { transform: translate(-11px, 5px); }
-  60% { transform: translate(9px, -4px); }
-  75% { transform: translate(-5px, 2px); }
-  90% { transform: translate(3px, -1px); }
-}
-
-/* =========================================================
-   RESPONSIVE · ACCESIBILIDAD
-   ========================================================= */
-
-@media (max-width: 640px) {
-  :root { --cw: clamp(104px, 28vw, 150px); }
-  .pack { width: clamp(200px, 62vw, 250px); }
-  .hand { gap: clamp(8px, 2.4vw, 14px); }
-  .bg-float img { display: none; }
-  .actions { flex-direction: column; align-items: center; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
 }
 
 /* =========================================================
@@ -1218,18 +930,8 @@ body {
    ========================================================= */
 
 .modo-overlay .pack { pointer-events: none; cursor: default; }
+.modo-overlay .pack-layer { padding-block: 22vh 6vh; } /* deja libre el banner del canje */
 .modo-overlay .bottom-ui { display: none; }
-.modo-overlay .pack__hint { display: none; }
-
-/* Aparición con muelle */
-.pack.is-entering {
-  animation: pack-spring 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-
-@keyframes pack-spring {
-  from { transform: translateY(9vh) scale(0.3) rotate(-10deg); opacity: 0; }
-  to { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
-}
 
 /* Carta en solitario (una a la vez, al centro) */
 .solo {
@@ -1238,19 +940,19 @@ body {
   display: grid;
   place-items: center;
   padding-top: clamp(40px, 22vh, 120px);
-  perspective: 1200px;
-  z-index: 3;
+  z-index: 4;
 }
+.solo[hidden] { display: none; }
 
 .solo .card {
-  --cw: min(520px, 58vw, 46vh);
-  --tilt: 0deg;
-  animation: card-solo-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --cw: min(420px, 58vw, 46vh);
+  cursor: default;
+  animation: card-sube 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes card-solo-in {
-  from { transform: translateY(-12vh) scale(0.4) rotate(-6deg); opacity: 0; }
-  to { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+@keyframes card-sube {
+  from { transform: translateY(26vh) scale(0.62); opacity: 0; }
+  to { transform: none; opacity: 1; }
 }
 
 .card.is-out {
@@ -1272,14 +974,14 @@ body {
   display: grid;
   place-items: center;
   gap: 10px;
-  z-index: 6;
+  z-index: 8;
 }
 
 .demo-note {
   margin: 0;
   font-family: var(--font-engine-mono);
   font-size: 11px;
-  color: rgb(191 168 153 / 60%);
+  color: rgb(201 189 176 / 70%);
   text-align: center;
   padding: 0 16px;
 }
@@ -1292,17 +994,22 @@ body.modo-overlay.is-transparente .hud,
 body.modo-overlay.is-transparente .dev,
 body.modo-overlay.is-transparente .back-link { display: none; }
 
+/* Sobre la transmisión el velo apenas baja la luz alrededor de la carta */
+body.modo-overlay.is-transparente .velo {
+  background: radial-gradient(70% 70% at 50% 55%, rgb(4 2 3 / 34%), transparent);
+}
+
 /* Registro en pantalla del modo debug (?debug=1) */
 .debug-log {
   position: absolute;
   top: 56px;
   left: 12px;
-  z-index: 9;
+  z-index: 10;
   width: min(420px, 62vw);
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid rgb(242 178 99 / 40%);
-  background: rgb(16 11 10 / 92%);
+  background: rgb(9 6 7 / 92%);
   font-family: var(--font-engine-mono);
   font-size: 11px;
   line-height: 1.6;
@@ -1315,20 +1022,22 @@ body.modo-overlay.is-transparente .back-link { display: none; }
 /* Banner: quién canjeó el sobre */
 .canje-banner {
   position: absolute;
-  top: clamp(64px, 15vh, 130px);
+  top: clamp(10px, 2.5vh, 22px);
   left: 50%;
   translate: -50% 0;
-  z-index: 3;
+  z-index: 7;
   padding: 10px 22px;
-  border-radius: 999px;
-  border: 1px solid rgb(242 178 99 / 55%);
-  background: rgb(23 17 15 / 88%);
-  color: var(--caramelo);
+  border: 2px solid var(--rojo);
+  border-radius: 3px;
+  background: rgb(9 6 7 / 90%);
+  color: var(--text);
+  font-family: var(--font-engine-display);
   font-weight: 800;
-  font-size: clamp(13px, 2.4vw, 17px);
-  letter-spacing: 0.4px;
+  font-size: clamp(18px, 2.8vw, 26px);
+  line-height: 1;
+  letter-spacing: 0.04em;
   white-space: nowrap;
-  box-shadow: 0 10px 30px rgb(0 0 0 / 45%), 0 0 24px rgb(242 178 99 / 25%);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 45%);
   animation: banner-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   transition: opacity 0.45s;
   pointer-events: none;
@@ -1347,153 +1056,76 @@ body.modo-overlay.is-transparente .back-link { display: none; }
   color: var(--muted);
   padding: 4px 10px;
   border-radius: 999px;
-  border: 1px solid rgb(246 235 221 / 14%);
-  background: rgb(23 17 15 / 80%);
+  border: 1px solid rgb(247 239 224 / 14%);
+  background: rgb(9 6 7 / 80%);
   max-width: 46vw;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.estado-twitch[data-estado="conectado"] { color: var(--mint); border-color: rgb(168 230 212 / 45%); }
+.estado-twitch[data-estado="conectado"] { color: var(--mint); border-color: rgb(159 236 214 / 45%); }
 .estado-twitch[data-estado="conectando"],
 .estado-twitch[data-estado="reconectando"] { color: var(--caramelo); border-color: rgb(242 178 99 / 45%); }
-.estado-twitch[data-estado="error"] { color: var(--rojo-vivo); border-color: rgb(255 90 106 / 45%); }
-
-.hud__config {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgb(246 235 221 / 20%);
-  background: rgb(23 17 15 / 80%);
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 17px;
-  transition: transform 0.15s, border-color 0.2s, color 0.2s;
-}
-.hud__config:hover {
-  transform: scale(1.1);
-  border-color: rgb(242 178 99 / 50%);
-  color: var(--caramelo);
-}
+.estado-twitch[data-estado="error"] { color: var(--rojo-vivo); border-color: rgb(255 75 62 / 45%); }
 
 /* =========================================================
-   SPLASH DE RAREZA · tinte de color · mejor del sobre
+   CINTA DE RAREZA · mejor del sobre
    ========================================================= */
 
-/* Destello a pantalla completa del color de la rareza */
-.tint {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  opacity: 0;
-  background:
-    radial-gradient(ellipse at 50% 58%, color-mix(in srgb, var(--c-tint, transparent) 40%, transparent), transparent 58%),
-    radial-gradient(ellipse at 50% 100%, rgb(255 117 41 / 12%), transparent 72%);
-  mix-blend-mode: screen;
-}
-.tint.is-on { animation: tint-flash 0.7s ease-out; }
-
-@keyframes tint-flash {
-  0% { opacity: 0.36; }
-  40% { opacity: 0.2; }
-  100% { opacity: 0; }
-}
-
-/* Florecimiento de color + mini onda en el centro de la carta */
-.mini-ring {
-  position: absolute;
-  width: 92px;
-  height: 92px;
-  margin: -46px 0 0 -46px;
-  border-radius: 50%;
-  border: 4px solid var(--c, #f6ebdd);
-  box-shadow: 0 0 24px var(--c, #f6ebdd), inset 0 0 18px var(--c, #f6ebdd);
-  animation: mini-ring 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
-}
-
-@keyframes mini-ring {
-  0% { transform: scale(0.25); opacity: 1; }
-  100% { transform: scale(2.4); opacity: 0; }
-}
-
-.bloom {
-  position: absolute;
-  width: 150px;
-  height: 150px;
-  margin: -75px 0 0 -75px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--c, #f2b263) 34%, transparent) 0%,
-    rgb(255 121 42 / 12%) 30%,
-    transparent 68%
-  );
-  mix-blend-mode: screen;
-  filter: blur(6px);
-  animation: bloom 0.7s ease-out forwards;
-}
-
-@keyframes bloom {
-  0% { transform: scale(0.2); opacity: 0.58; }
-  100% { transform: scale(3.2); opacity: 0; }
-}
-
-/* Estrellitas que titilan alrededor de la carta */
-.destello {
-  position: absolute;
-  clip-path: polygon(50% 0%, 63% 37%, 100% 50%, 63% 63%, 50% 100%, 37% 63%, 0% 50%, 37% 37%);
-  background: var(--c, #f2b263);
-  filter: drop-shadow(0 0 7px var(--c, #f2b263));
-  animation: twinkle var(--t, 0.6s) ease-out var(--d, 0s) forwards;
-}
-
-@keyframes twinkle {
-  0% { transform: scale(0) rotate(0deg); opacity: 0; }
-  40% { transform: scale(1) rotate(90deg); opacity: 1; }
-  100% { transform: scale(0) rotate(180deg); opacity: 0; }
-}
-
-/* Texto grande de la rareza (épica / legendaria) */
 .rarity-splash {
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  top: clamp(62px, 8vh, 96px);
   z-index: 7;
   display: grid;
   place-items: center;
+  height: clamp(52px, 8vw, 84px);
+  overflow: hidden;
   pointer-events: none;
-  transition: opacity 0.4s;
 }
-.rarity-splash.is-out { opacity: 0; }
+.rarity-splash[hidden] { display: none; }
+/* En el overlay deja libre la franja superior del banner de quién canjeó */
+.modo-overlay .rarity-splash { top: clamp(64px, 10vh, 84px); }
+
+.rarity-splash::before {
+  content: "";
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  background: #0a0708;
+  border-block: 3px solid var(--r-splash, transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
 .rarity-splash span {
-  font-family: var(--font-engine-display);
-  font-weight: 700;
-  font-style: italic;
+  grid-area: 1 / 1;
+  z-index: 1;
+  padding: 0 8%;
+  font: 900 clamp(40px, 7vw, 76px) / 1.1 var(--font-carta);
+  letter-spacing: 0.03em;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  font-size: clamp(46px, 11vw, 110px);
   color: var(--r-splash, #f2b263);
-  -webkit-text-stroke: 2px rgb(16 11 10 / 55%);
-  text-shadow:
-    0 0 36px var(--r-splash, #f2b263),
-    0 6px 0 rgb(16 11 10 / 45%),
-    0 16px 48px rgb(0 0 0 / 55%);
-  animation:
-    splash-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both,
-    splash-float 2.4s 0.55s ease-in-out infinite;
+  transform: translateX(-60%) skewX(-10deg);
+  opacity: 0;
 }
 
-@keyframes splash-pop {
-  0% { transform: scale(0.25) rotate(-8deg); }
-  62% { transform: scale(1.18) rotate(2deg); }
-  100% { transform: scale(1) rotate(0deg); }
+.rarity-splash.is-on::before { animation: cinta 1.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+.rarity-splash.is-on span { animation: letrero 1.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+@keyframes cinta {
+  0% { transform: scaleX(0); transform-origin: left; }
+  18%, 80% { transform: scaleX(1); transform-origin: left; }
+  81% { transform-origin: right; }
+  100% { transform: scaleX(0); transform-origin: right; }
 }
 
-@keyframes splash-float {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.05) rotate(-1.5deg); }
+@keyframes letrero {
+  0% { transform: translateX(-60%) skewX(-10deg); opacity: 0; }
+  20% { transform: translateX(0) skewX(-10deg); opacity: 1; }
+  80% { transform: translateX(2%) skewX(-10deg); opacity: 1; }
+  100% { transform: translateX(60%) skewX(-10deg); opacity: 0; }
 }
 
 /* Cierre: la rareza más grande del sobre, arriba de las cartas */
@@ -1505,123 +1137,55 @@ body.modo-overlay.is-transparente .back-link { display: none; }
   place-items: center;
   align-content: start;
   gap: 6px;
-  padding-top: 9vh;
+  padding-top: 7vh;
   pointer-events: none;
   transition: opacity 0.45s;
 }
+.final-splash[hidden] { display: none; }
 .final-splash.is-out { opacity: 0; }
 
 .final-label {
   font-family: var(--font-engine-mono);
-  font-weight: 800;
+  font-weight: 700;
   font-size: clamp(12px, 2.2vw, 16px);
   letter-spacing: 4px;
   text-transform: uppercase;
   color: var(--muted);
+  text-shadow: 0 1px 6px rgb(0 0 0 / 80%);
 }
 
 .final-rareza {
-  font-family: var(--font-engine-display);
-  font-weight: 700;
-  font-style: italic;
+  font: 900 clamp(40px, 8vw, 88px) / 1 var(--font-carta);
+  letter-spacing: 0.02em;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  font-size: clamp(40px, 9vw, 96px);
   color: var(--c-final, #f2b263);
-  -webkit-text-stroke: 2px rgb(16 11 10 / 55%);
-  text-shadow: 0 0 32px var(--c-final, #f2b263), 0 6px 0 rgb(16 11 10 / 45%), 0 16px 48px rgb(0 0 0 / 55%);
-  animation: splash-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  text-shadow: 3px 3px 0 #0a0708, 0 8px 28px rgb(0 0 0 / 60%);
+  animation: final-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-/* En modo transparente (OBS) no se ve nada de fondo: solo el evento */
-body.modo-overlay.is-transparente .bg-float { display: none; }
-
-/* =========================================================
-   ESTALLIDO DEL SOBRE · onda expansiva + pedazos de foil
-   ========================================================= */
-
-.shock {
-  position: absolute;
-  width: 90px;
-  height: 90px;
-  margin: -45px 0 0 -45px;
-  border-radius: 50%;
-  border: 4px solid rgb(255 223 158 / 85%);
-  box-shadow: 0 0 34px rgb(242 178 99 / 65%), inset 0 0 20px rgb(242 178 99 / 45%);
-  animation: shock-wave 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+@keyframes final-pop {
+  from { transform: scale(0.4) skewX(-10deg); opacity: 0; }
+  to { transform: none; opacity: 1; }
 }
 
-@keyframes shock-wave {
-  0% { transform: scale(0.3); opacity: 1; }
-  100% { transform: scale(8); opacity: 0; }
-}
-
-.frag {
-  position: absolute;
-  border-radius: 3px;
-  background: var(--c, #3f2c22);
-  box-shadow: 0 0 0 1px rgb(246 235 221 / 14%);
-  animation: frag-fly 0.85s cubic-bezier(0.15, 0.75, 0.35, 1) var(--d, 0s) forwards;
-}
-
-@keyframes frag-fly {
-  0% { transform: scale(0.4); opacity: 0; }
-  12% { transform: scale(1); opacity: 1; }
-  100% { transform: translate(var(--dx, 0), var(--dy, -200px)) rotate(var(--fr, 360deg)); opacity: 0; }
-}
-
-/* Humo que se disipa tras el estallido */
-.humo {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgb(96 68 44 / 42%), rgb(64 46 30 / 24%) 55%, transparent 74%);
-  filter: blur(6px);
-  animation: humo-out var(--t, 1s) ease-out forwards;
-}
-
-@keyframes humo-out {
-  0% { transform: scale(0.5); opacity: 0.75; }
-  100% { transform: scale(1.8); opacity: 0; }
-}
-
-/* Chispas que cruzan la pantalla en línea */
-.spark {
-  position: absolute;
-  width: 3px;
-  height: var(--largo, 60px);
-  margin: calc(var(--largo, 60px) / -2) 0 0 -1.5px;
-  border-radius: 2px;
-  transform: rotate(var(--ang, 0deg));
-  background: linear-gradient(180deg, transparent, var(--c, #ffdf9e), transparent);
-  animation: spark-fly 0.5s ease-out forwards;
-}
-
-@keyframes spark-fly {
-  0% { transform: rotate(var(--ang, 0deg)) translateY(0); opacity: 1; }
-  100% { transform: rotate(var(--ang, 0deg)) translateY(var(--dist, -320px)); opacity: 0; }
-}
-
-/* =========================================================
-   RECUENTO FINAL · las 3 cartas del sobre vuelven a pantalla
-   ========================================================= */
-
+/* Recuento final: las 3 cartas del sobre vuelven a pantalla */
 .final-hand {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 4;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(12px, 3vw, 32px);
-  perspective: 1200px;
+  gap: clamp(10px, 3vw, 32px);
+  padding-top: 12vh;
   pointer-events: none;
   transition: opacity 0.45s;
 }
+.final-hand[hidden] { display: none; }
 .final-hand.is-out { opacity: 0; }
 
-/* Tamaño completo y abanico, como las cartas de sobre.html */
 .final-hand .card {
-  --cw: min(250px, 21vw, 24vh);
+  --cw: min(280px, 29vw, 34vh);
   cursor: default;
   animation: card-final-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
   animation-delay: var(--d, 0s);
@@ -1629,20 +1193,69 @@ body.modo-overlay.is-transparente .bg-float { display: none; }
 
 @keyframes card-final-in {
   from { transform: translateY(28px) scale(0.6); opacity: 0; }
-  to { transform: translateY(0) scale(1); opacity: 1; }
+  to { transform: none; opacity: 1; }
 }
 
-/* El browser source comparte el acabado sobrio de las cartas del Álbum. */
-.modo-overlay {
-  --font-engine-body: "DM Sans", system-ui, sans-serif;
-  --font-engine-display: "Newsreader", Georgia, serif;
-  --font-engine-mono: "Space Mono", monospace;
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 720px) {
+  :root { --cw: min(60vw, 240px, 44vh); }
+  .pack { --ancho: min(62vw, 250px, 46vh); }
+  .hand-layer { padding-inline: 0; }
+
+  /* Carrusel de cartas grandes en lugar de tres miniaturas */
+  .hand {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-inline: calc(50% - var(--cw) / 2);
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    touch-action: pan-x;
+  }
+  .hand::-webkit-scrollbar { display: none; }
+  .hand.is-repartiendo { overflow: visible; }
+  .hand .card { scroll-snap-align: center; touch-action: pan-x; }
+
+  /* El enlace de volver ya lleva al álbum; el HUD no se le encima */
+  .back-link { top: 16px; left: 16px; font-size: 13px; line-height: 42px; }
+  .hud__album { display: none; }
+  .hud { flex-wrap: wrap; justify-content: flex-end; max-width: calc(100vw - 196px); gap: 6px 10px; }
+  .hud__count { font-size: 11px; }
+  .estado-twitch { max-width: 100%; }
 }
 
-.modo-overlay .card__face {
-  box-shadow: 0 10px 20px rgb(36 35 33 / 18%);
-}
+/* =========================================================
+   MOVIMIENTO REDUCIDO: el giro pasa a fundido y nada se mueve solo
+   ========================================================= */
 
-.modo-overlay .card.is-revealed .card__face--front {
-  animation: none;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .card__incl,
+  .card.is-flip .card__inner,
+  .card__face--front,
+  .pack__cuerpo { transform: none; }
+
+  .card__inner { transition: none; }
+  .card__face--back {
+    z-index: 2;
+    transition: opacity 0.25s !important;
+  }
+  .card.is-flip .card__face--back { opacity: 0; }
+  .card__brillo { display: none; }
+  .card.is-cargando::before { display: none; }
+
+  .rays { display: none; }
+
+  /* La cinta aparece fija, sin barrido */
+  .rarity-splash.is-on::before,
+  .rarity-splash.is-on span { animation: none !important; }
+  .rarity-splash.is-on::before { transform: none; }
+  .rarity-splash.is-on span { transform: skewX(-10deg); opacity: 1; }
 }

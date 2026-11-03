@@ -1,7 +1,7 @@
 /*
- * Prototipo "Sobre coleccionable" · WewinVT
- * Flujo: sobre → rasgado → 3 cartas boca abajo → revelado con efectos por rareza.
- * Los sonidos se sintetizan con Web Audio (sin archivos).
+ * Sobre coleccionable · WewinVT
+ * Flujo: sobre → corte → 3 cartas boca abajo → revelado con efectos por rareza.
+ * Los sonidos se sintetizan con Web Audio (sin archivos) y las chispas se pintan en un canvas.
  */
 (() => {
   "use strict";
@@ -20,11 +20,13 @@
   const forceSel = $("[data-force]");
   const fx = $("[data-fx]");
   const rays = $("[data-rays]");
-  const flash = $("[data-flash]");
+  const velo = $("[data-velo]");
   const solo = $("[data-solo]");
   const btnDemo = $("[data-demo]");
   const banner = $("[data-banner]");
   const debugLog = $("[data-debug-log]");
+
+  const Carta = window.CartaWewin;
 
   /* ?debug=1 muestra en pantalla la conexión y los canjes que llegan */
   const DEBUG = new URLSearchParams(location.search).get("debug") === "1";
@@ -32,7 +34,7 @@
   /* Modo: "interactivo" (sobre.html) u "overlay" (overlay.html, canje automático) */
   const MODO = document.body.dataset.modo === "overlay" ? "overlay" : "interactivo";
   let secuencia = false;
-  let splashT1 = 0, splashT2 = 0, finalT1 = 0, finalT2 = 0, recuentoT1 = 0, recuentoT2 = 0;
+  let splashT = 0, finalT1 = 0, finalT2 = 0, recuentoT1 = 0, recuentoT2 = 0, packT = 0;
   /* Cola de canjes: si varios viewers canjean seguido, los sobres salen en fila */
   const colaCanjes = [];
   const MAX_COLA = 10;
@@ -42,28 +44,13 @@
   /* Tiempo que cada carta se muestra antes de salir de pantalla */
   const HOLD_MS = { comun: 1400, rara: 1400, epica: 1900, legendaria: 2500 };
 
-  const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const COLORES = ["#d7263d", "#ff5a6a", "#f2b263", "#a8e6d4", "#ff9eb1", "#f6ebdd"];
-  const MINTS = ["#a8e6d4", "#c9f0e4", "#f6ebdd"];
-  const EPICAS = ["#b994ff", "#ff9b4b", "#ffd9a1"];
-  const DORADOS = ["#ff8038", "#f2b263", "#ffdf9e", "#fff6d8"];
+  const REDUCED = Carta.SERENO;
 
   /* =========================================================
      RAREZAS
      ========================================================= */
   const ORDEN = ["comun", "rara", "epica", "legendaria"];
-  const RAREZAS = {
-    comun: { nombre: "Común", simbolo: "●" },
-    rara: { nombre: "Rara", simbolo: "◆" },
-    epica: { nombre: "Épica", simbolo: "★" },
-    legendaria: { nombre: "Legendaria", simbolo: "★" },
-  };
-  const COLOR_RAREZA = {
-    comun: "#bfa78f",
-    rara: "#a8e6d4",
-    epica: "#b994ff",
-    legendaria: "#f2b263",
-  };
+  const RAREZAS = Carta.RAREZAS;
   /* Los pesos del sorteo viven en js/sorteo.js (compartido con el Worker) */
 
   const CATALOGO = window.SOBRE_CATALOGO || [];
@@ -145,14 +132,11 @@
         noise({ t: 0.05, d: 0.3, v: 0.32, f: 500, f2: 2600, q: 1.2 });
         osc({ t: 0.3, f: 1200, type: "square", d: 0.05, v: 0.08 });
       },
-      /* Estallido: doble sub-bass + crujido de foil + chispa metálica */
-      boom() {
+      /* Zumbido que sube mientras una carta épica o legendaria se carga */
+      carga(duracion = 0.6) {
         if (muted) return;
-        osc({ f: 130, f2: 38, type: "sine", d: 0.55, v: 0.5 });
-        osc({ t: 0.05, f: 90, f2: 30, type: "sine", d: 0.6, v: 0.3 });
-        noise({ d: 0.5, v: 0.6, f: 300, f2: 2400, q: 0.6 });
-        noise({ d: 0.28, v: 0.4, f: 5200, f2: 900, q: 0.8, type: "lowpass" });
-        noise({ t: 0.02, d: 0.16, v: 0.22, f: 4200, type: "highpass" });
+        osc({ f: 180, f2: 720, type: "sawtooth", d: duracion, v: 0.05 });
+        noise({ d: duracion, v: 0.08, f: 500, f2: 4200, q: 1.4 });
       },
       pop(i = 0) {
         if (muted) return;
@@ -196,6 +180,9 @@
      ========================================================= */
   const azar = (n) => Math.floor(Math.random() * n);
   const elegir = (lista) => lista[azar(lista.length)];
+  const espera = (ms) => new Promise((resolver) => setTimeout(resolver, ms));
+  /* Pausa que solo existe para acompañar una animación: desaparece con movimiento reducido */
+  const pausa = (ms) => espera(REDUCED ? 0 : ms);
 
   /* =========================================================
      ESTADO
@@ -268,326 +255,292 @@
     cartasActuales = window.SOBRE_SORTEO.construirCartas(CATALOGO, { forzado });
   }
 
+
   /* =========================================================
      RENDER DE CARTAS
      ========================================================= */
-  function numeroCard(indexGlobal) {
-    return "#" + String(indexGlobal + 1).padStart(2, "0");
-  }
-
-  function crearCarta(datos, i) {
-    const numGlobal = CATALOGO.indexOf(datos);
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "card";
-    btn.style.setProperty("--d", `${i * 0.14}s`);
-    btn.dataset.rareza = datos.rareza;
-    btn.dataset.tipo = datos.tipo;
-    btn.dataset.variante = datos.variante || "base";
+  function crearCarta(datos, i, opciones = {}) {
+    const btn = Carta.crearCarta(datos, opciones);
     btn.dataset.i = String(i);
     btn.setAttribute("aria-label", `Carta ${i + 1} de 3, sin revelar`);
-
-    btn.innerHTML = `
-      <span class="card__bob">
-        <span class="card__inner">
-          <span class="card__face card__face--back">
-            <span class="card__emblem">W</span>
-          </span>
-          <span class="card__face card__face--front">
-            <img class="card__arte" src="${datos.src}" alt="${datos.alt}" draggable="false" />
-            <i class="card__foil"></i>
-            <i class="card__holo"></i>
-            <i class="card__spark"></i>
-            <span class="card__nueva" aria-hidden="true">NUEVA</span>
-            <span class="card__scrim card__scrim--top">
-              <span class="card__name">${datos.nombre}</span>
-              <span class="card__num">${numeroCard(numGlobal < 0 ? i : numGlobal)}</span>
-            </span>
-            <span class="card__scrim card__scrim--base">
-              <span class="card__fila">
-                <span class="card__tipo">${datos.tipo}</span>
-                <span class="card__rareza-lado">
-                  <span class="card__rareza-nombre">${RAREZAS[datos.rareza].nombre}</span>
-                  <span class="card__simbolo">${RAREZAS[datos.rareza].simbolo}</span>
-                </span>
-              </span>
-              ${datos.nombreVariante ? `<span class="card__variante">${datos.nombreVariante}</span>` : ""}
-              <span class="card__credito">Illus. ${datos.artista || "Anónimo"}</span>
-            </span>
-          </span>
-        </span>
-      </span>
-    `;
-
-    if (MODO === "interactivo") btn.addEventListener("click", () => revelar(btn, datos));
+    if (MODO === "interactivo") {
+      btn.addEventListener("click", () => revelar(btn, datos));
+    }
     return btn;
   }
 
-  function ariaLabelCarta(datos, nueva = false) {
-    const etiquetas = [datos.nombreVariante, nueva ? "Nueva" : ""].filter(Boolean);
-    const detalle = etiquetas.length ? `, ${etiquetas.join(", ")}` : "";
-    return `${datos.nombre}${detalle}, ${RAREZAS[datos.rareza].nombre} (${datos.tipo})`;
+  /* =========================================================
+     EL SOBRE · dos piezas con el mismo arte y el mismo borde rasgado
+     ========================================================= */
+  const CORTE = 10; /* % de la altura donde pasa el corte */
+
+  function dientes(desde, hasta, y, alto, pasos) {
+    const puntos = [];
+    for (let i = 0; i <= pasos; i++) {
+      puntos.push(`${(desde + ((hasta - desde) * i) / pasos).toFixed(2)}% ${(y + (i % 2 ? alto : 0)).toFixed(2)}%`);
+    }
+    return puntos;
   }
 
-  function pintarCartas() {
-    hand.innerHTML = "";
-    cartasActuales.forEach((datos, i) => hand.append(crearCarta(datos, i)));
+  function bordeRasgado() {
+    const puntos = [];
+    let semilla = 7;
+    for (let i = 0; i <= 22; i++) {
+      semilla = (semilla * 31 + 11) % 97;
+      puntos.push(`${((i / 22) * 100).toFixed(2)}% ${(CORTE + ((semilla % 9) - 4) * 0.28).toFixed(2)}%`);
+    }
+    return puntos;
+  }
+
+  function construirPack() {
+    const arte = `
+      <span class="pack__arte">
+        <span class="pack__sol"></span>
+        <span class="pack__disco"></span>
+        <img class="pack__mascota" src="img/emotes/lentes-oscuros.webp" alt="" draggable="false" />
+        <span class="pack__marca">WEWIN<small>Colección comunidad · Serie 1</small></span>
+        <span class="pack__pie"><span>3 cartas</span><span>Arte: skyshinez_</span></span>
+        <i class="pack__foil"></i>
+      </span>
+    `;
+    pack.innerHTML = `
+      <span class="pack__sombra"></span>
+      <span class="pack__halo"></span>
+      <span class="pack__cuerpo">
+        <span class="pack__luz"></span>
+        <span class="pack__pieza pack__pieza--bolsa">${arte}</span>
+        <span class="pack__pieza pack__pieza--tapa">${arte}</span>
+        <span class="pack__corte"></span>
+      </span>
+    `;
+    const rasgado = bordeRasgado();
+    $(".pack__pieza--tapa", pack).style.clipPath =
+      `polygon(${[...dientes(0, 100, 0, 1.3, 44), ...[...rasgado].reverse()].join(",")})`;
+    $(".pack__pieza--bolsa", pack).style.clipPath =
+      `polygon(${[...rasgado, ...dientes(100, 0, 100, -1.3, 44)].join(",")})`;
+    Carta.conectar(pack, { mece: true });
+  }
+
+  function reiniciarPack() {
+    clearTimeout(packT);
+    pack.classList.remove("is-entering", "is-winding", "is-cortando", "is-open", "is-soltando");
+  }
+
+  /* Carga, corte de luz y tapa que sale volando */
+  async function rasgarPack() {
+    if (REDUCED) await espera(500);
+    pack.classList.add("is-winding");
+    AudioFX.grab();
+    await pausa(340);
+
+    pack.classList.add("is-cortando");
+    AudioFX.rip();
+    const r = rectoEnEscena(pack);
+    const yCorte = r.top + r.height * (CORTE / 100);
+    chisporrotearCorte(r, yCorte);
+    await pausa(470);
+
+    pack.classList.add("is-open");
+    Chispas.emitir(r.x, yCorte, 34, {
+      colores: ["#fff4d2", "#ffc96a"], vel: 360, grav: 340, vida: 1, ang: -Math.PI / 2, abre: 1.5,
+    });
+  }
+
+  /* La bolsa cae y se retira; las cartas ya están detrás de ella */
+  function soltarPack() {
+    pack.classList.add("is-soltando");
+    AudioFX.whoosh();
+    packT = setTimeout(() => {
+      pack.hidden = true;
+      reiniciarPack();
+    }, REDUCED ? 0 : 620);
   }
 
   /* =========================================================
-     EFECTOS
+     EFECTOS · chispas en canvas: solo corre mientras haya alguna
      ========================================================= */
-  /* Estallido de partículas: mezcla de chips que se voltean, gemas y estrellitas,
-     con impulso hacia fuera y caída con gravedad */
-  function burst(x, y, n = 22, fuerza = 1, colores = COLORES) {
-    if (REDUCED) return;
-    for (let i = 0; i < n; i++) {
-      const p = document.createElement("i");
-      const tipo = azar(4); // 0-1 chip de papel · 2 gema · 3 estrellita
-      p.className = tipo < 2 ? "p p--chip" : tipo === 2 ? "p p--gema" : "p p--estrella";
+  const Chispas = (() => {
+    const ctx = fx.getContext("2d");
+    let lista = [];
+    let corriendo = false;
+    let ultimo = 0;
+    let escala = 1;
 
-      const ang = Math.random() * Math.PI * 2;
-      const dist = (80 + Math.random() * 220) * fuerza;
-      p.style.left = `${x}px`;
-      p.style.top = `${y}px`;
-      p.style.setProperty("--dx", `${(Math.cos(ang) * dist).toFixed(1)}px`);
-      p.style.setProperty("--dy", `${(Math.sin(ang) * dist - 60 * fuerza).toFixed(1)}px`);
-      p.style.setProperty("--fall", `${(120 + Math.random() * 110) * fuerza}px`);
-      const baseGiro = tipo === 2 ? 45 : 0; /* las gemas nacen en diamante */
-      p.style.setProperty(
-        "--spin",
-        `${baseGiro + (Math.random() < 0.5 ? -1 : 1) * (180 + azar(540))}deg`
-      );
-      p.style.setProperty(
-        "--flip",
-        tipo < 2 ? `${(Math.random() < 0.5 ? -1 : 1) * (240 + azar(360))}deg` : "0deg"
-      );
-      p.style.setProperty("--c", elegir(colores));
-      p.style.animationDelay = `${azar(70)}ms`;
-      p.style.animationDuration = `${(0.9 + Math.random() * 0.5).toFixed(2)}s`;
-      p.addEventListener("animationend", () => p.remove());
-      fx.append(p);
+    function medir() {
+      const r = stage.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      fx.width = r.width * dpr;
+      fx.height = r.height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      escala = Math.max(0.6, Math.min(r.width / 900, 1.6));
     }
-  }
+    medir();
+    window.addEventListener("resize", medir);
 
-  /* Florecimiento de color + onda en el centro de la carta */
-  function anilloMini(x, y, color) {
-    if (REDUCED) return;
-
-    const flor = document.createElement("i");
-    flor.className = "bloom";
-    flor.style.left = `${x}px`;
-    flor.style.top = `${y}px`;
-    flor.style.setProperty("--c", color);
-    flor.addEventListener("animationend", () => flor.remove());
-    fx.append(flor);
-
-    const anillo = document.createElement("i");
-    anillo.className = "mini-ring";
-    anillo.style.left = `${x}px`;
-    anillo.style.top = `${y}px`;
-    anillo.style.setProperty("--c", color);
-    anillo.addEventListener("animationend", () => anillo.remove());
-    fx.append(anillo);
-  }
-
-  /* Chispas en línea del color de la rareza */
-  function chispasRadiales(x, y, n, colores) {
-    if (REDUCED) return;
-    for (let i = 0; i < n; i++) {
-      const chispa = document.createElement("i");
-      chispa.className = "spark";
-      chispa.style.left = `${x}px`;
-      chispa.style.top = `${y}px`;
-      chispa.style.setProperty("--largo", `${30 + azar(46)}px`);
-      chispa.style.setProperty("--ang", `${azar(360)}deg`);
-      chispa.style.setProperty("--dist", `${-(160 + azar(280))}px`);
-      chispa.style.setProperty("--c", elegir(colores));
-      chispa.addEventListener("animationend", () => chispa.remove());
-      fx.append(chispa);
+    function pintar(ahora) {
+      const dt = Math.min((ahora - ultimo) / 1000, 0.04);
+      ultimo = ahora;
+      ctx.clearRect(0, 0, fx.width, fx.height);
+      ctx.globalCompositeOperation = "lighter";
+      ctx.lineCap = "round";
+      lista = lista.filter((p) => {
+        p.t += dt;
+        if (p.t >= p.vida) return false;
+        p.vx *= 0.985;
+        p.vy = p.vy * 0.985 + p.grav * dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        ctx.globalAlpha = 1 - p.t / p.vida;
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = p.grosor;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x - p.vx * 0.028, p.y - p.vy * 0.028);
+        ctx.stroke();
+        return true;
+      });
+      if (lista.length) {
+        requestAnimationFrame(pintar);
+      } else {
+        corriendo = false;
+        ctx.clearRect(0, 0, fx.width, fx.height);
+      }
     }
+
+    return {
+      emitir(x, y, n, { colores = ["#ffd27a"], vel = 300, grav = 500, vida = 1, ang = null, abre = Math.PI * 2, grosor = 2 } = {}) {
+        if (REDUCED) return;
+        for (let i = 0; i < n; i++) {
+          const a = ang === null ? Math.random() * Math.PI * 2 : ang + (Math.random() - 0.5) * abre;
+          const v = vel * escala * (0.3 + Math.random() * 0.9);
+          lista.push({
+            x, y, t: 0,
+            vx: Math.cos(a) * v,
+            vy: Math.sin(a) * v,
+            grav: grav * escala,
+            vida: vida * (0.5 + Math.random() * 0.7),
+            color: colores[i % colores.length],
+            grosor: grosor * (0.6 + Math.random()),
+          });
+        }
+        if (!corriendo) {
+          corriendo = true;
+          ultimo = performance.now();
+          requestAnimationFrame(pintar);
+        }
+      },
+    };
+  })();
+
+  /* Posición de un elemento relativa al escenario, donde pinta el canvas */
+  function rectoEnEscena(el) {
+    const a = el.getBoundingClientRect();
+    const b = stage.getBoundingClientRect();
+    return {
+      left: a.left - b.left,
+      top: a.top - b.top,
+      width: a.width,
+      height: a.height,
+      x: a.left - b.left + a.width / 2,
+      y: a.top - b.top + a.height / 2,
+    };
   }
 
-  /* Estrellitas que titilan sobre la carta */
-  function destellos(el, n, colores, grande = false) {
+  /* Las chispas siguen a la punta del corte de izquierda a derecha */
+  function chisporrotearCorte(r, yCorte) {
     if (REDUCED) return;
-    const r = el.getBoundingClientRect();
-    for (let i = 0; i < n; i++) {
-      const d = document.createElement("i");
-      d.className = "destello";
-      d.style.left = `${r.left + Math.random() * r.width}px`;
-      d.style.top = `${r.top + Math.random() * r.height}px`;
-      const lado = grande ? 14 + azar(10) : 10 + azar(9);
-      d.style.width = `${lado}px`;
-      d.style.height = `${lado}px`;
-      d.style.setProperty("--c", elegir(colores));
-      d.style.setProperty("--t", `${(0.45 + Math.random() * 0.4).toFixed(2)}s`);
-      d.style.setProperty("--d", `${azar(300)}ms`);
-      d.addEventListener("animationend", () => d.remove());
-      fx.append(d);
-    }
+    const inicio = performance.now();
+    const avanzar = (ahora) => {
+      const f = Math.min((ahora - inicio) / 460, 1);
+      Chispas.emitir(r.left + r.width * f, yCorte, 4, {
+        colores: ["#fff0c0", "#ffc05a", "#ff7a3c"], vel: 230, grav: 620, vida: 0.6, ang: -Math.PI / 2, abre: 2.2, grosor: 1.6,
+      });
+      if (f < 1) requestAnimationFrame(avanzar);
+    };
+    requestAnimationFrame(avanzar);
   }
 
-  function confeti(n = 36) {
-    if (REDUCED) return;
-    for (let i = 0; i < n; i++) {
-      const c = document.createElement("i");
-      c.className = "cf";
-      c.style.setProperty("--x", `${azar(100)}vw`);
-      c.style.setProperty("--c", elegir(COLORES));
-      c.style.setProperty("--t", `${1.5 + Math.random() * 1.4}s`);
-      c.style.setProperty("--d", `${Math.random() * 0.5}s`);
-      c.addEventListener("animationend", () => c.remove());
-      fx.append(c);
-    }
-  }
+  /* Escena apagada con rayos para la legendaria; admite varias a la vez */
+  let escenasOscuras = 0;
 
-  function temblor() {
-    if (REDUCED) return;
-    stage.classList.remove("is-shake");
-    void stage.offsetWidth;
-    stage.classList.add("is-shake");
-  }
-
-  function destello() {
-    if (REDUCED) return;
-    flash.classList.remove("is-on");
-    void flash.offsetWidth;
-    flash.classList.add("is-on");
-  }
-
-  function activarRays(ms = 2000) {
+  function oscurecerEscena() {
+    escenasOscuras += 1;
+    velo?.classList.add("is-on");
     rays.classList.add("is-on");
-    setTimeout(() => rays.classList.remove("is-on"), ms);
   }
 
-  /* El sobre estalla: onda expansiva + humo + chispas + pedazos de foil */
-  function estallido(x, y) {
-    if (REDUCED) return;
-
-    /* Onda expansiva doble */
-    for (let i = 0; i < 2; i++) {
-      const onda = document.createElement("i");
-      onda.className = "shock";
-      onda.style.left = `${x}px`;
-      onda.style.top = `${y}px`;
-      if (i > 0) onda.style.animationDelay = "80ms";
-      onda.addEventListener("animationend", () => onda.remove());
-      fx.append(onda);
-    }
-
-    /* Humo que se despeja */
-    for (let i = 0; i < 5; i++) {
-      const humo = document.createElement("i");
-      humo.className = "humo";
-      const tam = 90 + azar(80);
-      humo.style.width = `${tam}px`;
-      humo.style.height = `${tam}px`;
-      humo.style.left = `${x + (Math.random() - 0.5) * 160}px`;
-      humo.style.top = `${y + (Math.random() - 0.5) * 200}px`;
-      humo.style.setProperty("--t", `${(0.8 + Math.random() * 0.5).toFixed(2)}s`);
-      humo.addEventListener("animationend", () => humo.remove());
-      fx.append(humo);
-    }
-
-    /* Chispas que cruzan la pantalla */
-    for (let i = 0; i < 10; i++) {
-      const chispa = document.createElement("i");
-      chispa.className = "spark";
-      chispa.style.left = `${x}px`;
-      chispa.style.top = `${y}px`;
-      chispa.style.setProperty("--largo", `${40 + azar(60)}px`);
-      chispa.style.setProperty("--ang", `${azar(360)}deg`);
-      chispa.style.setProperty("--dist", `${-(240 + azar(300))}px`);
-      chispa.style.setProperty("--c", elegir(["#ffdf9e", "#f2b263", "#f6ebdd", "#ff9eb1"]));
-      chispa.addEventListener("animationend", () => chispa.remove());
-      fx.append(chispa);
-    }
-
-    /* Pedazos del sobre */
-    const FOIL = ["#3f2c22", "#241813", "#4a3520", "#5a4128", "#f2b263", "#d7263d", "#ff5a6a"];
-    for (let i = 0; i < 22; i++) {
-      const pedazo = document.createElement("i");
-      pedazo.className = "frag";
-      const lado = 16 + azar(34);
-      pedazo.style.width = `${lado}px`;
-      pedazo.style.height = `${Math.round(lado * (0.6 + Math.random() * 0.8))}px`;
-      pedazo.style.left = `${x + (Math.random() - 0.5) * 170}px`;
-      pedazo.style.top = `${y + (Math.random() - 0.5) * 220}px`;
-      pedazo.style.setProperty("--c", elegir(FOIL));
-      pedazo.style.setProperty("--dx", `${(Math.random() - 0.5) * 560}px`);
-      pedazo.style.setProperty("--dy", `${-(60 + Math.random() * 380)}px`);
-      pedazo.style.setProperty("--fr", `${(Math.random() - 0.5) * 840}deg`);
-      pedazo.style.setProperty("--d", `${azar(90)}ms`);
-      pedazo.addEventListener("animationend", () => pedazo.remove());
-      fx.append(pedazo);
-    }
+  function aclararEscena() {
+    escenasOscuras = Math.max(0, escenasOscuras - 1);
+    if (escenasOscuras) return;
+    velo?.classList.remove("is-on");
+    rays.classList.remove("is-on");
   }
 
-  function centroDe(el) {
-    const r = el.getBoundingClientRect();
-    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  /* Anticipación antes de girar: la épica vibra, la legendaria apaga la escena */
+  async function cargarRareza(rareza, btn) {
+    if (rareza === "epica") {
+      btn.classList.add("is-cargando", "is-al-frente");
+      AudioFX.carga(0.55);
+      await pausa(620);
+    } else if (rareza === "legendaria") {
+      oscurecerEscena();
+      btn.classList.add("is-cargando", "is-al-frente", "is-lenta");
+      AudioFX.carga(0.9);
+      const c = rectoEnEscena(btn);
+      Chispas.emitir(c.x, c.y, 30, { colores: [RAREZAS.legendaria.color], vel: 90, grav: -40, vida: 0.9, grosor: 1.4 });
+      await pausa(900);
+    }
+    btn.classList.remove("is-cargando");
   }
 
-  /* Efectos por rareza (compartidos entre modos) */
+  /* Efectos por rareza (compartidos entre modos), justo cuando la carta da la cara */
   function efectosRareza(rareza, el) {
-    const c = centroDe(el);
-    const color = COLOR_RAREZA[rareza];
-
-    anilloMini(c.x, c.y, color);
+    const c = rectoEnEscena(el);
+    const color = RAREZAS[rareza].color;
 
     if (rareza === "comun") {
-      burst(c.x, c.y, 12, 0.6, [color, "#f6ebdd"]);
-      destellos(el, 5, [color, "#f6ebdd"]);
+      Chispas.emitir(c.x, c.y, 16, { colores: [color, "#fff"], vel: 170, grav: 120, vida: 0.7, grosor: 1.3 });
     } else if (rareza === "rara") {
-      chispasRadiales(c.x, c.y, 8, MINTS);
-      burst(c.x, c.y, 20, 0.8, MINTS);
-      destellos(el, 9, MINTS);
+      Chispas.emitir(c.x, c.y, 46, { colores: [color, "#d9fff4", "#fff"], vel: 340, grav: 240, vida: 0.9 });
     } else if (rareza === "epica") {
-      chispasRadiales(c.x, c.y, 12, EPICAS);
-      burst(c.x, c.y, 34, 1, EPICAS);
-      destellos(el, 14, EPICAS, true);
-      mostrarTinte(color);
-      mostrarSplash("¡Épica!", color);
+      Chispas.emitir(c.x, c.y, 90, { colores: [color, "#ff9b4b", "#fff"], vel: 520, grav: 260, vida: 1.1, grosor: 2.4 });
+      mostrarSplash(`¡${RAREZAS[rareza].nombre}!`, color);
     } else {
-      chispasRadiales(c.x, c.y, 16, DORADOS);
-      burst(c.x, c.y, 52, 1.4, DORADOS);
-      destellos(el, 18, DORADOS, true);
-      confeti(46);
-      activarRays(2600);
-      temblor();
-      mostrarTinte(color);
-      mostrarSplash("¡Legendaria!", color, true);
+      Chispas.emitir(c.x, c.y, 190, { colores: [color, "#ff8d3c", "#fff4d2"], vel: 760, grav: 380, vida: 1.5, grosor: 2.8 });
+      mostrarSplash(`¡${RAREZAS[rareza].nombre}!`, color);
+      /* Lluvia de brasas desde arriba */
+      if (!REDUCED) {
+        for (let i = 0; i < 6; i++) {
+          setTimeout(() => {
+            Chispas.emitir(Math.random() * stage.clientWidth, -8, 10, {
+              colores: [color, "#ff8d3c"], vel: 50, grav: 150, vida: 3, ang: Math.PI / 2, abre: 0.5,
+            });
+          }, i * 260);
+        }
+      }
     }
+
+    setTimeout(() => {
+      el.classList.remove("is-lenta", "is-al-frente");
+      if (rareza === "legendaria") aclararEscena();
+    }, REDUCED ? 800 : rareza === "legendaria" ? 2100 : 700);
   }
 
-  /* Texto grande de la rareza (estilo Balatro) */
-  function mostrarSplash(nombre, color, grande = false) {
+  /* Cinta con el nombre de la rareza (épica / legendaria) */
+  function mostrarSplash(nombre, color) {
     const splash = $("[data-splash]");
     if (!splash) return;
-    const span = splash.querySelector("span");
-    span.textContent = nombre;
-    span.style.setProperty("--r-splash", color);
-    span.style.fontSize = grande ? "clamp(52px, 13vw, 132px)" : "";
+    splash.querySelector("span").textContent = nombre;
+    splash.style.setProperty("--r-splash", color);
     splash.hidden = false;
-    splash.classList.remove("is-out");
+    splash.classList.remove("is-on");
     void splash.offsetWidth;
-    clearTimeout(splashT1);
-    clearTimeout(splashT2);
-    splashT1 = setTimeout(() => splash.classList.add("is-out"), grande ? 2100 : 1600);
-    splashT2 = setTimeout(() => {
+    splash.classList.add("is-on");
+    clearTimeout(splashT);
+    splashT = setTimeout(() => {
       splash.hidden = true;
-    }, (grande ? 2100 : 1600) + 450);
-  }
-
-  /* Destello a pantalla completa del color de la rareza */
-  function mostrarTinte(color) {
-    const tinte = $("[data-tint]");
-    if (!tinte || REDUCED) return;
-    tinte.style.setProperty("--c-tint", color);
-    tinte.classList.remove("is-on");
-    void tinte.offsetWidth;
-    tinte.classList.add("is-on");
+      splash.classList.remove("is-on");
+    }, 1950);
   }
 
   /* La rareza más grande del sobre */
@@ -604,7 +557,7 @@
     if (!finalEl) return;
     const nombre = $("[data-final-rareza]", finalEl);
     nombre.textContent = RAREZAS[rareza]?.nombre || "Común";
-    nombre.style.setProperty("--c-final", COLOR_RAREZA[rareza] || "#f2b263");
+    nombre.style.setProperty("--c-final", RAREZAS[rareza]?.color || RAREZAS.legendaria.color);
     finalEl.hidden = false;
     finalEl.classList.remove("is-out");
     void finalEl.offsetWidth;
@@ -616,76 +569,105 @@
     }, 3000);
   }
 
+  /* El dorso tarda en quedar de canto: ahí se cambia a la cara con sus efectos */
+  const giroMs = (rareza) => (rareza === "legendaria" ? 330 : 210);
+
   /* =========================================================
      FLUJO PRINCIPAL
      ========================================================= */
   const FRASES = [
-    "¡Colecciónalas todas! ¿Se podrá con las 39?",
-    "El álbum te espera… en una próxima actualización. ✨",
+    `¡Colecciónalas todas! Son ${CATALOGO.length} en total.`,
+    "Tus cartas ya te esperan en el álbum. ✨",
     "Cartas hechas por la comunidad, para la comunidad. 💛",
     "¿Otra ronda? El sobre nunca dice no.",
   ];
 
-  function abrirSobre() {
+  async function abrirSobre() {
     if (estado !== "idle") return;
     estado = "abriendo";
     actions.hidden = true;
     hint.textContent = "Abriendo el sobre…";
 
-    AudioFX.grab();
-    pack.classList.add("is-winding");
+    await rasgarPack();
 
-    /* 600ms: el sobre estalla */
-    setTimeout(() => {
-      pack.classList.add("is-open");
-      AudioFX.rip();
-      AudioFX.boom();
-      activarRays(2600);
-      const c = centroDe(pack);
-      estallido(c.x, c.y);
-      burst(c.x, c.y, 48, 1.5);
-      temblor();
-      destello();
-    }, 600);
+    /* Las cartas nacen apiladas detrás de la bolsa y suben */
+    construirSobre();
+    reveladas = 0;
+    hand.innerHTML = "";
+    hand.classList.add("is-repartiendo");
+    const cartas = cartasActuales.map((datos, i) => crearCarta(datos, i));
+    cartas.forEach((btn) => {
+      btn.classList.add("is-apilada", "is-quieta");
+      hand.append(btn);
+    });
+    const centroEscena = stage.getBoundingClientRect();
+    const alto = pack.getBoundingClientRect().height;
+    cartas.forEach((btn, i) => {
+      const r = btn.getBoundingClientRect();
+      const dx = centroEscena.left + centroEscena.width / 2 - (r.left + r.width / 2) + i * 2;
+      btn.style.setProperty("--px", `${dx}px`);
+      btn.style.setProperty("--py", `${alto * 0.42}px`);
+      btn.style.setProperty("--e", "0.86");
+      btn.style.opacity = "0";
+    });
+    void hand.offsetWidth;
+    cartas.forEach((btn) => {
+      btn.classList.remove("is-quieta");
+      btn.style.opacity = "";
+      btn.style.setProperty("--py", "-30px");
+      btn.style.setProperty("--e", "0.94");
+    });
+    await pausa(260);
 
-    /* 950ms: salen las cartas */
-    setTimeout(() => {
-      construirSobre();
-      pintarCartas();
-      estado = "cartas";
-      reveladas = 0;
-      pack.hidden = true;
+    soltarPack();
+    await pausa(420);
 
-      cartasActuales.forEach((_, i) => setTimeout(() => AudioFX.pop(i), i * 120));
+    /* Se reparten a su sitio */
+    cartas.forEach((btn, i) => {
+      setTimeout(() => {
+        btn.classList.remove("is-apilada");
+        btn.style.removeProperty("--px");
+        btn.style.removeProperty("--py");
+        btn.style.removeProperty("--e");
+        AudioFX.pop(i);
+      }, REDUCED ? 0 : i * 110);
+    });
+    await pausa(560);
+    hand.classList.remove("is-repartiendo");
 
-      hint.textContent = "Toca una carta para revelarla";
-      btnRevealAll.hidden = false;
-      actions.hidden = false;
-    }, 1050);
+    estado = "cartas";
+    hint.textContent = "Toca una carta para revelarla";
+    btnRevealAll.hidden = false;
+    btnAgain.hidden = true;
+    actions.hidden = false;
   }
 
-  function revelar(btn, datos) {
-    if (estado !== "cartas" || btn.classList.contains("is-flip")) return;
+  async function revelar(btn, datos) {
+    if (estado !== "cartas" || btn.classList.contains("is-flip") || btn.dataset.revelando) return;
+    btn.dataset.revelando = "1";
+    await cargarRareza(datos.rareza, btn);
+
     btn.classList.add("is-flip");
-    btn.setAttribute("aria-label", ariaLabelCarta(datos));
+    btn.setAttribute("aria-label", Carta.etiquetaCarta(datos));
     AudioFX.whoosh();
+    await pausa(giroMs(datos.rareza));
 
-    setTimeout(() => {
-      btn.classList.add("is-revealed");
-      const nueva = coleccionGuardar(datos.id);
-      if (nueva) btn.classList.add("is-new");
-      btn.setAttribute("aria-label", ariaLabelCarta(datos, nueva));
-      AudioFX.sting(datos.rareza);
-      efectosRareza(datos.rareza, btn);
+    btn.classList.add("is-revealed");
+    const nueva = coleccionGuardar(datos.id);
+    if (nueva) btn.classList.add("is-new");
+    btn.setAttribute("aria-label", Carta.etiquetaCarta(datos, nueva));
+    AudioFX.sting(datos.rareza);
+    efectosRareza(datos.rareza, btn);
+    if (datos.variante === "holo") Carta.meciendo(btn, true);
 
-      reveladas++;
-      if (reveladas === cartasActuales.length) terminar();
-    }, 260);
+    reveladas++;
+    if (reveladas === cartasActuales.length) terminar();
   }
 
   function terminar() {
     estado = "listo";
     btnRevealAll.hidden = true;
+    btnAgain.hidden = false;
     hint.textContent = elegir(FRASES);
     setTimeout(() => AudioFX.fanfare(), 380);
 
@@ -694,19 +676,27 @@
     pintarContador();
   }
 
-  function revelarTodas() {
-    [...hand.children].forEach((btn, i) => {
-      if (btn.classList.contains("is-flip")) return;
-      setTimeout(() => btn.click(), i * 300);
-    });
+  /* De una en una; en el carrusel móvil lleva cada carta al centro antes de girarla */
+  async function revelarTodas() {
+    btnRevealAll.hidden = true;
+    for (const btn of [...hand.children]) {
+      if (estado !== "cartas") return;
+      if (btn.classList.contains("is-flip") || btn.dataset.revelando) continue;
+      if (hand.scrollWidth > hand.clientWidth) {
+        btn.scrollIntoView({ inline: "center", block: "nearest", behavior: REDUCED ? "auto" : "smooth" });
+        await pausa(280);
+      }
+      await revelar(btn, cartasActuales[Number(btn.dataset.i)]);
+      await pausa(300);
+    }
   }
 
   function otroSobre() {
     if (estado !== "listo") return;
     AudioFX.tick();
     hand.innerHTML = "";
+    reiniciarPack();
     pack.hidden = false;
-    pack.classList.remove("is-winding", "is-open");
     hint.textContent = "Toca el sobre para abrirlo";
     actions.hidden = true;
     estado = "idle";
@@ -717,7 +707,7 @@
      Aparece el sobre → se rasga solo → las cartas salen una por
      una, se destapan, se muestran un momento y salen de pantalla.
      ========================================================= */
-  function secuenciaCanje(forzar = "", usuario = "", usuarioId = "", canjeId = "") {
+  async function secuenciaCanje(forzar = "", usuario = "", usuarioId = "", canjeId = "") {
     if (MODO !== "overlay" || secuencia || estado !== "idle") return;
     idsNuevosCanje = new Set();
     secuencia = true;
@@ -727,53 +717,41 @@
     btnDemo.hidden = true;
     mostrarBanner(usuario);
 
+    /* Solo los canjes reales (con canjeId y usuarioId) tocan la nube. Se registra desde
+       el principio para que la respuesta no retrase la apertura */
+    const registro = canjeId && usuarioId ? registrarCanjeNube(canjeId, usuarioId) : null;
+
     /* 1. El sobre entra con muelle */
-    pack.classList.remove("is-entering", "is-winding", "is-open");
+    reiniciarPack();
     pack.hidden = false;
     pack.classList.add("is-entering");
+    await pausa(600);
+    pack.classList.remove("is-entering");
 
-    /* 2. Carga y rasgado */
-    setTimeout(() => pack.classList.remove("is-entering"), 480);
-    setTimeout(() => {
-      pack.classList.add("is-winding");
-      AudioFX.grab();
-    }, 600);
-    setTimeout(() => {
-      pack.classList.add("is-open");
-      AudioFX.rip();
-      AudioFX.boom();
-      activarRays(3000);
-      const c = centroDe(pack);
-      estallido(c.x, c.y);
-      burst(c.x, c.y, 60, 1.8);
-      temblor();
-      destello();
-    }, 1200);
+    /* 2. Carga, corte y tapa */
+    await rasgarPack();
 
-    /* 3. Se despeja el humo del estallido y salen las cartas una por una */
-    setTimeout(async () => {
-      pack.hidden = true;
-      pack.classList.remove("is-entering", "is-winding", "is-open");
-      construirSobre();
-      /* Solo los canjes reales (con canjeId y usuarioId) tocan la nube; el
-         servidor decide las cartas y aquí se muestran esas */
-      if (canjeId && usuarioId) {
-        const resultado = await registrarCanjeNube(canjeId, usuarioId);
-        const otorgadas = resultado?.cartas.map((id) => CATALOGO.find((c) => c.id === id));
-        if (otorgadas && otorgadas.every(Boolean)) {
-          cartasActuales = otorgadas;
-          idsNuevosCanje = new Set(resultado.nuevas);
-        } else {
-          debugLinea(
-            resultado
-              ? "el servidor devolvió cartas desconocidas: lo que se ve en pantalla puede no coincidir con lo guardado"
-              : "no se pudo guardar el canje en la nube: el canje no se guardó",
-            "err"
-          );
-        }
+    /* 3. El servidor decide las cartas de un canje real y aquí se muestran esas */
+    construirSobre();
+    if (registro) {
+      const resultado = await registro;
+      const otorgadas = resultado?.cartas.map((id) => CATALOGO.find((c) => c.id === id));
+      if (otorgadas && otorgadas.every(Boolean)) {
+        cartasActuales = otorgadas;
+        idsNuevosCanje = new Set(resultado.nuevas);
+      } else {
+        debugLinea(
+          resultado
+            ? "el servidor devolvió cartas desconocidas: lo que se ve en pantalla puede no coincidir con lo guardado"
+            : "no se pudo guardar el canje en la nube: el canje no se guardó",
+          "err"
+        );
       }
-      soltarCartas();
-    }, 1800);
+    }
+
+    /* 4. Cae la bolsa y sube la primera carta por detrás */
+    soltarPack();
+    soltarCartas();
   }
 
   function soltarCartas() {
@@ -791,7 +769,7 @@
     siguiente();
   }
 
-  function mostrarCartaSola(datos, i, alTerminar) {
+  async function mostrarCartaSola(datos, i, alTerminar) {
     estado = "cartas";
     const nueva = idsNuevosCanje.has(datos.id);
     const btn = crearCarta(datos, i);
@@ -799,40 +777,36 @@
     solo.innerHTML = "";
     solo.append(btn);
     AudioFX.pop(i);
+    await espera(550);
 
-    /* Se destapa sola */
-    setTimeout(() => {
-      btn.classList.add("is-flip");
-      btn.setAttribute("aria-label", ariaLabelCarta(datos, nueva));
-      AudioFX.whoosh();
-    }, 550);
+    /* Anticipación según la rareza y se destapa sola */
+    await cargarRareza(datos.rareza, btn);
+    btn.classList.add("is-flip");
+    btn.setAttribute("aria-label", Carta.etiquetaCarta(datos, nueva));
+    AudioFX.whoosh();
+    await pausa(giroMs(datos.rareza));
 
-    setTimeout(() => {
-      btn.classList.add("is-revealed");
-      if (nueva) btn.classList.add("is-new");
-      AudioFX.sting(datos.rareza);
-      efectosRareza(datos.rareza, btn);
-      /* En el overlay las cartas son del viewer que canjeó:
-         no se guardan en el navegador del streamer, la nube las registra */
-    }, 950);
+    /* En el overlay las cartas son del viewer que canjeó:
+       no se guardan en el navegador del streamer, la nube las registra */
+    btn.classList.add("is-revealed");
+    if (nueva) btn.classList.add("is-new");
+    AudioFX.sting(datos.rareza);
+    efectosRareza(datos.rareza, btn);
+    if (datos.variante === "holo") Carta.meciendo(btn, true);
 
     /* Se muestra un momento y sale de pantalla */
-    const salida = 950 + HOLD_MS[datos.rareza];
-    setTimeout(() => {
-      btn.classList.add("is-out");
-      AudioFX.whoosh();
-    }, salida);
+    await espera(HOLD_MS[datos.rareza]);
+    btn.classList.add("is-out");
+    AudioFX.whoosh();
+    await pausa(450);
 
-    setTimeout(() => {
-      btn.remove();
-      alTerminar();
-    }, salida + 450);
+    btn.remove();
+    alTerminar();
   }
 
   function cerrarCanje() {
     solo.innerHTML = "";
     solo.hidden = true;
-    rays.classList.remove("is-on");
 
     /* El banner se retira al terminar el evento */
     banner.classList.add("is-out");
@@ -867,11 +841,11 @@
     contenedor.classList.remove("is-out");
 
     cartas.forEach((datos, i) => {
-      const btn = crearCarta(datos, i);
-      btn.classList.add("is-flip", "is-revealed");
+      const btn = crearCarta(datos, i, { soloFrente: true, mece: datos.variante === "holo" });
+      btn.style.setProperty("--d", `${i * 0.14}s`);
       const nueva = idsNuevosCanje.has(datos.id);
       if (nueva) btn.classList.add("is-new");
-      btn.setAttribute("aria-label", ariaLabelCarta(datos, nueva));
+      btn.setAttribute("aria-label", Carta.etiquetaCarta(datos, nueva));
       contenedor.append(btn);
     });
 
@@ -1005,6 +979,8 @@
   /* =========================================================
      EVENTOS E INICIO
      ========================================================= */
+  construirPack();
+
   if (MODO === "interactivo") {
     pack.addEventListener("click", abrirSobre);
     btnAgain.addEventListener("click", otroSobre);
@@ -1063,3 +1039,4 @@
   }
   pintarContador();
 })();
+
