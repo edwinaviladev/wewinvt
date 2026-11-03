@@ -217,6 +217,7 @@
   let estado = "idle"; // idle | abriendo | cartas | listo
   let cartasActuales = [];
   let reveladas = 0;
+  let idsNuevosCanje = new Set();
   /* Contexto del canje en curso (modo overlay) y del canal conectado */
   let canalId = null;
   let usuarioActual = "";
@@ -230,10 +231,13 @@
   function coleccionGuardar(id) {
     try {
       const coleccion = JSON.parse(localStorage.getItem("wewinvt_coleccion") || "{}");
-      coleccion[id] = (coleccion[id] || 0) + 1;
+      const cantidadAnterior = Number(coleccion[id]) || 0;
+      coleccion[id] = cantidadAnterior + 1;
       localStorage.setItem("wewinvt_coleccion", JSON.stringify(coleccion));
+      return cantidadAnterior === 0;
     } catch {
       /* sin almacenamiento disponible */
+      return false;
     }
   }
 
@@ -256,8 +260,8 @@
   async function registrarCanjeNube() {
     try {
       const token = await window.TwitchAuth?.tokenValido?.();
-      if (!token || !canalId || !usuarioIdActual) return;
-      await fetch("/api/canje", {
+      if (!token || !canalId || !usuarioIdActual) return [];
+      const res = await fetch("/api/canje", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({
@@ -267,8 +271,12 @@
           cartas: cartasActuales.map((c) => c.id),
         }),
       });
+      if (!res.ok) return [];
+      const resultado = await res.json();
+      return Array.isArray(resultado.nuevas) ? resultado.nuevas : [];
     } catch {
       /* silencioso: el evento en pantalla no depende de la nube */
+      return [];
     }
   }
 
@@ -283,6 +291,8 @@
     const forzado = forceSel.value; // "" | rara | epica | legendaria
     const usadas = new Set();
     cartasActuales = [];
+    const cartasBase = CATALOGO.filter((c) => !c.variante || c.variante === "base");
+    const grupoDe = (carta) => carta.grupoId || carta.id;
 
     for (let i = 0; i < 3; i++) {
       let tier;
@@ -294,13 +304,22 @@
         tier = rollRarity();
       }
 
-      const sinRepetir = (lista) => lista.filter((c) => !usadas.has(c.id));
-      let pool = sinRepetir(CATALOGO.filter((c) => c.rareza === tier));
-      if (!pool.length) pool = sinRepetir(CATALOGO.filter((c) => ORDEN.indexOf(c.rareza) >= ORDEN.indexOf(tier)));
-      if (!pool.length) pool = sinRepetir(CATALOGO);
+      const sinRepetir = (lista) => lista.filter((c) => !usadas.has(grupoDe(c)));
+      let pool = sinRepetir(cartasBase.filter((c) => c.rareza === tier));
+      if (!pool.length) pool = sinRepetir(cartasBase.filter((c) => ORDEN.indexOf(c.rareza) >= ORDEN.indexOf(tier)));
+      if (!pool.length) pool = sinRepetir(cartasBase);
 
-      const carta = elegir(pool);
-      usadas.add(carta.id);
+      const cartaBase = elegir(pool);
+      const grupoId = grupoDe(cartaBase);
+      const variantes = CATALOGO.filter((c) => grupoDe(c) === grupoId && c.rareza === cartaBase.rareza);
+      const pesosVariantes = Object.fromEntries(variantes.map((c) => [
+        c.id,
+        c.pesoVariante ?? (!c.variante || c.variante === "base" ? 100 : 0),
+      ]));
+      const idVariante = rollPeso(pesosVariantes);
+      const carta = variantes.find((c) => c.id === idVariante) || cartaBase;
+
+      usadas.add(grupoId);
       cartasActuales.push(carta);
     }
   }
@@ -320,6 +339,7 @@
     btn.style.setProperty("--d", `${i * 0.14}s`);
     btn.dataset.rareza = datos.rareza;
     btn.dataset.tipo = datos.tipo;
+    btn.dataset.variante = datos.variante || "base";
     btn.dataset.i = String(i);
     btn.setAttribute("aria-label", `Carta ${i + 1} de 3, sin revelar`);
 
@@ -334,6 +354,7 @@
             <i class="card__foil"></i>
             <i class="card__holo"></i>
             <i class="card__spark"></i>
+            <span class="card__nueva" aria-hidden="true">NUEVA</span>
             <span class="card__scrim card__scrim--top">
               <span class="card__name">${datos.nombre}</span>
               <span class="card__num">${numeroCard(numGlobal < 0 ? i : numGlobal)}</span>
@@ -346,6 +367,7 @@
                   <span class="card__simbolo">${RAREZAS[datos.rareza].simbolo}</span>
                 </span>
               </span>
+              ${datos.nombreVariante ? `<span class="card__variante">${datos.nombreVariante}</span>` : ""}
               <span class="card__credito">Illus. ${datos.artista || "Anónimo"}</span>
             </span>
           </span>
@@ -353,8 +375,38 @@
       </span>
     `;
 
+    activarReflejoHolo(btn);
     if (MODO === "interactivo") btn.addEventListener("click", () => revelar(btn, datos));
     return btn;
+  }
+
+  function ariaLabelCarta(datos, nueva = false) {
+    const etiquetas = [datos.nombreVariante, nueva ? "Nueva" : ""].filter(Boolean);
+    const detalle = etiquetas.length ? `, ${etiquetas.join(", ")}` : "";
+    return `${datos.nombre}${detalle}, ${RAREZAS[datos.rareza].nombre} (${datos.tipo})`;
+  }
+
+  function activarReflejoHolo(btn) {
+    if (btn.dataset.variante !== "holo" || REDUCED) return;
+
+    btn.addEventListener("pointermove", (event) => {
+      if (event.pointerType === "touch") return;
+      const r = btn.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      const x = Math.max(0, Math.min(1, (event.clientX - r.left) / r.width));
+      const y = Math.max(0, Math.min(1, (event.clientY - r.top) / r.height));
+      btn.style.setProperty("--holo-x", `${(x * 100).toFixed(1)}%`);
+      btn.style.setProperty("--holo-y", `${(y * 100).toFixed(1)}%`);
+      btn.style.setProperty("--rx", `${((0.5 - y) * 7).toFixed(2)}deg`);
+      btn.style.setProperty("--ry", `${((x - 0.5) * 9).toFixed(2)}deg`);
+    });
+
+    btn.addEventListener("pointerleave", () => {
+      btn.style.setProperty("--holo-x", "50%");
+      btn.style.setProperty("--holo-y", "50%");
+      btn.style.setProperty("--rx", "0deg");
+      btn.style.setProperty("--ry", "0deg");
+    });
   }
 
   function pintarCartas() {
@@ -695,14 +747,16 @@
   function revelar(btn, datos) {
     if (estado !== "cartas" || btn.classList.contains("is-flip")) return;
     btn.classList.add("is-flip");
-    btn.setAttribute("aria-label", `${datos.nombre}, ${RAREZAS[datos.rareza].nombre} (${datos.tipo})`);
+    btn.setAttribute("aria-label", ariaLabelCarta(datos));
     AudioFX.whoosh();
 
     setTimeout(() => {
       btn.classList.add("is-revealed");
+      const nueva = coleccionGuardar(datos.id);
+      if (nueva) btn.classList.add("is-new");
+      btn.setAttribute("aria-label", ariaLabelCarta(datos, nueva));
       AudioFX.sting(datos.rareza);
       efectosRareza(datos.rareza, btn);
-      coleccionGuardar(datos.id);
       subirColeccion([datos.id]);
 
       reveladas++;
@@ -747,6 +801,7 @@
      ========================================================= */
   function secuenciaCanje(forzar = "", usuario = "", usuarioId = "") {
     if (MODO !== "overlay" || secuencia || estado !== "idle") return;
+    idsNuevosCanje = new Set();
     secuencia = true;
     if (forzar) forceSel.value = forzar;
     usuarioActual = usuario;
@@ -778,11 +833,11 @@
     }, 1200);
 
     /* 3. Se despeja el humo del estallido y salen las cartas una por una */
-    setTimeout(() => {
+    setTimeout(async () => {
       pack.hidden = true;
       pack.classList.remove("is-entering", "is-winding", "is-open");
       construirSobre();
-      registrarCanjeNube();
+      idsNuevosCanje = new Set(await registrarCanjeNube());
       soltarCartas();
     }, 1800);
   }
@@ -804,6 +859,7 @@
 
   function mostrarCartaSola(datos, i, alTerminar) {
     estado = "cartas";
+    const nueva = idsNuevosCanje.has(datos.id);
     const btn = crearCarta(datos, i);
     solo.hidden = false;
     solo.innerHTML = "";
@@ -813,12 +869,13 @@
     /* Se destapa sola */
     setTimeout(() => {
       btn.classList.add("is-flip");
-      btn.setAttribute("aria-label", `${datos.nombre}, ${RAREZAS[datos.rareza].nombre} (${datos.tipo})`);
+      btn.setAttribute("aria-label", ariaLabelCarta(datos, nueva));
       AudioFX.whoosh();
     }, 550);
 
     setTimeout(() => {
       btn.classList.add("is-revealed");
+      if (nueva) btn.classList.add("is-new");
       AudioFX.sting(datos.rareza);
       efectosRareza(datos.rareza, btn);
       /* En el overlay las cartas son del viewer que canjeó:
@@ -878,6 +935,9 @@
     cartas.forEach((datos, i) => {
       const btn = crearCarta(datos, i);
       btn.classList.add("is-flip", "is-revealed");
+      const nueva = idsNuevosCanje.has(datos.id);
+      if (nueva) btn.classList.add("is-new");
+      btn.setAttribute("aria-label", ariaLabelCarta(datos, nueva));
       contenedor.append(btn);
     });
 

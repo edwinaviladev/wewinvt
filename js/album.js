@@ -193,6 +193,49 @@
       });
       album.append(seccion);
     });
+
+    const destacada = $(`[data-novedad-proyectado]`);
+    if (destacada) {
+      destacada.innerHTML = "";
+      const carta = CATALOGO.find((c) => c.id === "proyectado");
+      if (carta) destacada.append(cartaObtenida(carta, 0));
+    }
+
+    const todasLasVariantesHolo = CATALOGO.filter((c) => c.variante === "holo");
+    const variantesHolo = ORDEN
+      .map((rareza) => todasLasVariantesHolo.find((c) => c.rareza === rareza))
+      .filter(Boolean);
+    const carruselHolo = $(`[data-novedades-holo]`);
+    if (carruselHolo) {
+      carruselHolo.innerHTML = "";
+      variantesHolo.forEach((carta, i) => carruselHolo.append(cartaObtenida(carta, i)));
+    }
+
+    const totalHolo = $(`[data-novedades-holo-count]`);
+    if (totalHolo) totalHolo.textContent = `${variantesHolo.length} de ${todasLasVariantesHolo.length}`;
+  }
+
+  function activarReflejoHolo(btn) {
+    if (btn.dataset.variante !== "holo" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    btn.addEventListener("pointermove", function (event) {
+      if (event.pointerType === "touch") return;
+      const rect = btn.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+      const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
+      btn.style.setProperty("--holo-x", (x * 100).toFixed(1) + "%");
+      btn.style.setProperty("--holo-y", (y * 100).toFixed(1) + "%");
+      btn.style.setProperty("--rx", ((0.5 - y) * 7).toFixed(2) + "deg");
+      btn.style.setProperty("--ry", ((x - 0.5) * 9).toFixed(2) + "deg");
+    });
+
+    btn.addEventListener("pointerleave", function () {
+      btn.style.setProperty("--holo-x", "50%");
+      btn.style.setProperty("--holo-y", "50%");
+      btn.style.setProperty("--rx", "0deg");
+      btn.style.setProperty("--ry", "0deg");
+    });
   }
 
   function cartaObtenida(datos, indice, clickeable = true) {
@@ -202,7 +245,9 @@
     btn.style.setProperty("--d", `${indice * 0.04}s`);
     btn.dataset.rareza = datos.rareza;
     btn.dataset.tipo = datos.tipo;
-    btn.setAttribute("aria-label", `${datos.nombre}, ${RAREZAS[datos.rareza].nombre} (${datos.tipo})`);
+    btn.dataset.variante = datos.variante || "base";
+    const variante = datos.nombreVariante ? `, ${datos.nombreVariante}` : "";
+    btn.setAttribute("aria-label", `${datos.nombre}${variante}, ${RAREZAS[datos.rareza].nombre} (${datos.tipo})`);
     btn.innerHTML = `
       <span class="card__bob">
         <span class="card__inner">
@@ -223,12 +268,14 @@
                   <span class="card__simbolo">${RAREZAS[datos.rareza].simbolo}</span>
                 </span>
               </span>
+              ${datos.nombreVariante ? `<span class="card__variante">${datos.nombreVariante}</span>` : ""}
               <span class="card__credito">Illus. ${datos.artista || "Anónimo"}</span>
             </span>
           </span>
         </span>
       </span>
     `;
+    activarReflejoHolo(btn);
     if (clickeable) btn.addEventListener("click", () => abrirDetalle(datos));
     return btn;
   }
@@ -269,6 +316,7 @@
       <h3>${datos.nombre}</h3>
       <p class="detalle-dato"><span>Tipo</span><b>${datos.tipo}</b></p>
       <p class="detalle-dato"><span>Rareza</span><b style="color: ${RAREZAS[datos.rareza].color}">${RAREZAS[datos.rareza].nombre}</b></p>
+      ${datos.nombreVariante ? `<p class="detalle-dato"><span>Variante</span><b>${datos.nombreVariante}</b></p>` : ""}
       <p class="detalle-dato"><span>Número</span><b>${numeroDe(datos)}</b></p>
       <p class="detalle-dato"><span>Artista</span><b>${enlaceArtista}</b></p>
       <p class="detalle-dato"><span>Obtenida</span><b>×${obtenidas(datos.id)}</b></p>
