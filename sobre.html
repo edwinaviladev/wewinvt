@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=JetBrains+Mono:wght@700;800&family=Space+Grotesk:wght@700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="css/sobre.css" />
@@ -20,42 +20,20 @@
   <body>
     <!--
       PROTOTIPO · Widget de sobres coleccionables (futura sección overlay)
-      Flujo: sobre → rasgado → 3 cartas boca abajo → revelado con efectos por rareza.
+      Flujo: sobre → corte → 3 cartas boca abajo → revelado con efectos por rareza.
       Los sonidos se sintetizan con Web Audio (sin archivos).
     -->
     <main class="stage" data-stage>
       <a class="back-link" href="album.html">← Volver al álbum</a>
 
-      <!-- Emotes flotando de fondo (ambiente Balatro) -->
-      <div class="bg-float" aria-hidden="true">
-        <img src="img/emotes/risa.webp" alt="" />
-        <img src="img/emotes/gordinflon.webp" alt="" />
-        <img src="img/emotes/gran-corazon.webp" alt="" />
-      </div>
 
+      <div class="velo" data-velo aria-hidden="true"></div>
       <div class="rays" data-rays aria-hidden="true"></div>
-      <div class="flash" data-flash aria-hidden="true"></div>
-      <div class="tint" data-tint aria-hidden="true"></div>
       <div class="rarity-splash" data-splash hidden><span></span></div>
 
       <!-- SOBRE -->
       <div class="layer pack-layer">
-        <button class="pack" data-pack type="button" aria-label="Abrir el sobre coleccionable">
-          <span class="pack__strip" aria-hidden="true">
-            <span class="pack__strip-label">WewinVT · Serie 1</span>
-          </span>
-          <span class="pack__seal" aria-hidden="true">W</span>
-          <span class="pack__body" aria-hidden="true">
-            <span class="pack__frame"></span>
-            <span class="pack__brand">W</span>
-            <span class="pack__title">Sobre coleccionable</span>
-            <span class="pack__dots">✦ ✦ ✦</span>
-            <span class="pack__count">3 cartas de la comunidad</span>
-            <span class="pack__band">Edición comunidad</span>
-          </span>
-          <span class="pack__light" aria-hidden="true"></span>
-          <span class="pack__hint">Toca para abrir</span>
-        </button>
+        <button class="pack" data-pack type="button" aria-label="Abrir el sobre coleccionable"></button>
       </div>
 
       <!-- CARTAS -->
@@ -92,11 +70,12 @@
       </div>
 
       <!-- Capa de partículas -->
-      <div class="fx" data-fx aria-hidden="true"></div>
+      <canvas class="fx" data-fx aria-hidden="true"></canvas>
     </main>
 
     <script src="js/sobre-data.js" defer></script>
     <script src="js/sorteo.js" defer></script>
+    <script src="js/carta.js" defer></script>
     <script src="js/sobre.js" defer></script>
   </body>
 </html>
