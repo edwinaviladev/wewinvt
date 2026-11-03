@@ -137,12 +137,14 @@ export default {
         const idDestino = String(cuerpo.usuarioId || "");
         if (!idDestino) throw new Error("falta el usuario que canjeó");
         const coleccion = await leerColeccionDe(env, idDestino);
-        (cuerpo.cartas || []).forEach((id) => {
-          if (id) coleccion.cartas[id] = (coleccion.cartas[id] || 0) + 1;
+        const cartas = Array.isArray(cuerpo.cartas) ? cuerpo.cartas.filter(Boolean) : [];
+        const nuevas = [...new Set(cartas.filter((id) => !Number(coleccion.cartas[id])))];
+        cartas.forEach((id) => {
+          coleccion.cartas[id] = (Number(coleccion.cartas[id]) || 0) + 1;
         });
         coleccion.sobres = (coleccion.sobres || 0) + 1;
         await env.COLECCIONES.put(claveColeccion(idDestino), JSON.stringify(coleccion));
-        return json({ ok: true });
+        return json({ ok: true, nuevas });
       }
 
       return json({ error: "no encontrado" }, 404);

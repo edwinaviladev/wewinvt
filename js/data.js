@@ -266,5 +266,11 @@ window.WEWIN = {
       artista: "Josswarz",
       enlace: "",
     },
+    {
+      src: "img/fanarts/proyectado.webp",
+      alt: "Fanart de Wewin vestido de rojo frente a un campo de batalla",
+      artista: "darklobo117",
+      enlace: "https://www.twitch.tv/darklobo117",
+    },
   ],
 };

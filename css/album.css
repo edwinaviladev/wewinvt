@@ -517,6 +517,59 @@ body.album-page .album-seccion .card__face {
   box-shadow: 0 10px 20px rgb(36 35 33 / 18%);
 }
 
+body.album-page .album-novedades {
+  --c: var(--color-accent);
+}
+
+body.album-page .album-novedades__copy {
+  max-width: 52rem;
+  margin: -0.5rem 0 1.5rem;
+  color: var(--color-muted);
+}
+
+body.album-page .album-novedades__variantes {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+body.album-page .album-novedades__variantes h3 {
+  margin: 0 0 0.35rem;
+  color: var(--color-ink);
+  font-family: var(--font-heading);
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+}
+
+body.album-page .album-novedades__variantes > p {
+  margin: 0 0 1rem;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.album-novedades__carrusel {
+  --holo-card-size: clamp(160px, 18vw, 210px);
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--holo-card-size);
+  grid-template-rows: auto;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 0.5rem 0.25rem 1rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: var(--color-accent) transparent;
+}
+
+.album-novedades__carrusel .card {
+  --cw: var(--holo-card-size);
+  width: var(--cw);
+  scroll-snap-align: start;
+}
+
+body.album-page .album-novedades__acciones {
+  margin: 1.25rem 0 0;
+}
+
 body.album-page .detalle .card {
   color: #f6ebdd;
   --text: #f6ebdd;
@@ -582,5 +635,9 @@ body.album-page .detalle-cerrar {
 
   body.album-page .album-acciones {
     justify-content: flex-start;
+  }
+
+  .album-novedades__carrusel {
+    --holo-card-size: clamp(126px, 40vw, 160px);
   }
 }

@@ -97,7 +97,35 @@
           </div>
         </header>
 
-        <div data-album></div>
+        <section class="album-seccion album-novedades" aria-labelledby="novedades-titulo">
+          <header class="album-rareza">
+            <h2 id="novedades-titulo">Novedades de cartas</h2>
+            <span class="conteo"><span data-novedades-holo-count>0</span> variantes Holo</span>
+            <span class="linea" aria-hidden="true"></span>
+          </header>
+          <p class="album-novedades__copy">
+            Proyectado se suma como carta legendaria. Explora la carta y las versiones Holo de toda la colección.
+          </p>
+          <div class="album-grid album-novedades__destacada" data-novedad-proyectado></div>
+
+          <div class="album-novedades__variantes">
+            <h3>Variantes Holo</h3>
+            <p>Una muestra de cada rareza; cada versión se colecciona por separado. Todas siguen en el catálogo completo.</p>
+            <div
+              class="album-novedades__carrusel"
+              data-novedades-holo
+              role="region"
+              aria-label="Variantes Holo; desplázate horizontalmente para recorrerlas"
+              tabindex="0"
+            ></div>
+          </div>
+
+          <p class="album-novedades__acciones">
+            <a class="btn btn--ghost" href="#catalogo-cartas">Ver catálogo completo</a>
+          </p>
+        </section>
+
+        <div id="catalogo-cartas" data-album></div>
 
         <footer class="album-pie">
           <span>Sobres abiertos: <b data-sobres>0</b></span>

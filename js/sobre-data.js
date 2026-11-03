@@ -1,6 +1,7 @@
 /*
  * Catálogo de cartas del prototipo "Sobre coleccionable".
- * Cada entrada: id, tipo (emote|fanart), src, nombre (en carta), alt, artista, rareza.
+ * Cada entrada base: id, tipo (emote|fanart), src, nombre (en carta), alt, artista, rareza.
+ * Al final, cada carta se expande en una versión base (90) y una Holo (10).
  * Rarezas: comun | rara | epica | legendaria (misma paleta del sitio).
  */
 window.SOBRE_CATALOGO = [
@@ -46,4 +47,18 @@ window.SOBRE_CATALOGO = [
   { id: "wechi-bebe", tipo: "fanart", src: "img/fanarts/wechi-bebe.webp", nombre: "Wechi bebé", alt: "Wechi bebé: mascota cariñosa con su juguete", artista: "andromeda_vte", rareza: "rara" },
   { id: "dino-pijama", tipo: "fanart", src: "img/fanarts/dino-pijama.webp", nombre: "Disfraz de Godzilla", alt: "Fanart de Wewin con pijama de dinosaurio", artista: "cosmic_alexs", rareza: "rara" },
   { id: "cumpleanos-pixel", tipo: "fanart", src: "img/fanarts/cumpleanos-pixel.webp", nombre: "Cumpleaños pixel", alt: "Fanart pixel art de cumpleaños de Wewin con chibis de Red, Goku, Luffy y Edward", artista: "Josswarz", rareza: "epica" },
-];
+  { id: "proyectado", tipo: "fanart", src: "img/fanarts/proyectado.webp", nombre: "Proyectado", alt: "Fanart de Wewin vestido de rojo frente a un campo de batalla", artista: "darklobo117", rareza: "legendaria" },
+].flatMap((carta) => {
+  const grupoId = carta.id;
+  return [
+    { ...carta, grupoId, variante: "base", pesoVariante: 90 },
+    {
+      ...carta,
+      id: `${grupoId}-holo`,
+      grupoId,
+      variante: "holo",
+      nombreVariante: "Holo",
+      pesoVariante: 10,
+    },
+  ];
+});
