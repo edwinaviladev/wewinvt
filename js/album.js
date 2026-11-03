@@ -215,29 +215,6 @@
     if (totalHolo) totalHolo.textContent = `${variantesHolo.length} de ${todasLasVariantesHolo.length}`;
   }
 
-  function activarReflejoHolo(btn) {
-    if (btn.dataset.variante !== "holo" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    btn.addEventListener("pointermove", function (event) {
-      if (event.pointerType === "touch") return;
-      const rect = btn.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      const x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
-      const y = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
-      btn.style.setProperty("--holo-x", (x * 100).toFixed(1) + "%");
-      btn.style.setProperty("--holo-y", (y * 100).toFixed(1) + "%");
-      btn.style.setProperty("--rx", ((0.5 - y) * 7).toFixed(2) + "deg");
-      btn.style.setProperty("--ry", ((x - 0.5) * 9).toFixed(2) + "deg");
-    });
-
-    btn.addEventListener("pointerleave", function () {
-      btn.style.setProperty("--holo-x", "50%");
-      btn.style.setProperty("--holo-y", "50%");
-      btn.style.setProperty("--rx", "0deg");
-      btn.style.setProperty("--ry", "0deg");
-    });
-  }
-
   function cartaObtenida(datos, indice, clickeable = true) {
     const btn = document.createElement("button");
     btn.type = "button";
@@ -275,7 +252,6 @@
         </span>
       </span>
     `;
-    activarReflejoHolo(btn);
     if (clickeable) btn.addEventListener("click", () => abrirDetalle(datos));
     return btn;
   }
