@@ -1,9 +1,12 @@
 /*
  * Catálogo de cartas del prototipo "Sobre coleccionable".
- * Cada entrada base: id, tipo (emote|fanart), src, nombre (en carta), alt, artista, rareza.
+ * Cada entrada base: id, tipo (emote|fanart), src, nombre (en carta), alt, artista y rareza.
+ * `conjunto` opcional tiene forma { id, nombre }; si falta, pertenece a Serie 1.
  * Al final, cada carta se expande en una versión base (90) y una Holo (10).
  * Rarezas: comun | rara | epica | legendaria (misma paleta del sitio).
  */
+const CONJUNTO_SERIE_1 = { id: "serie-1", nombre: "Serie 1" };
+
 globalThis.SOBRE_CATALOGO = [
   /* ---------- Emotes ---------- */
   { id: "lentes-oscuros", tipo: "emote", src: "img/emotes/lentes-oscuros.webp", nombre: "Modo cool", alt: "Emote de Wewin con lentes oscuros: modo cool", artista: "skyshinez_", rareza: "comun", lore: "Dicen que estos lentes aparecen justo antes de cada decisión cuestionable. Nadie sabe quién los deja ahí." },
@@ -50,12 +53,14 @@ globalThis.SOBRE_CATALOGO = [
   { id: "proyectado", tipo: "fanart", src: "img/fanarts/proyectado.webp", nombre: "Proyectado", alt: "Fanart de Wewin vestido de rojo frente a un campo de batalla", artista: "darklobo117", rareza: "legendaria" },
 ].flatMap((carta) => {
   const grupoId = carta.id;
+  const conjunto = carta.conjunto || CONJUNTO_SERIE_1;
   return [
-    { ...carta, grupoId, variante: "base", pesoVariante: 90 },
+    { ...carta, grupoId, conjunto, variante: "base", pesoVariante: 90 },
     {
       ...carta,
       id: `${grupoId}-holo`,
       grupoId,
+      conjunto,
       variante: "holo",
       nombreVariante: "Holo",
       pesoVariante: 10,

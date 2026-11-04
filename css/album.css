@@ -99,6 +99,142 @@ body.sin-scroll { overflow: hidden !important; }
   margin: 0 auto 22px;
 }
 
+.album-conjuntos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: 12px;
+  max-width: 900px;
+  margin: 0 auto 22px;
+}
+
+.album-conjunto {
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  text-align: left;
+}
+
+.album-conjunto__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.album-conjunto__header h2 {
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.album-conjunto__header span {
+  flex: none;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+}
+
+.album-conjunto__barra {
+  height: 8px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.album-conjunto__barra i {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+  transition: width 0.4s ease;
+}
+
+.album-conjunto__texto {
+  margin: 8px 0 0;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+}
+
+.album-filtros {
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  margin: 28px 0 12px;
+}
+
+.album-filtros > label:not(.album-filtro-toggle) {
+  display: grid;
+  gap: 6px;
+  min-width: 150px;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.album-filtros select {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font: 500 0.9rem var(--font-body);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.album-filtros select:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.album-filtro-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--color-ink);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.album-filtro-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-accent);
+}
+
+.album-filtros .btn {
+  min-height: 44px;
+  margin: 0;
+}
+
+.album-filtro-resultados {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-align: center;
+}
+
+.album-filtro-vacio {
+  margin: 0 0 18px;
+  color: var(--color-accent-hover);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 .stat {
   display: inline-flex;
   align-items: center;
@@ -312,6 +448,10 @@ body.sin-scroll { overflow: hidden !important; }
 @media (max-width: 640px) {
   .detalle { padding: 16px; }
   .detalle-caja { gap: 18px; }
+  .album-filtros > label:not(.album-filtro-toggle),
+  .album-filtros .btn { width: 100%; }
+  .album-filtros > label:not(.album-filtro-toggle) { min-width: 0; }
+  .album-filtro-toggle { width: 100%; }
   .album-seccion {
     --album-card-size: clamp(118px, 38vw, 150px);
     margin: 24px 0;

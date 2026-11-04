@@ -22,6 +22,11 @@
   let coleccion = {};
   let sobres = 0;
   let clienteId = null;
+  const filtroRareza = $("[data-filtro-rareza]");
+  const filtroFaltantes = $("[data-filtro-faltantes]");
+  const limpiarFiltros = $("[data-limpiar-filtros]");
+  const resultadosFiltro = $("[data-filtro-resultados]");
+  const sinResultados = $("[data-filtro-vacio]");
 
   try {
     coleccion = JSON.parse(localStorage.getItem("wewinvt_coleccion") || "{}");
@@ -124,6 +129,45 @@
   /* =========================================================
      RENDER
      ========================================================= */
+  function renderProgresoConjuntos() {
+    const contenedor = $("[data-conjuntos]");
+    if (!contenedor || !window.AlbumFilters) return;
+    contenedor.innerHTML = "";
+
+    const conjuntos = window.AlbumFilters.progresoPorConjunto(CATALOGO, (id) => obtenidas(id) > 0);
+    conjuntos.forEach((conjunto, index) => {
+      const porcentaje = conjunto.total ? Math.round((conjunto.obtenidas / conjunto.total) * 100) : 0;
+      const tarjeta = document.createElement("section");
+      tarjeta.className = "album-conjunto";
+
+      const encabezado = document.createElement("header");
+      encabezado.className = "album-conjunto__header";
+      const titulo = document.createElement("h2");
+      titulo.id = `album-conjunto-${index}`;
+      titulo.textContent = conjunto.nombre;
+      const cuenta = document.createElement("span");
+      cuenta.textContent = `${conjunto.obtenidas}/${conjunto.total}`;
+      encabezado.append(titulo, cuenta);
+
+      const barra = document.createElement("div");
+      barra.className = "album-conjunto__barra";
+      barra.setAttribute("role", "progressbar");
+      barra.setAttribute("aria-label", `Progreso de ${conjunto.nombre}`);
+      barra.setAttribute("aria-valuemin", "0");
+      barra.setAttribute("aria-valuemax", String(conjunto.total));
+      barra.setAttribute("aria-valuenow", String(conjunto.obtenidas));
+      const relleno = document.createElement("i");
+      relleno.style.width = `${porcentaje}%`;
+      barra.appendChild(relleno);
+
+      const resumen = document.createElement("p");
+      resumen.className = "album-conjunto__texto";
+      resumen.textContent = `${porcentaje}% completado`;
+      tarjeta.append(encabezado, barra, resumen);
+      contenedor.appendChild(tarjeta);
+    });
+  }
+
   function render() {
     const total = CATALOGO.length;
     const cuantas = CATALOGO.filter((c) => obtenidas(c.id) > 0).length;
@@ -153,12 +197,24 @@
       stats.append(chip);
     });
 
+    renderProgresoConjuntos();
+
+    const filtros = {
+      rareza: filtroRareza?.value || "all",
+      soloFaltantes: Boolean(filtroFaltantes?.checked),
+    };
+    const filtradas = window.AlbumFilters.filtrar(CATALOGO, filtros, (id) => obtenidas(id) > 0);
+    if (resultadosFiltro) resultadosFiltro.textContent = `${filtradas.length} cartas mostradas`;
+    if (sinResultados) sinResultados.hidden = filtradas.length > 0;
+
     const album = $("[data-album]");
     album.innerHTML = "";
 
     ORDEN.forEach((clave) => {
-      const grupo = CATALOGO.filter((c) => c.rareza === clave);
-      const tengo = grupo.filter((c) => obtenidas(c.id) > 0).length;
+      const grupoCompleto = CATALOGO.filter((c) => c.rareza === clave);
+      const grupo = filtradas.filter((c) => c.rareza === clave);
+      if (!grupo.length) return;
+      const tengo = grupoCompleto.filter((c) => obtenidas(c.id) > 0).length;
 
       const seccion = document.createElement("section");
       seccion.className = "album-seccion";
@@ -166,7 +222,7 @@
       seccion.innerHTML = `
         <header class="album-rareza">
           <h2>${RAREZAS[clave].nombre}</h2>
-          <span class="conteo">${tengo}/${grupo.length}</span>
+          <span class="conteo">${tengo}/${grupoCompleto.length}</span>
           <span class="linea" aria-hidden="true"></span>
         </header>
         <div class="album-grid"></div>
@@ -174,7 +230,7 @@
 
       const grid = seccion.querySelector(".album-grid");
       grupo.forEach((datos) => {
-        grid.append(obtenidas(datos.id) > 0 ? cartaObtenida(datos) : cartaBloqueada());
+        grid.append(obtenidas(datos.id) > 0 ? cartaObtenida(datos) : cartaBloqueada(datos));
       });
       album.append(seccion);
     });
@@ -200,6 +256,14 @@
     if (totalHolo) totalHolo.textContent = `${variantesHolo.length} de ${todasLasVariantesHolo.length}`;
   }
 
+  filtroRareza?.addEventListener("change", render);
+  filtroFaltantes?.addEventListener("change", render);
+  limpiarFiltros?.addEventListener("click", () => {
+    filtroRareza.value = "all";
+    filtroFaltantes.checked = false;
+    render();
+  });
+
   /* En la cuadrícula la carta queda plana y quieta; solo se inclina la que se toca */
   function cartaObtenida(datos, opciones = { plana: true }) {
     const btn = Carta.crearCarta(datos, { soloFrente: true, ...opciones });
@@ -208,9 +272,11 @@
     return btn;
   }
 
-  function cartaBloqueada() {
+  function cartaBloqueada(datos) {
     const div = document.createElement("div");
     div.className = "card card--locked";
+    div.dataset.rareza = datos.rareza;
+    div.dataset.obtenida = "false";
     div.setAttribute("aria-label", "Carta sin descubrir");
     div.innerHTML = `
       <span class="card__incl">

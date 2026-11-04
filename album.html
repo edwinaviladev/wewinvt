@@ -90,6 +90,8 @@
             <p class="barra-texto"><b data-total-obtenidas>0</b>/<span data-total-cartas>0</span> cartas · <b data-porcentaje>0%</b></p>
           </div>
 
+          <div class="album-conjuntos" data-conjuntos aria-label="Progreso por serie"></div>
+
           <div class="album-stats" data-stats></div>
 
           <div class="album-acciones">
@@ -126,6 +128,26 @@
           </p>
         </section>
 
+        <div class="album-filtros" role="group" aria-label="Filtros del catálogo">
+          <label for="album-filtro-rareza">
+            <span>Rareza</span>
+            <select id="album-filtro-rareza" data-filtro-rareza>
+              <option value="all">Todas</option>
+              <option value="comun">Común</option>
+              <option value="rara">Rara</option>
+              <option value="epica">Épica</option>
+              <option value="legendaria">Legendaria</option>
+            </select>
+          </label>
+          <label class="album-filtro-toggle" for="album-filtro-faltantes">
+            <input id="album-filtro-faltantes" data-filtro-faltantes type="checkbox" />
+            Solo las que me faltan
+          </label>
+          <button class="btn btn--ghost" data-limpiar-filtros type="button">Limpiar filtros</button>
+          <p class="album-filtro-resultados" data-filtro-resultados aria-live="polite"></p>
+        </div>
+        <p class="album-filtro-vacio" data-filtro-vacio hidden>No hay cartas con esos filtros. Prueba otra combinación.</p>
+
         <div id="catalogo-cartas" data-album></div>
 
         <footer class="album-pie">
@@ -154,6 +176,7 @@
     <script src="js/twitch-auth.js" defer></script>
     <script src="js/main.js" defer></script>
     <script src="js/carta.js" defer></script>
+    <script src="js/album-filters.js" defer></script>
     <script src="js/album.js" defer></script>
   </body>
 </html>
