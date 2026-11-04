@@ -621,6 +621,15 @@ p {
     transform: scale(1.12);
 }
 
+/* Las miniaturas traen width/height en el HTML: sin height:auto, gana la altura del atributo */
+.emote-tile .tile-btn img {
+    width: 74%;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    aspect-ratio: 1;
+}
+
 .animation-badge {
     position: absolute;
     top: 0.6rem;

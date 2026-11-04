@@ -18,3 +18,10 @@ test("the CSP lets the Cloudflare Web Analytics beacon load and report", () => {
   assert.ok(directiva("script-src").includes("https://static.cloudflareinsights.com"));
   assert.ok(directiva("connect-src").includes("https://cloudflareinsights.com"));
 });
+
+test("images with width and height attributes keep their ratio in the CSS", () => {
+  assert.match(regla(leer("css/artistas.css"), ".artist-work img"), /height:\s*auto/);
+  const emote = regla(leer("css/styles.css"), ".emote-tile .tile-btn img");
+  assert.match(emote, /height:\s*auto/);
+  assert.match(emote, /aspect-ratio:\s*1/);
+});
