@@ -380,6 +380,17 @@ body.sin-scroll { overflow: hidden !important; }
   cursor: default;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-group(album-card) {
+    animation-duration: 360ms;
+    animation-timing-function: cubic-bezier(0.22, 0.7, 0.2, 1);
+  }
+
+  .detalle.is-view-transition .detalle-caja {
+    animation: none;
+  }
+}
+
 .detalle-info {
   display: grid;
   gap: 12px;

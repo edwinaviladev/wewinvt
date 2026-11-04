@@ -268,7 +268,7 @@
   function cartaObtenida(datos, opciones = { plana: true }) {
     const btn = Carta.crearCarta(datos, { soloFrente: true, ...opciones });
     btn.setAttribute("aria-label", Carta.etiquetaCarta(datos));
-    if (opciones.plana) btn.addEventListener("click", () => abrirDetalle(datos));
+    if (opciones.plana) btn.addEventListener("click", () => abrirDetalle(datos, btn));
     return btn;
   }
 
@@ -295,40 +295,103 @@
   const cajaCarta = $("[data-detalle-carta]");
   const cajaInfo = $("[data-detalle-info]");
   let dejarDeInclinar = () => {};
+  let tarjetaOrigenDetalle = null;
 
-  function abrirDetalle(datos) {
+  function transicionarCarta(origen, dialogo, actualizar) {
+    const movimientoReducido = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true;
+    if (!origen?.isConnected || typeof document.startViewTransition !== "function" || movimientoReducido) {
+      dialogo.classList.remove("is-view-transition");
+      actualizar();
+      return null;
+    }
+
+    let destino = null;
+    origen.style.setProperty("view-transition-name", "album-card");
+    dialogo.classList.add("is-view-transition");
+
+    let transicion;
+    try {
+      transicion = document.startViewTransition(() => {
+        origen.style.removeProperty("view-transition-name");
+        destino = actualizar();
+        if (destino?.isConnected) destino.style.setProperty("view-transition-name", "album-card");
+        else destino = null;
+      });
+    } catch {
+      origen.style.removeProperty("view-transition-name");
+      dialogo.classList.remove("is-view-transition");
+      actualizar();
+      return null;
+    }
+
+    const limpiar = () => {
+      origen.style.removeProperty("view-transition-name");
+      destino?.style.removeProperty("view-transition-name");
+      if (dialogo.hidden) dialogo.classList.remove("is-view-transition");
+    };
+    transicion.finished.then(limpiar, limpiar);
+    return transicion;
+  }
+
+  function abrirDetalle(datos, origen) {
     const enlaceArtista = datos.enlace
       ? `<a href="${datos.enlace}" target="_blank" rel="noreferrer">${datos.artista || "Anónimo"}</a>`
       : datos.artista || "Anónimo";
 
-    cajaCarta.innerHTML = "";
-    const carta = cartaObtenida(datos, { mece: datos.variante === "holo" });
-    cajaCarta.append(carta);
-    dejarDeInclinar();
-    dejarDeInclinar = Carta.seguirInclinacion(carta);
+    const actualizar = () => {
+      cajaCarta.innerHTML = "";
+      const carta = cartaObtenida(datos, { mece: datos.variante === "holo" });
+      cajaCarta.append(carta);
+      dejarDeInclinar();
+      dejarDeInclinar = Carta.seguirInclinacion(carta);
 
-    cajaInfo.innerHTML = `
-      <h3>${datos.nombre}</h3>
-      ${datos.lore ? '<p class="detalle-lore"></p>' : ""}
-      <p class="detalle-dato"><span>Tipo</span><b>${datos.tipo}</b></p>
-      <p class="detalle-dato"><span>Rareza</span><b style="color: ${RAREZAS[datos.rareza].color}">${RAREZAS[datos.rareza].nombre}</b></p>
-      ${datos.nombreVariante ? `<p class="detalle-dato"><span>Variante</span><b>${datos.nombreVariante}</b></p>` : ""}
-      <p class="detalle-dato"><span>Número</span><b>${numeroDe(datos)}</b></p>
-      <p class="detalle-dato"><span>Artista</span><b>${enlaceArtista}</b></p>
-      <p class="detalle-dato"><span>Obtenida</span><b>×${obtenidas(datos.id)}</b></p>
-    `;
-    if (datos.lore) cajaInfo.querySelector(".detalle-lore").textContent = datos.lore;
+      cajaInfo.innerHTML = `
+        <h3>${datos.nombre}</h3>
+        ${datos.lore ? '<p class="detalle-lore"></p>' : ""}
+        <p class="detalle-dato"><span>Tipo</span><b>${datos.tipo}</b></p>
+        <p class="detalle-dato"><span>Rareza</span><b style="color: ${RAREZAS[datos.rareza].color}">${RAREZAS[datos.rareza].nombre}</b></p>
+        ${datos.nombreVariante ? `<p class="detalle-dato"><span>Variante</span><b>${datos.nombreVariante}</b></p>` : ""}
+        <p class="detalle-dato"><span>Número</span><b>${numeroDe(datos)}</b></p>
+        <p class="detalle-dato"><span>Artista</span><b>${enlaceArtista}</b></p>
+        <p class="detalle-dato"><span>Obtenida</span><b>×${obtenidas(datos.id)}</b></p>
+      `;
+      if (datos.lore) cajaInfo.querySelector(".detalle-lore").textContent = datos.lore;
 
-    detalle.hidden = false;
-    document.body.classList.add("sin-scroll");
+      detalle.hidden = false;
+      document.body.classList.add("sin-scroll");
+      return carta;
+    };
+
+    if (origen?.isConnected) {
+      const transicion = transicionarCarta(origen, detalle, actualizar);
+      tarjetaOrigenDetalle = transicion ? origen : null;
+    } else {
+      tarjetaOrigenDetalle = null;
+      detalle.classList.remove("is-view-transition");
+      actualizar();
+    }
   }
 
   function cerrarDetalle() {
-    dejarDeInclinar();
-    dejarDeInclinar = () => {};
-    cajaCarta.innerHTML = "";
-    detalle.hidden = true;
-    document.body.classList.remove("sin-scroll");
+    const cartaDetalle = cajaCarta.firstElementChild;
+    const origen = tarjetaOrigenDetalle?.isConnected ? tarjetaOrigenDetalle : null;
+    tarjetaOrigenDetalle = null;
+
+    const actualizar = () => {
+      dejarDeInclinar();
+      dejarDeInclinar = () => {};
+      cajaCarta.innerHTML = "";
+      detalle.hidden = true;
+      document.body.classList.remove("sin-scroll");
+      return origen;
+    };
+
+    if (cartaDetalle && origen) {
+      transicionarCarta(cartaDetalle, detalle, actualizar);
+    } else {
+      detalle.classList.remove("is-view-transition");
+      actualizar();
+    }
   }
 
   detalle.addEventListener("click", (e) => {
