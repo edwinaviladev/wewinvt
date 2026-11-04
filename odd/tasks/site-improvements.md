@@ -2,7 +2,7 @@
 
 File locator: `odd/tasks/site-improvements.md`. Engram mirror: `odd/site-improvements/tasks`.
 
-Audited against the current branch on 2026-11-03. P1-P4, C1-C4, L1-L6, D1-D3, A1-A2 and A5 are implemented; unchecked items remain pending. The user chooses what to build next.
+Audited against the current branch on 2026-11-03. P1-P4, C1-C4, L1-L6, D1-D3, A1-A3 and A5 are implemented; unchecked items remain pending. The user chooses what to build next.
 
 ## Starting point
 - `origin/master` includes the hardening work (PR #7). In production, `/worker.js`, `/README.md` and the image originals answer 404, `boceto-lapiz.webp` is 303924 bytes, and security and cache headers are live.
@@ -45,7 +45,7 @@ These ideas come from the code and the published text. The pages were not review
 ## Animation
 - [x] A1 Add CSS-only cross-document page transitions with `@view-transition`, enabled only when reduced motion is not requested. Public pages opt in; OBS overlay pages stay unchanged.
 - [x] A2 Animate an opened card from its album source into the detail view and back; unsupported browsers and reduced-motion users keep the existing behavior.
-- [ ] A3 Add scroll reveals with `animation-timeline`, no libraries.
+- [x] A3 Add CSS `animation-timeline: view()` scroll reveals. Use IntersectionObserver as a fallback and bypass animation for reduced motion.
 - [ ] A4 Give the hero avatar some life: a blink, or a reaction on hover.
 - [x] A5 Make the pack opening build differently by rarity before the card shows. `js/sobre.js` adds pre-reveal anticipation for Epic and Legendary cards.
 
@@ -62,4 +62,4 @@ These touch the server redemption and existing collections, so design them caref
 - [ ] H3 Four non-blocking review findings on `test/site-config.test.mjs`: the inline-handler regex can give false positives and miss cases; an image prefix stored in a constant goes unseen; a header repeated inside one rule is not detected; the ignore-rule matcher accepts unsupported syntax silently. The recommendation was to leave them unless one causes trouble.
 
 ## Next step
-The first batch (P1-P3, C1), P4, C2-C4, L1-L6, D1-D3 and A1-A2 are complete. The next pending item by order is A3; the user chooses what to build next.
+The first batch (P1-P3, C1), P4, C2-C4, L1-L6, D1-D3 and A1-A3 are complete. The next pending item by order is A4; the user chooses what to build next.

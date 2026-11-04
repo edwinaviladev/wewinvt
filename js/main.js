@@ -50,8 +50,13 @@
   /* ------------------------------------------------------------------ */
 
   var toReveal = Array.prototype.slice.call(document.querySelectorAll('[data-animate]'));
+  var supportsViewTimeline =
+    window.CSS &&
+    typeof window.CSS.supports === 'function' &&
+    window.CSS.supports('animation-timeline: view()') &&
+    window.CSS.supports('animation-range: entry 0% entry 40%');
 
-  if (!('IntersectionObserver' in window) || reduceMotion) {
+  if (!('IntersectionObserver' in window) || reduceMotion || supportsViewTimeline) {
     toReveal.forEach(function (el) {
       el.classList.add('is-visible');
     });
