@@ -105,6 +105,58 @@ h3 {
   border-top: 1px solid var(--color-border);
 }
 
+.home-page main > .section {
+  position: relative;
+}
+
+.home-page .manga-divider {
+  position: absolute;
+  z-index: 1;
+  inset-inline: 0;
+  top: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(0.4rem, 1.4vw, 0.85rem);
+  width: min(100%, 34rem);
+  margin-inline: auto;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.home-page .manga-divider__panel {
+  display: block;
+  min-width: 0;
+  height: 1.15rem;
+  border: 1px solid var(--color-ink);
+  background-color: var(--color-surface);
+}
+
+.home-page .manga-divider__panel--dots {
+  background-image: radial-gradient(circle, rgb(36 35 33 / 30%) 0.8px, transparent 1px);
+  background-size: 6px 6px;
+}
+
+.home-page .manga-divider__panel--lines {
+  background-image: repeating-linear-gradient(135deg, transparent 0 8px, var(--color-accent-soft) 8px 11px);
+}
+
+.home-page .manga-divider__sound {
+  display: block;
+  padding: 0.32rem 0.6rem;
+  border: 2px solid var(--color-ink);
+  background: var(--color-bg);
+  box-shadow: 3px 3px 0 var(--color-ink);
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: clamp(0.62rem, 1.1vw, 0.78rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  transform: rotate(-3deg);
+}
+
 .eyebrow {
   margin-bottom: 0.8rem;
   color: var(--color-accent);
@@ -296,6 +348,27 @@ h3 {
   padding: 0.75rem 1rem;
   object-fit: contain;
   object-position: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-figure img {
+    transform-origin: 50% 82%;
+    transition:
+      transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      filter 280ms ease;
+  }
+
+  .hero-figure:focus-within img {
+    transform: translateY(-0.35rem) rotate(-1.2deg) scale(1.015);
+    filter: drop-shadow(0 0.45rem 0.35rem rgb(36 35 33 / 18%));
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .hero-figure:hover img {
+    transform: translateY(-0.35rem) rotate(-1.2deg) scale(1.015);
+    filter: drop-shadow(0 0.45rem 0.35rem rgb(36 35 33 / 18%));
+  }
 }
 
 .hero-figure figcaption {
@@ -670,6 +743,70 @@ h3 {
   margin-top: 0.75rem;
 }
 
+.clips-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 3vw, 2rem);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.clip-card {
+  min-width: 0;
+  padding: clamp(0.75rem, 2vw, 1rem);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.clip-card__label {
+  margin: 0 0 0.5rem;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.clip-embed {
+  display: block;
+  width: 100%;
+  min-height: 300px;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  background: #17110f;
+}
+
+.clip-card__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  margin-top: 0.5rem;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.clip-card__link:hover {
+  color: var(--color-accent-hover);
+}
+
+@media (max-width: 879px) {
+  .clips-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .clip-embed {
+    display: none;
+  }
+}
+
 .emote-grid {
   grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
   gap: 0.75rem 1rem;
@@ -701,16 +838,31 @@ h3 {
   column-gap: clamp(1rem, 2.5vw, 2rem);
 }
 
+.fanart-card--featured {
+  column-span: all;
+  width: min(100%, 40rem);
+  margin-inline: auto;
+}
+
 .fanart-card .tile-btn {
   border: 0;
   border-radius: 0;
   background: var(--color-surface);
 }
 
+.fanart-card--featured .tile-btn {
+  border-bottom: 2px solid var(--color-accent);
+}
+
 .fanart-card img {
   max-width: 100%;
   max-height: none;
   object-fit: contain;
+}
+
+.fanart-card--featured .tile-credit {
+  margin-top: 0.65rem;
+  font-size: 0.72rem;
 }
 
 .tile-credit {
@@ -826,6 +978,31 @@ html.js [data-animate] {
     transform var(--motion-medium);
 }
 
+@keyframes reveal-on-scroll {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@supports (animation-timeline: view()) and (animation-range: entry 0% entry 40%) {
+  @media (prefers-reduced-motion: no-preference) {
+    html.js [data-animate],
+    html.js [data-animate].is-visible {
+      opacity: 0;
+      transform: translateY(14px);
+      transition: none;
+      animation: reveal-on-scroll 1s linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
+
 @media (max-width: 700px) {
   .hero {
     grid-template-columns: minmax(0, 1fr);
@@ -865,6 +1042,19 @@ html.js [data-animate] {
 }
 
 @media (max-width: 480px) {
+  .home-page .manga-divider {
+    gap: 0.4rem;
+  }
+
+  .home-page .manga-divider__panel {
+    height: 1rem;
+  }
+
+  .home-page .manga-divider__sound {
+    padding: 0.25rem 0.4rem;
+    box-shadow: 2px 2px 0 var(--color-ink);
+  }
+
   .hero-copy,
   .hero-stage,
   .hero-figure {

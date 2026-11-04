@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/paleta-editorial.css" />
     <link rel="stylesheet" href="css/home-cards.css" />
+    <link rel="stylesheet" href="css/view-transitions.css" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="WewinVT" />
@@ -31,14 +32,14 @@
       property="og:description"
       content="El universo visual de Wewin: streams, fanarts, emotes, cartas y recuerdos de la comunidad."
     />
-    <meta property="og:image" content="https://wewinvt.com/img/og-wewin.webp?v=2" />
-    <meta property="og:image:type" content="image/webp" />
+    <meta property="og:image" content="https://wewinvt.com/img/og-wewin.png" />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="WewinVT y su avatar en pixel art, con la frase «Un pequeño universo, una gran comunidad» y enlace a Twitch." />
     <meta property="og:locale" content="es_MX" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content="https://wewinvt.com/img/og-wewin.webp?v=2" />
+    <meta name="twitter:image" content="https://wewinvt.com/img/og-wewin.png" />
     <meta name="twitter:image:alt" content="WewinVT y su avatar en pixel art, con la frase «Un pequeño universo, una gran comunidad» y enlace a Twitch." />
     <meta name="twitter:title" content="WewinVT | Comunidad, fanarts y streams" />
     <meta
@@ -67,6 +68,7 @@
             <li><span class="nav-link is-active" aria-current="page">Inicio</span></li>
             <li><a class="nav-link" href="emotes.html">Galería</a></li>
             <li><a class="nav-link" href="album.html">Álbum</a></li>
+            <li><a class="nav-link" href="artistas.html">Artistas</a></li>
           </ul>
         </nav>
       </div>
@@ -120,6 +122,11 @@
 
       <!-- Quién es Wewin -->
       <section class="section section-about" id="quien-es-wewin" aria-labelledby="about-titulo">
+        <div class="manga-divider" aria-hidden="true">
+          <span class="manga-divider__panel manga-divider__panel--dots"></span>
+          <span class="manga-divider__sound">¡PUM!</span>
+          <span class="manga-divider__panel manga-divider__panel--lines"></span>
+        </div>
         <div class="about-inner">
           <div class="about-copy">
             <p class="eyebrow" data-animate>02 / Quién es Wewin</p>
@@ -155,6 +162,11 @@
       </section>
 
       <section class="section" id="galeria-comunidad" aria-labelledby="galeria-home-titulo">
+        <div class="manga-divider" aria-hidden="true">
+          <span class="manga-divider__panel manga-divider__panel--dots"></span>
+          <span class="manga-divider__sound">¡TACHÁN!</span>
+          <span class="manga-divider__panel manga-divider__panel--lines"></span>
+        </div>
         <div class="section-heading" data-animate>
           <p class="eyebrow">03 / Archivo de comunidad</p>
           <h2 id="galeria-home-titulo">Fanarts y momentos del canal.</h2>
@@ -198,6 +210,11 @@
       </section>
 
       <section class="section album-teaser" id="coleccion" aria-labelledby="album-home-titulo">
+        <div class="manga-divider" aria-hidden="true">
+          <span class="manga-divider__panel manga-divider__panel--dots"></span>
+          <span class="manga-divider__sound">¡CLIC!</span>
+          <span class="manga-divider__panel manga-divider__panel--lines"></span>
+        </div>
         <div
           class="album-teaser__cards home-card-fan"
           data-home-cards
@@ -216,9 +233,82 @@
         </div>
       </section>
 
-      <section class="section" id="redes" aria-labelledby="redes-titulo">
+      <section class="section clips-section" id="clips" aria-labelledby="clips-titulo">
+        <div class="manga-divider" aria-hidden="true">
+          <span class="manga-divider__panel manga-divider__panel--dots"></span>
+          <span class="manga-divider__sound">¡JA!</span>
+          <span class="manga-divider__panel manga-divider__panel--lines"></span>
+        </div>
         <div class="section-heading" data-animate>
-          <p class="eyebrow">05 / Comunidad</p>
+          <p class="eyebrow">05 / Clips del canal</p>
+          <h2 id="clips-titulo">Momentos que merecían salir del directo.</h2>
+          <p class="lead">Cuatro clips para repetir el caos. El contexto es opcional; la risa, no.</p>
+        </div>
+
+        <ul class="clips-grid" aria-label="Clips destacados de WewinVT">
+          <li class="clip-card" data-animate>
+            <p class="clip-card__label">Clip 01</p>
+            <iframe
+              class="clip-embed"
+              src="https://clips.twitch.tv/embed?clip=EasyTrappedEyeballMrDestructoid-IFZhSg8Zo57g5LRs&amp;parent=wewinvt.com&amp;parent=www.wewinvt.com&amp;parent=localhost&amp;preload=metadata"
+              title="Clip destacado 1 de WewinVT"
+              width="560"
+              height="315"
+              loading="lazy"
+              allowfullscreen
+            ></iframe>
+            <a class="clip-card__link" href="https://www.twitch.tv/wewinvt/clip/EasyTrappedEyeballMrDestructoid-IFZhSg8Zo57g5LRs?range=7d" target="_blank" rel="noreferrer">Ver clip en Twitch ↗</a>
+          </li>
+          <li class="clip-card" data-animate>
+            <p class="clip-card__label">Clip 02</p>
+            <iframe
+              class="clip-embed"
+              src="https://clips.twitch.tv/embed?clip=ElatedSmoothCrabPupper-UO8pGWGqPu5mF258&amp;parent=wewinvt.com&amp;parent=www.wewinvt.com&amp;parent=localhost&amp;preload=metadata"
+              title="Clip destacado 2 de WewinVT"
+              width="560"
+              height="315"
+              loading="lazy"
+              allowfullscreen
+            ></iframe>
+            <a class="clip-card__link" href="https://www.twitch.tv/wewinvt/clip/ElatedSmoothCrabPupper-UO8pGWGqPu5mF258?range=7d" target="_blank" rel="noreferrer">Ver clip en Twitch ↗</a>
+          </li>
+          <li class="clip-card" data-animate>
+            <p class="clip-card__label">Clip 03</p>
+            <iframe
+              class="clip-embed"
+              src="https://clips.twitch.tv/embed?clip=HyperImpartialVultureSSSsss-DYCBDr-y_tHentPF&amp;parent=wewinvt.com&amp;parent=www.wewinvt.com&amp;parent=localhost&amp;preload=metadata"
+              title="Clip destacado 3 de WewinVT"
+              width="560"
+              height="315"
+              loading="lazy"
+              allowfullscreen
+            ></iframe>
+            <a class="clip-card__link" href="https://www.twitch.tv/wewinvt/clip/HyperImpartialVultureSSSsss-DYCBDr-y_tHentPF?range=7d" target="_blank" rel="noreferrer">Ver clip en Twitch ↗</a>
+          </li>
+          <li class="clip-card" data-animate>
+            <p class="clip-card__label">Clip 04</p>
+            <iframe
+              class="clip-embed"
+              src="https://clips.twitch.tv/embed?clip=SolidPopularOryxGivePLZ-2zI0P4rRU2gspMfL&amp;parent=wewinvt.com&amp;parent=www.wewinvt.com&amp;parent=localhost&amp;preload=metadata"
+              title="Clip destacado 4 de WewinVT"
+              width="560"
+              height="315"
+              loading="lazy"
+              allowfullscreen
+            ></iframe>
+            <a class="clip-card__link" href="https://www.twitch.tv/wewinvt/clip/SolidPopularOryxGivePLZ-2zI0P4rRU2gspMfL?range=7d" target="_blank" rel="noreferrer">Ver clip en Twitch ↗</a>
+          </li>
+        </ul>
+      </section>
+
+      <section class="section" id="redes" aria-labelledby="redes-titulo">
+        <div class="manga-divider" aria-hidden="true">
+          <span class="manga-divider__panel manga-divider__panel--dots"></span>
+          <span class="manga-divider__sound">¡BZZT!</span>
+          <span class="manga-divider__panel manga-divider__panel--lines"></span>
+        </div>
+        <div class="section-heading" data-animate>
+          <p class="eyebrow">06 / Comunidad</p>
           <h2 id="redes-titulo">Dónde encontrar al Wewin.</h2>
           <p class="lead">
             Toda la actividad del canal pasa por aquí: directos, clips, comunidad y anuncios.
@@ -277,8 +367,13 @@
 
       <!-- Donaciones -->
       <section class="section" id="apoyo" aria-labelledby="apoyo-titulo">
+        <div class="manga-divider" aria-hidden="true">
+          <span class="manga-divider__panel manga-divider__panel--dots"></span>
+          <span class="manga-divider__sound">¡PLIN!</span>
+          <span class="manga-divider__panel manga-divider__panel--lines"></span>
+        </div>
         <div class="section-heading" data-animate>
-          <p class="eyebrow">06 / Apoyo</p>
+          <p class="eyebrow">07 / Apoyo</p>
           <h2 id="apoyo-titulo">Financia decisiones cuestionables.</h2>
           <p class="lead">
             Todo apoyo es voluntario: con estar aquí ya ayudas muchísimo. Pero si te sobra un

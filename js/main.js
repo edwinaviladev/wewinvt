@@ -50,8 +50,13 @@
   /* ------------------------------------------------------------------ */
 
   var toReveal = Array.prototype.slice.call(document.querySelectorAll('[data-animate]'));
+  var supportsViewTimeline =
+    window.CSS &&
+    typeof window.CSS.supports === 'function' &&
+    window.CSS.supports('animation-timeline: view()') &&
+    window.CSS.supports('animation-range: entry 0% entry 40%');
 
-  if (!('IntersectionObserver' in window) || reduceMotion) {
+  if (!('IntersectionObserver' in window) || reduceMotion || supportsViewTimeline) {
     toReveal.forEach(function (el) {
       el.classList.add('is-visible');
     });
@@ -85,12 +90,85 @@
   /* Horario de streams                                                  */
   /* ------------------------------------------------------------------ */
 
+  function partesFechaEnZona(fecha, zona) {
+    var partes = new Intl.DateTimeFormat('en-US', {
+      timeZone: zona,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(fecha);
+    var valores = {};
+    partes.forEach(function (parte) {
+      if (parte.type !== 'literal') valores[parte.type] = Number(parte.value);
+    });
+    return valores;
+  }
+
+  function instanteEnZona(fechaLocal, hora, zona) {
+    var horaObjetivo = Date.UTC(fechaLocal.year, fechaLocal.month - 1, fechaLocal.day, hora, 0, 0);
+    var instante = horaObjetivo;
+    for (var intento = 0; intento < 3; intento++) {
+      var local = partesFechaEnZona(new Date(instante), zona);
+      var horaRepresentada = Date.UTC(
+        local.year,
+        local.month - 1,
+        local.day,
+        local.hour,
+        local.minute,
+        local.second
+      );
+      var siguiente = instante + horaObjetivo - horaRepresentada;
+      if (siguiente === instante) break;
+      instante = siguiente;
+    }
+    return new Date(instante);
+  }
+
+  function horasEnZona(horas, zonaOrigen, zonaDestino, ahora) {
+    var fechaOrigen = partesFechaEnZona(ahora, zonaOrigen);
+    var formateador = new Intl.DateTimeFormat('es-MX', {
+      timeZone: zonaDestino,
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+    return horas.map(function (hora) {
+      return formateador.format(instanteEnZona(fechaOrigen, hora, zonaOrigen));
+    });
+  }
+
+  function listaHoras(horas) {
+    if (horas.length < 2) return horas[0] || '';
+    return horas.slice(0, -1).join(', ') + ' o ' + horas[horas.length - 1];
+  }
+
+  function lineasHorario(zonaVisitante, ahora) {
+    if (!Array.isArray(horario.horas) || !horario.horas.length || !horario.zonaIana) {
+      return horario.texto ? [horario.texto] : [];
+    }
+
+    var fecha = ahora || new Date();
+    var zonaLocal = zonaVisitante || Intl.DateTimeFormat().resolvedOptions().timeZone || horario.zonaIana;
+    var horasMexico = horasEnZona(horario.horas, horario.zonaIana, horario.zonaIana, fecha);
+    var horasLocales = horasEnZona(horario.horas, horario.zonaIana, zonaLocal, fecha);
+    var lineas = ['Todos los días, entre ' + listaHoras(horasMexico) + ' (' + horario.zona + ')'];
+
+    if (horasLocales.some(function (hora, index) { return hora !== horasMexico[index]; })) {
+      lineas.push('En tu hora local: ' + listaHoras(horasLocales));
+    }
+    if (horario.texto) lineas.push(horario.texto);
+    return lineas;
+  }
+
   function proximoStreamTexto() {
     if (horario.dias && horario.dias.length > 0) {
       var proximo = horario.dias[0];
       return 'Próximo stream: ' + proximo.dia + ' ' + proximo.hora + ' (' + horario.zona + ')';
     }
-    return horario.texto ? horario.texto : '';
+    return lineasHorario().join('. ');
   }
 
   function renderScheduleSlot() {
@@ -102,8 +180,8 @@
       horario.dias.forEach(function (dia) {
         lines.push(dia.dia + ' · ' + dia.hora + ' (' + horario.zona + ')');
       });
-    } else if (horario.texto) {
-      lines.push(horario.texto);
+    } else {
+      lines = lineasHorario();
     }
     if (lines.length === 0) return;
 
@@ -307,24 +385,26 @@
       if (cta) cta.textContent = 'Entrar a la transmisión';
       insertarReproductor(panel);
     } else if (status.state === 'offline') {
-      if (label) label.textContent = 'Sin transmisión por ahora';
-      if (strong) strong.textContent = 'Wewin no está en vivo';
+      if (label) label.textContent = 'Fuera de aire';
+      if (strong) strong.textContent = 'Wewin anda en pausa';
       if (text) {
         text.textContent = status.lastTitle
-          ? 'Última transmisión: «' + status.lastTitle + '». Cuando inicie un directo, este panel se actualizará.'
-          : 'Cuando el canal inicie una transmisión, este panel cambiará automáticamente.';
+          ? 'Último stream: «' + status.lastTitle + '». La próxima decisión cuestionable se cocina a su ritmo; este panel se actualiza cuando vuelva.'
+          : 'Ahora toca descanso. Sigue el canal para que Twitch avise cuando vuelva el caos.';
       }
-      if (cta) cta.textContent = 'Ir al canal';
+      if (cta) cta.textContent = 'Ver el canal';
     } else {
       // Estado de respaldo: la consulta falló o expiró.
-      if (label) label.textContent = 'Sin transmisión por ahora';
-      if (strong) strong.textContent = 'Wewin no está en vivo';
+      if (label) label.textContent = 'Interferencia';
+      if (strong) strong.textContent = 'No pudimos consultar Twitch';
       if (text) {
         var proximo = proximoStreamTexto();
         text.textContent =
-          proximo || 'Síguelo en Twitch para enterarte cuando empiece.';
+          proximo
+            ? 'La bola de cristal de la web se desconectó. ' + proximo + ' Mientras tanto, confirma el directo en Twitch.'
+            : 'La bola de cristal de esta web se desconectó. Entra al canal para comprobar si Wewin está en vivo.';
       }
-      if (cta) cta.textContent = 'Ir al canal';
+      if (cta) cta.textContent = 'Comprobar en Twitch';
     }
 
     if (logo && status.logo) {
