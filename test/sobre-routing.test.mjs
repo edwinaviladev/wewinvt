@@ -11,11 +11,11 @@ test("sobre is indexable, has social preview metadata, and appears in the sitema
   assert.match(sobre, /<link rel="canonical" href="https:\/\/wewinvt\.com\/sobre" \/>/);
   assert.doesNotMatch(sobre, /<meta name="robots" content="noindex/i);
   assert.match(sobre, /<meta property="og:title" content="Sobre coleccionable \| WewinVT" \/>/);
-  assert.match(sobre, /<meta property="og:image" content="https:\/\/wewinvt\.com\/img\/og-wewin\.webp\?v=2" \/>/);
-  assert.match(sobre, /<meta property="og:image:type" content="image\/webp" \/>/);
+  assert.match(sobre, /<meta property="og:image" content="https:\/\/wewinvt\.com\/img\/og-wewin\.png" \/>/);
+  assert.match(sobre, /<meta property="og:image:type" content="image\/png" \/>/);
   assert.match(sobre, /<meta property="og:image:width" content="1200" \/>/);
   assert.match(sobre, /<meta property="og:image:height" content="630" \/>/);
   assert.match(sobre, /<meta name="twitter:card" content="summary_large_image" \/>/);
-  assert.match(sobre, /<meta name="twitter:image" content="https:\/\/wewinvt\.com\/img\/og-wewin\.webp\?v=2" \/>/);
+  assert.match(sobre, /<meta name="twitter:image" content="https:\/\/wewinvt\.com\/img\/og-wewin\.png" \/>/);
   assert.match(sitemap, /<loc>https:\/\/wewinvt\.com\/sobre<\/loc>/);
 });

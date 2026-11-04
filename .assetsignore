@@ -32,10 +32,12 @@ Desktop.ini
 /old
 /fanarts y emotes
 
-# Image originals and unused images: pages only load the .webp versions below
+# Image originals and unused images; keep the social preview PNG public.
 /favicon.png
+/img/avatar.png
+/img/avatar-preview.png
 /img/avatar-preview.webp
-/img/**/*.png
+/img/*/**/*.png
 /img/**/*.jpg
 /img/**/*.jpeg
 /img/**/*.gif

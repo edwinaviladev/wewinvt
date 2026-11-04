@@ -121,6 +121,20 @@ test("every image the site references exists and is published", () => {
   }
 });
 
+test("public social previews use the published 1200x630 PNG", () => {
+  for (const pagina of ["index.html", "emotes.html", "album.html", "artistas.html", "sobre.html"]) {
+    const html = leer(pagina);
+    assert.match(html, /<meta property="og:image" content="https:\/\/wewinvt\.com\/img\/og-wewin\.png" \/>/, pagina);
+    assert.match(html, /<meta property="og:image:type" content="image\/png" \/>/, pagina);
+    assert.match(html, /<meta name="twitter:image" content="https:\/\/wewinvt\.com\/img\/og-wewin\.png" \/>/, pagina);
+  }
+
+  const imagen = readFileSync(new URL("../img/og-wewin.png", import.meta.url));
+  assert.equal(imagen.toString("ascii", 1, 4), "PNG");
+  assert.deepEqual([imagen.readUInt32BE(16), imagen.readUInt32BE(20)], [1200, 630]);
+  assert.ok(imagen.length < 8 * 1024 * 1024, "social image must stay under Facebook's 8 MB limit");
+});
+
 test("image paths are written in full, so the reference check can see them", () => {
   for (const fuente of fuentes) {
     const texto = leer(fuente);
@@ -133,11 +147,12 @@ test(".assetsignore keeps non-site files out and the site files in", () => {
   for (const ruta of [
     "worker.js", "README.md", "servidor.mjs", "servidor.cmd", "wrangler.jsonc", ".gitignore", ".dev.vars", ".env.local",
     "odd/tasks/site-hardening.md", "test/worker.test.mjs", "old/index.html", "upgrades.md", "fanarts y emotes/emotes/a.png",
-    "favicon.png", "img/og-wewin.png", "img/avatar-preview.webp", "img/fanarts/boceto-lapiz.jpg", "img/emotes/pensar-sonrojo.gif",
+    "favicon.png", "img/avatar.png", "img/avatar-preview.png", "img/emotes/lentes-oscuros.png", "img/fanarts/comic-comunidad.png",
+    "img/avatar-preview.webp", "img/fanarts/boceto-lapiz.jpg", "img/emotes/pensar-sonrojo.gif",
   ]) {
     assert.ok(excluido(ruta), `${ruta} should be excluded`);
   }
-  for (const ruta of ["_headers", ...paginas, "robots.txt", "sitemap.xml", "favicon.webp", "js/main.js", "css/styles.css", "img/avatar.webp", "img/og-wewin.webp"]) {
+  for (const ruta of ["_headers", ...paginas, "robots.txt", "sitemap.xml", "favicon.webp", "js/main.js", "css/styles.css", "img/avatar.webp", "img/og-wewin.png", "img/og-wewin.webp"]) {
     assert.ok(!excluido(ruta), `${ruta} should be published`);
   }
 });
