@@ -350,6 +350,27 @@ h3 {
   object-position: center;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .hero-figure img {
+    transform-origin: 50% 82%;
+    transition:
+      transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      filter 280ms ease;
+  }
+
+  .hero-figure:focus-within img {
+    transform: translateY(-0.35rem) rotate(-1.2deg) scale(1.015);
+    filter: drop-shadow(0 0.45rem 0.35rem rgb(36 35 33 / 18%));
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .hero-figure:hover img {
+    transform: translateY(-0.35rem) rotate(-1.2deg) scale(1.015);
+    filter: drop-shadow(0 0.45rem 0.35rem rgb(36 35 33 / 18%));
+  }
+}
+
 .hero-figure figcaption {
   display: flex;
   justify-content: space-between;

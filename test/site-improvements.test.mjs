@@ -56,3 +56,9 @@ test("public pages opt into cross-document transitions only when motion is allow
     /::view-transition-old\(root\),\s*::view-transition-new\(root\)\s*\{[^}]*animation-duration:\s*200ms;/s
   );
 });
+
+test("hero avatar reacts to hover or focus only when motion is allowed", () => {
+  assert.match(editorialStyles, /@media \(hover:\s*hover\) and \(prefers-reduced-motion:\s*no-preference\)/);
+  assert.match(editorialStyles, /\.hero-figure:hover img\s*\{[^}]*transform:/s);
+  assert.match(editorialStyles, /@media \(prefers-reduced-motion:\s*no-preference\)[\s\S]*?\.hero-figure:focus-within img\s*\{/);
+});
