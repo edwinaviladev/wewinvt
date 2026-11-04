@@ -906,6 +906,9 @@ body {
   font-size: 11px;
   color: rgb(201 189 176 / 60%);
 }
+.dev[hidden] {
+  display: none;
+}
 .dev select {
   font: inherit;
   color: var(--text);

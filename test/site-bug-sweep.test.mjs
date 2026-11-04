@@ -34,3 +34,10 @@ test("the lightbox caption text does not match its background", () => {
   assert.notEqual(fondo[1], color[1]);
   assert.notEqual(fondo[1], "var(--surface-strong)");
 });
+
+test("test controls stay hidden on the public pack page and visible on the overlay", () => {
+  assert.match(leer("sobre.html"), /<div class="dev" hidden>/);
+  assert.match(leer("overlay.html"), /<div class="dev">/);
+  assert.match(leer("js/sobre.js"), /if \(DEBUG\) forceSel\.closest\("\.dev"\)\.hidden = false;/);
+  assert.match(regla(leer("css/sobre.css"), ".dev[hidden]"), /display:\s*none/);
+});

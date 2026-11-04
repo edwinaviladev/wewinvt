@@ -30,6 +30,7 @@
 
   /* ?debug=1 muestra en pantalla la conexión y los canjes que llegan */
   const DEBUG = new URLSearchParams(location.search).get("debug") === "1";
+  if (DEBUG) forceSel.closest(".dev").hidden = false;
 
   /* Modo: "interactivo" (sobre.html) u "overlay" (overlay.html, canje automático) */
   const MODO = document.body.dataset.modo === "overlay" ? "overlay" : "interactivo";
