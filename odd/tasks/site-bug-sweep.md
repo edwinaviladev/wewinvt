@@ -28,7 +28,7 @@ images, and the CSS for those images never set `height: auto`, so the attribute 
 - [x] T2 `css/styles.css`, `css/artistas.css`: fix emote and artist image sizing. Route: inline (one-line rules).
 - [x] T3 `css/paleta-editorial.css`, `css/gallery-filters.css`: lightbox caption contrast and doubled rules. Route: inline.
 - [x] T4 `sobre.html`, `js/sobre.js`: show test controls only with `?debug=1`. Route: inline.
-- [ ] T5 Verify in the browser at desktop and phone widths, then after deploy on production.
+- [x] T5 Verify in the browser at desktop and phone widths, then after deploy on production.
 
 ## Acceptance criteria
 - No CSP error in the console on any public page.
@@ -45,7 +45,10 @@ images, and the CSS for those images never set `height: auto`, so the attribute 
 - Local browser, desktop: emote tile 1,360px to 166px, `/emotes` page 7,740px to 4,463px, `/artistas` page 20,529px to 5,615px.
 - Local browser, 375px: `/emotes` page 19,192px to 10,138px, tile 211px, no horizontal overflow.
 - Lightbox credit readable at both widths. `.dev` is hidden on `/sobre`, visible with `?debug=1` and on `overlay.html`.
-- T5 production check is pending until the push deploys.
+- T5 production, after deploy, in a fresh tab: no console errors on `/artistas` and `/emotes`, beacon answers 200,
+  `/artistas` image 140x140 and page 5,615px, `/emotes` tile 166px and page 4,462px, `/sobre` test controls hidden.
+- Review assessment: medium risk from `_headers`, `review_due: false`, reason `under_budget`, so no native review ran.
+- Returning browsers can see the old layout for up to 10 minutes, the `max-age` of `/css/*`.
 
 ## Next step
-Confirm on production that the CSP error is gone and the pages match the local results.
+None. Feature complete.
