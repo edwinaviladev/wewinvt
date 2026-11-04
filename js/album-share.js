@@ -3,6 +3,8 @@ window.AlbumShare = (() => {
 
   const ANCHO = 1200;
   const ALTO = 630;
+  /* Algunos navegadores, como iOS Safari, leen la URL cuando se confirma la descarga */
+  const REVOCAR_MS = 40000;
   const RAREZAS = window.CartaWewin.RAREZAS;
 
   function esperarImagen(imagen) {
@@ -166,7 +168,7 @@ window.AlbumShare = (() => {
     document.body.appendChild(enlace);
     enlace.click();
     enlace.remove();
-    window.setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+    window.setTimeout(() => window.URL.revokeObjectURL(url), REVOCAR_MS);
   }
 
   async function compartir(datos, imagen, meta) {
