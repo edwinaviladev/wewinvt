@@ -21,6 +21,7 @@
     />
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/paleta-editorial.css" />
+    <link rel="stylesheet" href="css/gallery-filters.css" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="WewinVT" />
@@ -82,7 +83,29 @@
           </p>
         </div>
 
-        <section class="gallery-section" aria-labelledby="fanarts-titulo">
+        <div class="gallery-filters" role="group" aria-label="Filtros de la galería">
+          <label for="gallery-filter-type">
+            <span>Tipo de obra</span>
+            <select id="gallery-filter-type" data-gallery-type-filter>
+              <option value="all">Todos los tipos</option>
+              <option value="fanart">Fanarts</option>
+              <option value="emote">Emotes</option>
+            </select>
+          </label>
+          <label for="gallery-filter-artist">
+            <span>Artista</span>
+            <select id="gallery-filter-artist" data-gallery-artist-filter>
+              <option value="all">Todos los artistas</option>
+            </select>
+          </label>
+          <button class="button button-secondary gallery-filter-clear" data-gallery-clear type="button">Limpiar filtros</button>
+          <p class="gallery-filter-count" data-gallery-filter-count aria-live="polite"></p>
+        </div>
+        <p class="gallery-empty" data-gallery-empty role="status" hidden>
+          No hay obras con esos filtros. Prueba otra combinación.
+        </p>
+
+        <section class="gallery-section" data-gallery-section="fanart" aria-labelledby="fanarts-titulo">
           <div class="gallery-section__heading" data-animate>
             <p class="eyebrow">01 / Obras de la comunidad</p>
             <h2 id="fanarts-titulo">Fanarts de la comunidad</h2>
@@ -96,7 +119,7 @@
           </p>
         </section>
 
-        <section class="gallery-section" aria-labelledby="emotes-titulo">
+        <section class="gallery-section" data-gallery-section="emote" aria-labelledby="emotes-titulo">
           <div class="gallery-section__heading" data-animate>
             <p class="eyebrow">02 / Gestos del canal</p>
             <h2 id="emotes-titulo">Emotes de Wewin</h2>

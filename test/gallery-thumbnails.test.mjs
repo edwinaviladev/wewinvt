@@ -11,6 +11,7 @@ function element() {
     children: [],
     listeners: {},
     attributes: {},
+    dataset: {},
     style: {},
     addEventListener(name, listener) {
       this.listeners[name] = listener;

@@ -9,6 +9,10 @@
   var DATA = window.WEWIN || {};
   var emotes = DATA.emotes || [];
   var fanarts = DATA.fanarts || [];
+  var visibleIndexes = {
+    emote: emotes.map(function (_item, index) { return index; }),
+    fanart: fanarts.map(function (_item, index) { return index; }),
+  };
 
   /**
    * Placeholder de 1px (SVG transparente) para el <img> del lightbox cuando
@@ -70,6 +74,9 @@
   function buildItem(item, listName, index) {
     var li = document.createElement('li');
     li.className = listName === 'emote' ? 'emote-tile' : 'fanart-card';
+    li.dataset.tipo = listName;
+    li.dataset.artista = item.artista || '';
+    li.dataset.index = String(index);
 
     var button = document.createElement('button');
     button.type = 'button';
@@ -128,6 +135,70 @@
     });
   }
 
+  var typeFilter = document.querySelector('[data-gallery-type-filter]');
+  var artistFilter = document.querySelector('[data-gallery-artist-filter]');
+  var clearFilters = document.querySelector('[data-gallery-clear]');
+  var filterCount = document.querySelector('[data-gallery-filter-count]');
+  var filterEmpty = document.querySelector('[data-gallery-empty]');
+
+  if (typeFilter && artistFilter) {
+    var artistNames = Array.from(new Set(emotes.concat(fanarts)
+      .map(function (item) { return item.artista; })
+      .filter(Boolean)))
+      .sort(function (a, b) { return a.localeCompare(b, 'es', { sensitivity: 'base' }); });
+
+    artistNames.forEach(function (name) {
+      var option = document.createElement('option');
+      option.value = name;
+      option.textContent = name;
+      artistFilter.appendChild(option);
+    });
+
+    var gallerySections = Array.prototype.slice.call(
+      document.querySelectorAll('[data-gallery-section]')
+    );
+
+    function applyFilters() {
+      var tipoElegido = typeFilter.value;
+      var artistaElegido = artistFilter.value;
+      var actualizados = { emote: [], fanart: [] };
+      var totalVisible = 0;
+
+      gallerySections.forEach(function (section) {
+        var tipo = section.dataset.gallerySection;
+        var list = section.querySelector('ul');
+        var visiblesEnSeccion = 0;
+        Array.prototype.forEach.call(list ? list.children : [], function (item) {
+          var visible =
+            (tipoElegido === 'all' || tipoElegido === tipo) &&
+            (artistaElegido === 'all' || artistaElegido === item.dataset.artista);
+          item.hidden = !visible;
+          if (visible) {
+            actualizados[tipo].push(Number(item.dataset.index));
+            visiblesEnSeccion += 1;
+            totalVisible += 1;
+          }
+        });
+        section.hidden = visiblesEnSeccion === 0;
+      });
+
+      visibleIndexes = actualizados;
+      if (filterCount) filterCount.textContent = totalVisible + (totalVisible === 1 ? ' obra' : ' obras');
+      if (filterEmpty) filterEmpty.hidden = totalVisible > 0;
+    }
+
+    typeFilter.addEventListener('change', applyFilters);
+    artistFilter.addEventListener('change', applyFilters);
+    if (clearFilters) {
+      clearFilters.addEventListener('click', function () {
+        typeFilter.value = 'all';
+        artistFilter.value = 'all';
+        applyFilters();
+      });
+    }
+    applyFilters();
+  }
+
   /* ------------------------------------------------------------------ */
   /* Lightbox                                                            */
   /* ------------------------------------------------------------------ */
@@ -151,7 +222,9 @@
 
   /** Pinta la leyenda: autor como enlace si existe; si no, la descripción. */
   function renderLightbox() {
-    var item = itemsFor(currentList)[currentIndex];
+    var index = (visibleIndexes[currentList] || [])[currentIndex];
+    var item = itemsFor(currentList)[index];
+    if (!item) return;
     lightboxImg.src = item.src;
     lightboxImg.alt = item.alt;
     lightboxCaption.textContent = '';
@@ -175,8 +248,11 @@
   }
 
   function openLightbox(listName, index, trigger) {
+    var visible = visibleIndexes[listName] || [];
+    var visibleIndex = visible.indexOf(index);
+    if (visibleIndex === -1) return;
     currentList = listName;
-    currentIndex = index;
+    currentIndex = visibleIndex;
     lastTrigger = trigger || null;
     renderLightbox();
     lightbox.hidden = false;
@@ -197,8 +273,9 @@
   }
 
   function step(direction) {
-    var items = itemsFor(currentList);
-    currentIndex = (currentIndex + direction + items.length) % items.length;
+    var visible = visibleIndexes[currentList] || [];
+    if (!visible.length) return;
+    currentIndex = (currentIndex + direction + visible.length) % visible.length;
     renderLightbox();
   }
 
