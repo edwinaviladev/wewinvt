@@ -2,7 +2,7 @@
 
 File locator: `odd/tasks/site-improvements.md`. Engram mirror: `odd/site-improvements/tasks`.
 
-Audited against the current branch on 2026-11-03. P1-P4, C1-C4, L1-L6, D1-D3 and A5 are implemented; unchecked items remain pending. The user chooses what to build next.
+Audited against the current branch on 2026-11-03. P1-P4, C1-C4, L1-L6, D1-D3, A1 and A5 are implemented; unchecked items remain pending. The user chooses what to build next.
 
 ## Starting point
 - `origin/master` includes the hardening work (PR #7). In production, `/worker.js`, `/README.md` and the image originals answer 404, `boceto-lapiz.webp` is 303924 bytes, and security and cache headers are live.
@@ -43,7 +43,7 @@ These ideas come from the code and the published text. The pages were not review
 - [x] D3 Check cross-platform social preview support. Social bots received the WebP, and Microlink parsed it, but Meta documents only JPEG/GIF/PNG for `og:image:type`; authenticated platform debuggers were unavailable for a visual check. Use the 1200×630 PNG as the safer default and keep WebP public for cached shares.
 
 ## Animation
-- [ ] A1 Add page transitions with `@view-transition`, which need no JS. Not used today.
+- [x] A1 Add CSS-only cross-document page transitions with `@view-transition`, enabled only when reduced motion is not requested. Public pages opt in; OBS overlay pages stay unchanged.
 - [ ] A2 Move a card from the album grid into its detail view with View Transitions.
 - [ ] A3 Add scroll reveals with `animation-timeline`, no libraries.
 - [ ] A4 Give the hero avatar some life: a blink, or a reaction on hover.
@@ -62,4 +62,4 @@ These touch the server redemption and existing collections, so design them caref
 - [ ] H3 Four non-blocking review findings on `test/site-config.test.mjs`: the inline-handler regex can give false positives and miss cases; an image prefix stored in a constant goes unseen; a header repeated inside one rule is not detected; the ignore-rule matcher accepts unsupported syntax silently. The recommendation was to leave them unless one causes trouble.
 
 ## Next step
-The first batch (P1-P3, C1), P4, C2-C4, L1-L6 and D1-D3 are complete. The next pending item by order is A1; the user chooses what to build next.
+The first batch (P1-P3, C1), P4, C2-C4, L1-L6, D1-D3 and A1 are complete. The next pending item by order is A2; the user chooses what to build next.
