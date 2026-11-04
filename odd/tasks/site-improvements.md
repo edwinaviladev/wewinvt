@@ -2,7 +2,7 @@
 
 File locator: `odd/tasks/site-improvements.md`. Engram mirror: `odd/site-improvements/tasks`.
 
-Audited against the current branch on 2026-11-03. P1-P4, C1-C4, L1-L5 and A5 are implemented; unchecked items remain pending. The user chooses what to build next.
+Audited against the current branch on 2026-11-03. P1-P4, C1-C4, L1-L6 and A5 are implemented; unchecked items remain pending. The user chooses what to build next.
 
 ## Starting point
 - `origin/master` includes the hardening work (PR #7). In production, `/worker.js`, `/README.md` and the image originals answer 404, `boceto-lapiz.webp` is 303924 bytes, and security and cache headers are live.
@@ -35,7 +35,7 @@ These ideas come from the code and the published text. The pages were not review
 - [x] L3 Add an artists page grouping the emotes and fanarts by artist, linking to profiles where available.
 - [x] L4 Add gallery filters by artist and type of work; combined filters update counts and the lightbox stays within visible results.
 - [x] L5 Add filters for missing cards and rarity, plus progress per set. Current cards default to Serie 1; filters combine without losing set or rarity progress.
-- [ ] L6 Give `/sobre` an OG image and add it to `sitemap.xml`.
+- [x] L6 Give `/sobre` an OG image and add it to `sitemap.xml`. Reuse the published image, add canonical/social metadata, and remove `noindex` so the sitemap agrees with page directives.
 
 ## Visual design
 - [ ] D1 Give the fanart mosaic hierarchy, with some pieces at double size. The gallery already uses CSS columns; deliberate double-size hierarchy remains.
@@ -62,4 +62,4 @@ These touch the server redemption and existing collections, so design them caref
 - [ ] H3 Four non-blocking review findings on `test/site-config.test.mjs`: the inline-handler regex can give false positives and miss cases; an image prefix stored in a constant goes unseen; a header repeated inside one rule is not detected; the ignore-rule matcher accepts unsupported syntax silently. The recommendation was to leave them unless one causes trouble.
 
 ## Next step
-The first batch (P1-P3, C1), P4, C2-C4 and L1-L5 are complete. The next pending item by order is L6; the user chooses what to build next.
+The first batch (P1-P3, C1), P4, C2-C4 and L1-L6 are complete. The next pending item by order is D1; the user chooses what to build next.
