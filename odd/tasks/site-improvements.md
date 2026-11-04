@@ -2,7 +2,7 @@
 
 File locator: `odd/tasks/site-improvements.md`. Engram mirror: `odd/site-improvements/tasks`.
 
-Audited against the current branch on 2026-11-03. P1-P4, C1-C4, L1-L6, D1 and A5 are implemented; unchecked items remain pending. The user chooses what to build next.
+Audited against the current branch on 2026-11-03. P1-P4, C1-C4, L1-L6, D1-D2 and A5 are implemented; unchecked items remain pending. The user chooses what to build next.
 
 ## Starting point
 - `origin/master` includes the hardening work (PR #7). In production, `/worker.js`, `/README.md` and the image originals answer 404, `boceto-lapiz.webp` is 303924 bytes, and security and cache headers are live.
@@ -39,7 +39,7 @@ These ideas come from the code and the published text. The pages were not review
 
 ## Visual design
 - [x] D1 Give the fanart mosaic hierarchy, with some pieces at double size. Two selected landscape pieces span the masonry columns at up to 40rem wide; filters and lightbox order remain unchanged.
-- [ ] D2 Add manga details in separators: panels, onomatopoeia, screentones.
+- [x] D2 Add manga details in section separators: bordered panels, dot and speed-line screentones, and aria-hidden onomatopoeias.
 - [ ] D3 Check whether social previews render correctly. `og:image` points at a WebP, which some crawlers may not read. If they fail, publish a PNG again and update the meta tags and `.assetsignore`.
 
 ## Animation
@@ -62,4 +62,4 @@ These touch the server redemption and existing collections, so design them caref
 - [ ] H3 Four non-blocking review findings on `test/site-config.test.mjs`: the inline-handler regex can give false positives and miss cases; an image prefix stored in a constant goes unseen; a header repeated inside one rule is not detected; the ignore-rule matcher accepts unsupported syntax silently. The recommendation was to leave them unless one causes trouble.
 
 ## Next step
-The first batch (P1-P3, C1), P4, C2-C4, L1-L6 and D1 are complete. The next pending item by order is D2; the user chooses what to build next.
+The first batch (P1-P3, C1), P4, C2-C4, L1-L6 and D1-D2 are complete. The next pending item by order is D3; the user chooses what to build next.
