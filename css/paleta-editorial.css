@@ -765,16 +765,31 @@ h3 {
   column-gap: clamp(1rem, 2.5vw, 2rem);
 }
 
+.fanart-card--featured {
+  column-span: all;
+  width: min(100%, 40rem);
+  margin-inline: auto;
+}
+
 .fanart-card .tile-btn {
   border: 0;
   border-radius: 0;
   background: var(--color-surface);
 }
 
+.fanart-card--featured .tile-btn {
+  border-bottom: 2px solid var(--color-accent);
+}
+
 .fanart-card img {
   max-width: 100%;
   max-height: none;
   object-fit: contain;
+}
+
+.fanart-card--featured .tile-credit {
+  margin-top: 0.65rem;
+  font-size: 0.72rem;
 }
 
 .tile-credit {

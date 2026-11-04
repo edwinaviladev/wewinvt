@@ -67,13 +67,18 @@
     img.srcset = candidates.join(', ');
     img.sizes = listName === 'emote'
       ? '(max-width: 480px) 30vw, 96px'
-      : '(max-width: 600px) calc(100vw - 3rem), (max-width: 900px) 45vw, 290px';
+      : item.destacada
+        ? '(max-width: 600px) calc(100vw - 3rem), 640px'
+        : '(max-width: 600px) calc(100vw - 3rem), (max-width: 900px) 45vw, 290px';
     img.src = candidates[0].split(' ')[0];
   }
 
   function buildItem(item, listName, index) {
     var li = document.createElement('li');
-    li.className = listName === 'emote' ? 'emote-tile' : 'fanart-card';
+    var featuredFanart = listName === 'fanart' && item.destacada;
+    li.className = listName === 'emote'
+      ? 'emote-tile'
+      : 'fanart-card' + (featuredFanart ? ' fanart-card--featured' : '');
     li.dataset.tipo = listName;
     li.dataset.artista = item.artista || '';
     li.dataset.index = String(index);
