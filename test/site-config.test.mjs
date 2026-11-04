@@ -95,6 +95,7 @@ test("the CSP allows the external origins the site connects to", () => {
   assert.ok(directiva("style-src").includes("https://fonts.googleapis.com"));
   assert.ok(directiva("font-src").includes("https://fonts.gstatic.com"));
   assert.ok(directiva("frame-src").includes("https://player.twitch.tv"));
+  assert.ok(directiva("frame-src").includes("https://clips.twitch.tv"));
 });
 
 test("each header is set by a single rule and nothing is immutable", () => {

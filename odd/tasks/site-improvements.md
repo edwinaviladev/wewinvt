@@ -2,7 +2,7 @@
 
 File locator: `odd/tasks/site-improvements.md`. Engram mirror: `odd/site-improvements/tasks`.
 
-Audited against the current branch on 2026-11-03. P1-P4, C1-C4, L1 and A5 are implemented; unchecked items remain pending. The user chooses what to build next.
+Audited against the current branch on 2026-11-03. P1-P4, C1-C4, L1-L2 and A5 are implemented; unchecked items remain pending. The user chooses what to build next.
 
 ## Starting point
 - `origin/master` includes the hardening work (PR #7). In production, `/worker.js`, `/README.md` and the image originals answer 404, `boceto-lapiz.webp` is 303924 bytes, and security and cache headers are live.
@@ -31,7 +31,7 @@ These ideas come from the code and the published text. The pages were not review
 
 ## Page composition
 - [x] L1 Make the hero change when the channel is live, with the player in front and a clear indicator. `js/main.js` updates the signal panel and inserts the Twitch player when live.
-- [ ] L2 Add a section of featured clips.
+- [x] L2 Add a section of four featured Twitch clips with direct links and a CSP allowance for the embed host.
 - [ ] L3 Add an artists page grouping work by artist with their links. Credits already exist in `js/data.js`.
 - [ ] L4 Add gallery filters by artist or type of work.
 - [ ] L5 Add filters for missing cards and rarity, plus progress per set. The album already groups by rarity and shows overall/per-rarity counts; these are not filters or per-set progress.
@@ -62,4 +62,4 @@ These touch the server redemption and existing collections, so design them caref
 - [ ] H3 Four non-blocking review findings on `test/site-config.test.mjs`: the inline-handler regex can give false positives and miss cases; an image prefix stored in a constant goes unseen; a header repeated inside one rule is not detected; the ignore-rule matcher accepts unsupported syntax silently. The recommendation was to leave them unless one causes trouble.
 
 ## Next step
-The first batch (P1, P2, P3 and C1), P4 and C2-C4 are complete. The next pending item by order is L2; the user chooses what to build next.
+The first batch (P1, P2, P3 and C1), P4 and C2-C4 are complete. L2 is complete; the next pending item by order is L3.
