@@ -198,7 +198,8 @@ test("the renderer rejects without a 2D context or a PNG blob", async () => {
 
 test("the renderer reads its rarities from the card module, loaded first", () => {
   assert.match(cartaSource, /window\.CartaWewin = \{[^}]*\bRAREZAS\b/);
-  assert.ok(albumHtml.indexOf("js/carta.js") < albumHtml.indexOf("js/album-share.js"));
+  const carta = albumHtml.indexOf("js/carta.js");
+  assert.ok(carta >= 0 && carta < albumHtml.indexOf("js/album-share.js"));
 });
 
 /* El detalle real de album.js, con su botón de compartir, sobre un DOM mínimo */
