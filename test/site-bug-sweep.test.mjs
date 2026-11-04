@@ -25,3 +25,12 @@ test("images with width and height attributes keep their ratio in the CSS", () =
   assert.match(emote, /height:\s*auto/);
   assert.match(emote, /aspect-ratio:\s*1/);
 });
+
+test("the lightbox caption text does not match its background", () => {
+  const caption = regla(leer("css/paleta-editorial.css"), ".lb-caption");
+  const fondo = caption.match(/background:\s*([^;]+);/);
+  const color = caption.match(/(?:^|\s)color:\s*([^;]+);/);
+  assert.ok(fondo, "the editorial palette must set the caption background");
+  assert.notEqual(fondo[1], color[1]);
+  assert.notEqual(fondo[1], "var(--surface-strong)");
+});
