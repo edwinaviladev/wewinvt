@@ -333,6 +333,26 @@
     return transicion;
   }
 
+  async function compartirCarta(datos, imagen, boton, estado) {
+    /* aria-disabled y no disabled: desactivarlo tiraría el foco del teclado al body */
+    if (boton.getAttribute("aria-disabled") === "true") return;
+    boton.setAttribute("aria-disabled", "true");
+    estado.textContent = "Preparando la imagen…";
+    try {
+      const resultado = await window.AlbumShare.compartir(datos, imagen, {
+        numero: numeroDe(datos),
+        total: CATALOGO.length,
+      });
+      if (resultado === "shared") estado.textContent = "Carta compartida. ¡Gracias!";
+      else if (resultado === "cancelled") estado.textContent = "Se canceló el envío.";
+      else estado.textContent = "PNG descargado. Adjunta la imagen en Discord o X.";
+    } catch {
+      estado.textContent = "No se pudo preparar la imagen. Inténtalo de nuevo.";
+    } finally {
+      boton.removeAttribute("aria-disabled");
+    }
+  }
+
   function abrirDetalle(datos, origen) {
     const enlaceArtista = datos.enlace
       ? `<a href="${datos.enlace}" target="_blank" rel="noreferrer">${datos.artista || "Anónimo"}</a>`
@@ -354,8 +374,20 @@
         <p class="detalle-dato"><span>Número</span><b>${numeroDe(datos)}</b></p>
         <p class="detalle-dato"><span>Artista</span><b>${enlaceArtista}</b></p>
         <p class="detalle-dato"><span>Obtenida</span><b>×${obtenidas(datos.id)}</b></p>
+        ${obtenidas(datos.id) > 0 ? `
+        <div class="detalle-compartir">
+          <button class="btn btn--ghost" data-compartir type="button">Compartir como imagen</button>
+          <p class="detalle-compartir-ayuda">Se abre el menú de compartir si está disponible; si no, se descarga un PNG para adjuntarlo.</p>
+          <p class="detalle-compartir-estado" data-compartir-estado aria-live="polite"></p>
+        </div>` : ""}
       `;
       if (datos.lore) cajaInfo.querySelector(".detalle-lore").textContent = datos.lore;
+      /* Las novedades muestran cartas que quizá no se tienen: esas no se comparten */
+      const botonCompartir = cajaInfo.querySelector("[data-compartir]");
+      const estadoCompartir = cajaInfo.querySelector("[data-compartir-estado]");
+      botonCompartir?.addEventListener("click", () => {
+        compartirCarta(datos, carta.querySelector(".card__arte"), botonCompartir, estadoCompartir);
+      });
 
       detalle.hidden = false;
       document.body.classList.add("sin-scroll");

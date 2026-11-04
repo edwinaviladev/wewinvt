@@ -429,6 +429,25 @@ body.sin-scroll { overflow: hidden !important; }
 .detalle-dato b { color: var(--text); }
 .detalle-dato a { color: var(--mint); }
 
+.detalle-compartir {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+.detalle-compartir-ayuda,
+.detalle-compartir-estado {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.detalle-compartir-estado:empty { display: none; }
+
 .detalle-cerrar {
   position: absolute;
   top: 18px;
@@ -754,6 +773,26 @@ body.album-page .detalle-dato a {
 
 body.album-page .detalle-cerrar {
   color: #fffcf6;
+}
+
+body.album-page .detalle-compartir .btn--ghost {
+  border-color: #d9c8b5;
+  color: #fffcf6;
+}
+
+body.album-page .detalle-compartir .btn--ghost:hover {
+  border-color: #fffcf6;
+  background: rgb(255 252 246 / 12%);
+}
+
+body.album-page .detalle-compartir .btn--ghost[aria-disabled="true"] {
+  opacity: 0.65;
+  cursor: progress;
+}
+
+body.album-page .detalle-compartir-ayuda,
+body.album-page .detalle-compartir-estado {
+  color: #d9c8b5;
 }
 
 @media (max-width: 640px) {

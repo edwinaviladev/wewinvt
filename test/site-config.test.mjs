@@ -152,7 +152,7 @@ test(".assetsignore keeps non-site files out and the site files in", () => {
   ]) {
     assert.ok(excluido(ruta), `${ruta} should be excluded`);
   }
-  for (const ruta of ["_headers", ...paginas, "robots.txt", "sitemap.xml", "favicon.webp", "js/main.js", "css/styles.css", "img/avatar.webp", "img/og-wewin.png", "img/og-wewin.webp"]) {
+  for (const ruta of ["_headers", ...paginas, "robots.txt", "sitemap.xml", "favicon.webp", "js/main.js", "js/album-share.js", "css/styles.css", "img/avatar.webp", "img/og-wewin.png", "img/og-wewin.webp"]) {
     assert.ok(!excluido(ruta), `${ruta} should be published`);
   }
 });

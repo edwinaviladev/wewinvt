@@ -2,7 +2,7 @@
 
 File locator: `odd/tasks/site-improvements.md`. Engram mirror: `odd/site-improvements/tasks`.
 
-Audited against the current branch on 2026-11-03. P1-P4, C1-C4, L1-L6, D1-D3 and A1-A5 are implemented; unchecked items remain pending. The user chooses what to build next.
+Audited against the current branch on 2026-11-03. P1-P4, C1-C4, L1-L6, D1-D3, A1-A5 and M1 are implemented; unchecked items remain pending. The user chooses what to build next.
 
 ## Starting point
 - `origin/master` includes the hardening work (PR #7). In production, `/worker.js`, `/README.md` and the image originals answer 404, `boceto-lapiz.webp` is 303924 bytes, and security and cache headers are live.
@@ -51,7 +51,7 @@ These ideas come from the code and the published text. The pages were not review
 
 ## Album mechanics
 These touch the server redemption and existing collections, so design them carefully first.
-- [ ] M1 Share a card as an image to Discord or X. Likely the best free promotion.
+- [x] M1 Share a card as a PNG image: use the native file-share sheet when supported, with a download fallback for manual upload to Discord or X. Only owned cards offer sharing. Verified with `node --test` and the download path in a browser; see H4 for the native sheet.
 - [ ] M2 Add sets with a reward, such as a badge.
 - [ ] M3 Add a public collection page per person, and later a collectors ranking.
 - [ ] M4 Give duplicates a use, for example trading five for a pack.
@@ -60,6 +60,7 @@ These touch the server redemption and existing collections, so design them caref
 - [ ] H1 Exercise a full Twitch login, a real redemption, a full pack opening in `/overlay`, and the player with the channel live under the CSP. Not tested so far.
 - [ ] H2 Check the browser console for CSP errors on production pages. Verified only under `wrangler dev`.
 - [ ] H3 Four non-blocking review findings on `test/site-config.test.mjs`: the inline-handler regex can give false positives and miss cases; an image prefix stored in a constant goes unseen; a header repeated inside one rule is not detected; the ignore-rule matcher accepts unsupported syntax silently. The recommendation was to leave them unless one causes trouble.
+- [ ] H4 Try the M1 native share sheet on a real phone, and the download under the production CSP. Not tested so far: the test browser has no `navigator.share` and the local server does not apply `_headers`.
 
 ## Next step
-The first batch (P1-P3, C1), P4, C2-C4, L1-L6, D1-D3 and A1-A5 are complete. The next pending item by order is M1; the user chooses what to build next.
+The first batch (P1-P3, C1), P4, C2-C4, L1-L6, D1-D3, A1-A5 and M1 are complete. The next pending item by order is M2; the user chooses what to build next.
