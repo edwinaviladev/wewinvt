@@ -151,3 +151,14 @@ test("collection ids from the URL never reach innerHTML", () => {
 test("variant empty message is built from the collection name", () => {
   assert.match(albumSource, /Aún no tienes cartas \$\{coleccionInfo\.nombre\}\. Cada carta puede salir en versión \$\{coleccionInfo\.nombre\} al canjear el gacha\./);
 });
+
+test("novedades belongs to the normal album and links to the holo tab", () => {
+  assert.match(albumHtml, /Una muestra de cada rareza; cada versión se colecciona en su propio álbum\./);
+  assert.doesNotMatch(albumHtml, /Todas siguen en el catálogo completo/);
+  assert.match(albumHtml, /<button[^>]*data-ver-holo[^>]*>Ver álbum Holo<\/button>/);
+  assert.match(albumHtml, /href="#catalogo-cartas">Ver catálogo completo/);
+  assert.match(albumSource, /novedades\.hidden = coleccionActiva !== "normales"/);
+  assert.match(albumSource, /botonVerHolo\.hidden = !COLECCION_HOLO/);
+  assert.match(albumSource, /botonVerHolo\?\.addEventListener\("click"/);
+  assert.match(albumSource, /activarColeccion\(COLECCION_HOLO\.id, \{ enfocar: true \}\)/);
+});

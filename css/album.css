@@ -795,6 +795,9 @@ body.album-page .album-novedades__variantes > p {
 }
 
 body.album-page .album-novedades__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
   margin: 1.25rem 0 0;
 }
 
