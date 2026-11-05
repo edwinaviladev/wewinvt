@@ -760,7 +760,14 @@ body.album-page .album-conjunto__barra i {
   background: var(--album-accent);
 }
 
-/* ---------- Filtros ---------- */
+/* ---------- Filtros: barra de herramientas ---------- */
+
+body.album-page .album-filtros {
+  align-items: end;
+  justify-content: flex-start;
+  gap: 0.75rem 1rem;
+  margin: 1.75rem 0 1rem;
+}
 
 body.album-page .album-filtros > label:not(.album-filtro-toggle) {
   color: var(--album-muted);
@@ -786,21 +793,25 @@ body.album-page .album-filtro-toggle input {
 }
 
 body.album-page .album-filtro-resultados {
+  flex-basis: auto;
+  align-self: center;
+  margin-left: 0.25rem;
   color: var(--album-muted);
+  text-align: left;
 }
 
 body.album-page .album-filtro-vacio {
   color: var(--album-accent-text);
 }
 
-/* ---------- Secciones por rareza ---------- */
+/* ---------- Secciones por rareza: cartas directo sobre la página ---------- */
 
 body.album-page .album-seccion {
-  margin: 2rem 0;
-  padding: clamp(1rem, 2vw, 1.5rem);
-  border: 1px solid color-mix(in srgb, var(--c) 40%, var(--album-line));
-  border-radius: 0.2rem;
-  background: var(--album-surface);
+  margin: 2.5rem 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
   box-shadow: none;
 }
 
@@ -832,6 +843,10 @@ body.album-page .album-rareza .linea {
   opacity: 1;
 }
 
+body.album-page .album-grid {
+  justify-content: start;
+}
+
 /* Cartas aún sin descubrir: el reverso apenas se despega de la página oscura */
 body.album-page .card--locked .card__face--back {
   background-color: #24201e;
@@ -839,49 +854,67 @@ body.album-page .card--locked .card__face--back {
   filter: brightness(0.8);
 }
 
-/* ---------- Novedades ---------- */
+/* ---------- Novedades: banda compacta ---------- */
 
 body.album-page .album-novedades {
   --c: var(--album-accent);
+  --album-card-size: clamp(150px, 13vw, 176px);
+  margin: 0 0 2rem;
+  padding: 1rem 1.5rem 1.25rem;
+  border: 1px solid var(--album-line);
+  background: var(--album-surface);
 }
 
-body.album-page .album-novedades__copy {
-  max-width: 52rem;
-  margin: -0.5rem 0 1.5rem;
-  color: var(--album-muted);
+body.album-page .album-novedades .album-rareza {
+  margin-bottom: 1rem;
+}
+
+.album-novedades__cuerpo {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+body.album-page .album-novedades__destacada {
+  justify-content: start;
 }
 
 body.album-page .album-novedades__variantes {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--album-line);
+  min-width: 0;
+  padding-left: 1.5rem;
+  border-left: 1px solid var(--album-line);
 }
 
 body.album-page .album-novedades__variantes h3 {
-  margin: 0 0 0.35rem;
+  margin: 0 0 0.2rem;
   color: var(--album-text);
   font-family: var(--font-heading);
-  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  font-size: 1.15rem;
 }
 
 body.album-page .album-novedades__variantes > p {
-  margin: 0 0 1rem;
+  margin: 0 0 0.5rem;
   color: var(--album-muted);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .album-novedades__carrusel {
-  --holo-card-size: clamp(160px, 18vw, 210px);
+  --holo-card-size: clamp(150px, 13vw, 176px);
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: var(--holo-card-size);
   grid-template-rows: auto;
-  gap: clamp(0.75rem, 2vw, 1.25rem);
+  gap: clamp(0.75rem, 1.5vw, 1.1rem);
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  padding: 0.5rem 0.25rem 1rem;
+  padding: 0.25rem 0.25rem 0.75rem;
   scroll-snap-type: x mandatory;
   scrollbar-color: var(--album-accent) transparent;
+}
+
+.album-novedades__carrusel:focus-visible {
+  outline-offset: -2px;
 }
 
 .album-novedades__carrusel .card {
@@ -890,11 +923,30 @@ body.album-page .album-novedades__variantes > p {
   touch-action: pan-x;
 }
 
+body.album-page .album-novedades__pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-top: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--album-line);
+}
+
+body.album-page .album-novedades__copy {
+  flex: 1 1 24rem;
+  max-width: 44rem;
+  margin: 0;
+  color: var(--album-muted);
+  font-size: 0.9rem;
+}
+
 body.album-page .album-novedades__acciones {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-  margin: 1.25rem 0 0;
+  margin: 0;
 }
 
 /* ---------- Pie ---------- */
@@ -991,6 +1043,20 @@ body.album-page .detalle-compartir-estado {
 
 /* ---------- Teléfono ---------- */
 
+@media (max-width: 760px) {
+  .album-novedades__cuerpo {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  body.album-page .album-novedades__variantes {
+    padding-top: 1rem;
+    padding-left: 0;
+    border-top: 1px solid var(--album-line);
+    border-left: 0;
+  }
+}
+
 @media (max-width: 640px) {
   body.album-page .album-head {
     margin-bottom: 1.5rem;
@@ -1005,8 +1071,30 @@ body.album-page .detalle-compartir-estado {
     padding: 1rem;
   }
 
+  body.album-page .album-filtros {
+    gap: 0.75rem;
+  }
+
+  body.album-page .album-filtro-resultados {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+
+  body.album-page .album-seccion {
+    margin: 1.75rem 0;
+    padding: 0;
+  }
+
+  body.album-page .album-novedades {
+    padding: 0.85rem 1rem 1rem;
+  }
+
   .album-novedades__carrusel {
     --holo-card-size: clamp(126px, 40vw, 160px);
+  }
+
+  body.album-page .album-novedades__acciones .btn {
+    flex: 1 1 auto;
   }
 }
 
