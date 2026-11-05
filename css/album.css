@@ -1000,6 +1000,10 @@ body.album-page .detalle-dato b {
   color: #fffcf6;
 }
 
+body.album-page .detalle-info h3 {
+  font-family: var(--font-heading);
+}
+
 body.album-page .detalle-lore {
   border-left-color: var(--album-accent);
   color: var(--album-accent-text);

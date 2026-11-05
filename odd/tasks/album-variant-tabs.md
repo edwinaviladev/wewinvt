@@ -70,6 +70,7 @@ The catalog holds a base and a Holo version of every card, mixed in one grid wit
 - T8 layout: at 1280px, Novedades is 463px high (was 1,009px), the page went from 6,297px to 5,411px, and the bar shows fills per rarity after a tab switch. At 375px there is no horizontal overflow and Novedades stacks at 843px.
 - Review over `72ae54c..f3ce4d2`: medium risk from `album.html`, user granted consent, reliability lens approved with no blocker. Its three findings are resolved: bar segments now persist between renders, the carousel focus selector wins, and the criterion allows dimmed backs on undiscovered cards.
 - Findings evidence: 121 tests pass. In a browser, `transitionrun` fires for the three segments whose width changes on a tab switch and none fires on a filter change; the keyboard-focused carousel has a -2px outline offset.
+- Combined review over `174c4c6..764024c`: approved. Its finding about dropped engine tokens was measured by comparing computed styles with and without the old tokens: card faces and all colors match; only font fallbacks differ, and the card detail title had moved to Big Shoulders. The title is back on the editorial heading font.
 - Not verified: hover states by eye, the fill animation on first page load, a catalog with 2 or more series in a browser (covered by tests), real touch devices, production.
 
 ## Next step
