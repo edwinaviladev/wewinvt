@@ -21,9 +21,9 @@ Three palettes coexist: cream on home, gallery, artists and 404; charcoal on `/a
 - Push, pull request and merge remain the user's decisions.
 
 ## Tasks
-- [ ] T1 `css/paleta-editorial.css`, `css/album.css`, tests: one source of palette tokens, dark by default, with `/album` reading from it. Route: delegated (writer trigger, 2+ non-trivial files).
-- [ ] T2 `css/styles.css`, `css/paleta-editorial.css`, `css/home-cards.css`, `css/gallery-filters.css`, `css/artistas.css`, page metas: home, gallery, artists, 404, header and footer. Route: delegated, same writer.
-- [ ] T3 `sobre.html`, `css/sobre.css`, tests: `/sobre` page palette, leaving both overlay pages untouched. Route: delegated, same writer.
+- [x] T1 `css/paleta-editorial.css`, `css/album.css`, tests: one source of palette tokens, dark by default, with `/album` reading from it. Route: delegated (writer trigger, 2+ non-trivial files).
+- [x] T2 `css/styles.css`, `css/paleta-editorial.css`, `css/home-cards.css`, `css/gallery-filters.css`, `css/artistas.css`, page metas: home, gallery, artists, 404, header and footer. Route: delegated, same writer.
+- [x] T3 `sobre.html`, `css/sobre.css`, tests: `/sobre` page palette, leaving both overlay pages untouched. Route: delegated, same writer.
 - [ ] T4 Verify every page in a browser at desktop and phone widths, including contrast and the overlay pages. Route: inline.
 
 ## Acceptance criteria
@@ -38,7 +38,10 @@ Three palettes coexist: cream on home, gallery, artists and 404; charcoal on `/a
 `node --test test/*.test.mjs`, plus a browser walk of all pages at both widths with a computed contrast audit.
 
 ## Progress and evidence
-None yet.
+- T1 `a0cd58a`: tokens in `css/paleta-editorial.css` are the single source (added control, accent-text, on-accent, surface-hover, art-mat); `/album` aliases point at them; cream-header workaround removed; duplicate color tokens removed from `css/styles.css`. `node --test test/*.test.mjs`: 123 pass, 0 fail.
+- T2 `3e2b219`: home, gallery, artists, 404, header and footer on tokens; art mats on logo, avatar, home gallery, emote and fanart tiles, lightbox image, artist works and 404 emote; `theme-color` #1F1D1B on five pages. 126 pass, 0 fail.
+- T3 `c56a9eb`: `body.sobre-page` plus a scoped palette block in `css/sobre.css` (no `paleta-editorial.css` load, so fonts and layout stay); `theme-color` updated; overlay pages guarded by tests. 128 pass, 0 fail.
+- T4 pending: browser verification by the parent.
 
 ## Next step
-T1.
+T4: verify every page in a browser at desktop and phone widths.
