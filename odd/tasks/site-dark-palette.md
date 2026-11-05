@@ -24,7 +24,7 @@ Three palettes coexist: cream on home, gallery, artists and 404; charcoal on `/a
 - [x] T1 `css/paleta-editorial.css`, `css/album.css`, tests: one source of palette tokens, dark by default, with `/album` reading from it. Route: delegated (writer trigger, 2+ non-trivial files).
 - [x] T2 `css/styles.css`, `css/paleta-editorial.css`, `css/home-cards.css`, `css/gallery-filters.css`, `css/artistas.css`, page metas: home, gallery, artists, 404, header and footer. Route: delegated, same writer.
 - [x] T3 `sobre.html`, `css/sobre.css`, tests: `/sobre` page palette, leaving both overlay pages untouched. Route: delegated, same writer.
-- [ ] T4 Verify every page in a browser at desktop and phone widths, including contrast and the overlay pages. Route: inline.
+- [x] T4 Verify every page in a browser at desktop and phone widths, including contrast and the overlay pages. Route: inline.
 
 ## Acceptance criteria
 - Every in-scope page uses the same page, surface, text and accent colors, including its header and footer, and no cream area remains except art mats.
@@ -41,7 +41,12 @@ Three palettes coexist: cream on home, gallery, artists and 404; charcoal on `/a
 - T1 `a0cd58a`: tokens in `css/paleta-editorial.css` are the single source (added control, accent-text, on-accent, surface-hover, art-mat); `/album` aliases point at them; cream-header workaround removed; duplicate color tokens removed from `css/styles.css`. `node --test test/*.test.mjs`: 123 pass, 0 fail.
 - T2 `3e2b219`: home, gallery, artists, 404, header and footer on tokens; art mats on logo, avatar, home gallery, emote and fanart tiles, lightbox image, artist works and 404 emote; `theme-color` #1F1D1B on five pages. 126 pass, 0 fail.
 - T3 `c56a9eb`: `body.sobre-page` plus a scoped palette block in `css/sobre.css` (no `paleta-editorial.css` load, so fonts and layout stay); `theme-color` updated; overlay pages guarded by tests. 128 pass, 0 fail.
-- T4 pending: browser verification by the parent.
+- T4 local browser, 1280px and 375px, on index, emotes, artistas, album and 404: `#1f1d1b` page and header; every text style outside the cards measures at least 4.5:1; no horizontal overflow; no broken images. The only light areas left are art mats, the skip link and small rarity markers.
+- T4 `/sobre`: charcoal gradient page with the pack unchanged and no overflow. The audit's four low ratios there were false positives, since it compares against white when the background is a gradient; these colors measure about 7.5:1 on the page color.
+- T4 overlays: `css/sobre.css` only gained `body.sobre-page` rules, with no lines removed. `overlay.html` and `overlay-config.html` keep `#100b0a`, `--bg` `#120c0d` and `--rojo` `#d3142f`, and no HTML or JS changed there.
+- T4 also checked: lightbox mat, mobile menu with a real tap, and 404 emote mat.
+- Returning browsers can see the old palette until cached CSS expires, as happened locally; `/css/*` has a 10-minute `max-age` in production.
+- Not verified: hover states by eye, the full pack opening on `/sobre`, real touch devices, production. Tiles show their light mat while lazy images load.
 
 ## Next step
-T4: verify every page in a browser at desktop and phone widths.
+The user decides on push and pull request.
