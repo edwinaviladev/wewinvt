@@ -6,6 +6,39 @@
   if (!container) return;
 
   const thumbnailWidths = { emote: [64, 128, 256], fanart: [320, 640] };
+  // Artists with this many works or more get a full-width card.
+  const WIDE_CARD_MIN_WORKS = 4;
+  const PLATFORMS = [
+    { host: "twitch.tv", label: "Twitch" },
+    { host: "instagram.com", label: "Instagram" },
+  ];
+
+  function pluralize(count, singular, plural) {
+    return `${count} ${count === 1 ? singular : plural}`;
+  }
+
+  function countsText(works) {
+    const emotes = works.filter((work) => work.category === "Emote").length;
+    const fanarts = works.filter((work) => work.category === "Fanart").length;
+    return [
+      emotes ? pluralize(emotes, "emote", "emotes") : "",
+      fanarts ? pluralize(fanarts, "fanart", "fanarts") : "",
+    ]
+      .filter(Boolean)
+      .join(" · ");
+  }
+
+  // Returns the platform label for a profile URL, or "" when it is malformed.
+  function platformLabel(url) {
+    let hostname;
+    try {
+      hostname = new URL(url).hostname.toLowerCase();
+    } catch (error) {
+      return "";
+    }
+    const known = PLATFORMS.find(({ host }) => hostname === host || hostname.endsWith(`.${host}`));
+    return known ? known.label : "Perfil";
+  }
 
   function thumbnailPath(src, width) {
     const directory = src.slice(0, src.lastIndexOf("/") + 1);
@@ -33,7 +66,7 @@
       return;
     }
     img.srcset = candidates.join(", ");
-    img.sizes = "(max-width: 560px) 42vw, 160px";
+    img.sizes = "(max-width: 560px) 42vw, 180px";
     img.src = candidates[0].split(" ")[0];
   }
 
@@ -58,7 +91,7 @@
     .sort((a, b) => a.name.localeCompare(b.name, "es", { sensitivity: "base" }))
     .forEach((artist, index) => {
       const section = document.createElement("section");
-      section.className = "artist-card";
+      section.className = artist.works.length >= WIDE_CARD_MIN_WORKS ? "artist-card artist-card--wide" : "artist-card";
       section.setAttribute("aria-labelledby", `artist-${index}-title`);
 
       const header = document.createElement("header");
@@ -66,21 +99,24 @@
       const heading = document.createElement("h2");
       heading.className = "artist-card__title";
       heading.id = `artist-${index}-title`;
-      if (artist.link) {
-        const link = document.createElement("a");
-        link.href = artist.link;
-        link.target = "_blank";
-        link.rel = "noreferrer";
-        link.textContent = artist.name;
-        heading.appendChild(link);
-      } else {
-        heading.textContent = artist.name;
-      }
+      heading.textContent = artist.name;
 
       const count = document.createElement("p");
       count.className = "artist-card__count";
-      count.textContent = `${artist.works.length} ${artist.works.length === 1 ? "obra" : "obras"}`;
+      count.textContent = countsText(artist.works);
       header.append(heading, count);
+
+      const label = artist.link ? platformLabel(artist.link) : "";
+      if (label) {
+        const link = document.createElement("a");
+        link.className = "artist-card__profile";
+        link.href = artist.link;
+        link.target = "_blank";
+        link.rel = "noreferrer";
+        link.textContent = `${label} ↗`;
+        link.setAttribute("aria-label", `Perfil de ${artist.name} en ${label} (se abre en otra pestaña)`);
+        header.appendChild(link);
+      }
 
       const list = document.createElement("ul");
       list.className = "artist-works";
