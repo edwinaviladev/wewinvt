@@ -46,5 +46,10 @@ Holo is the only special variant. The user wants a premium tier, approved the lo
 - Reduced motion: unit tests cover no dust with the ribbon kept, and `css/sobre.css` hides glints and sweep. Not emulated live, because the browser tool cannot set that preference.
 - Not checked: real phone performance of the `color-dodge` layers, and draws through the deployed worker.
 
+- Native review over `3bac0e2..f619b91`: granted, one reliability lens, approved, acknowledged. Three non-blocking findings:
+  - Glint delays lost the cascade, so all four twinkled together. Confirmed and fixed after the review.
+  - Rarity sparks under reduced motion: dismissed, because `Chispas.emitir` already returns early when `REDUCED` is set (`js/sobre.js:413`).
+  - Gold markup had no repeatable test: added one. The reveal call sites still rely on the browser walk.
+
 ## Next step
 User decides on push and pull request.

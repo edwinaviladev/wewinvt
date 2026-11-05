@@ -811,9 +811,11 @@ body {
   background: radial-gradient(closest-side, #fff, #ffe6a0 60%, transparent);
   clip-path: polygon(50% 0, 54% 46%, 100% 50%, 54% 54%, 50% 100%, 46% 54%, 0 50%, 46% 46%);
   opacity: 0;
+  animation: none 4.2s ease-in-out infinite;
 }
 
-.card.is-viva .card__destellos i { animation: destello 4.2s ease-in-out infinite; }
+/* Solo el nombre: un shorthand aquí pisaría los retrasos escalonados de abajo */
+.card.is-viva .card__destellos i { animation-name: destello; }
 .card__destellos i:nth-child(1) { left: 5%; top: 14%; }
 .card__destellos i:nth-child(2) { right: 7%; top: 48%; animation-delay: 1.3s; }
 .card__destellos i:nth-child(3) { left: 24%; bottom: 21%; animation-delay: 2.5s; }

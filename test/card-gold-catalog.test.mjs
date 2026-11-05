@@ -83,7 +83,9 @@ test("Gold odds are close to 2% over many draws", () => {
 test("Gold motion is gated: glints on live cards, sweep on demand, both off for reduced motion", async () => {
   const { readFileSync } = await import("node:fs");
   const css = readFileSync(new URL("../css/sobre.css", import.meta.url), "utf8");
-  assert.match(css, /\.card\.is-viva \.card__destellos i \{ animation: destello/);
+  /* animation-name only: a shorthand here would outrank and reset the staggered delays */
+  assert.match(css, /\.card\.is-viva \.card__destellos i \{ animation-name: destello; \}/);
+  assert.match(css, /\.card__destellos i:nth-child\(2\) \{[^}]*animation-delay: 1\.3s/);
   assert.match(css, /\.card\.is-barrido \.card__barrido::after \{ animation: barrido/);
   assert.doesNotMatch(css, /is-revealed \.card__barrido/);
   assert.match(css, /prefers-reduced-motion: reduce\) \{\s*\.card__destellos,\s*\.card__barrido \{ display: none; \}/);
@@ -93,6 +95,25 @@ test("Gold motion is gated: glints on live cards, sweep on demand, both off for 
 const { readFileSync: leer } = await import("node:fs");
 const { runInNewContext } = await import("node:vm");
 const sobreSource = leer(new URL("../js/sobre.js", import.meta.url), "utf8");
+
+function marcadoDe(id) {
+  const ventana = { SOBRE_CATALOGO: catalogo, matchMedia: () => ({ matches: true }) };
+  const documento = {
+    createElement: () => ({ classList: { add() {} }, dataset: {}, innerHTML: "" }),
+  };
+  runInNewContext(leer(new URL("../js/carta.js", import.meta.url), "utf8"), { window: ventana, document: documento });
+  return ventana.CartaWewin.crearCarta(catalogo.find((c) => c.id === id)).innerHTML;
+}
+
+test("a Gold card renders its frame, foil, pattern, glints and sweep; others do not", () => {
+  const capas = ["card__oro--aro", "card__oro--claro", "card__oro--oscuro", "card__oro-patron", "card__destellos", "card__barrido"];
+  const dorada = marcadoDe("headpat-gold");
+  capas.forEach((capa) => assert.ok(dorada.includes(capa), capa));
+  for (const id of ["headpat", "headpat-holo"]) {
+    const otra = marcadoDe(id);
+    capas.forEach((capa) => assert.ok(!otra.includes(capa), `${id} ${capa}`));
+  }
+});
 
 function efectos({ reduced = false } = {}) {
   const inicio = sobreSource.indexOf("  function efectosRareza(");
