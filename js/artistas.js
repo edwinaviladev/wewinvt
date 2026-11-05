@@ -46,7 +46,14 @@
     return `${directory}thumbs/${filename}-${width}.webp`;
   }
 
-  function configureImage(img, work, category) {
+  // Rendered thumbnail width follows the card layout in css/artistas.css.
+  function thumbnailSizes(worksCount) {
+    if (worksCount >= WIDE_CARD_MIN_WORKS) return "(max-width: 560px) 28vw, 180px";
+    if (worksCount === 1) return "(max-width: 560px) 42vw, (max-width: 900px) 46vw, min(31vw, 590px)";
+    return "(max-width: 560px) 42vw, (max-width: 900px) 23vw, min(16vw, 290px)";
+  }
+
+  function configureImage(img, work, category, sizes) {
     img.alt = "";
     img.loading = "lazy";
     img.decoding = "async";
@@ -66,7 +73,7 @@
       return;
     }
     img.srcset = candidates.join(", ");
-    img.sizes = "(max-width: 560px) 42vw, 180px";
+    img.sizes = sizes;
     img.src = candidates[0].split(" ")[0];
   }
 
@@ -146,10 +153,15 @@
       if (!focusable.length) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
+      const active = document.activeElement;
+      if (!focusable.includes(active)) {
+        // Focus left the controls, for example after a click on the image: bring it back.
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && active === first) {
         event.preventDefault();
         last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
+      } else if (!event.shiftKey && active === last) {
         event.preventDefault();
         first.focus();
       }
@@ -232,7 +244,7 @@
         item.className = "artist-work";
         const figure = document.createElement("figure");
         const img = document.createElement("img");
-        configureImage(img, work, work.category === "Emote" ? "emote" : "fanart");
+        configureImage(img, work, work.category === "Emote" ? "emote" : "fanart", thumbnailSizes(artist.works.length));
         if (lightboxReady) {
           const button = document.createElement("button");
           button.type = "button";

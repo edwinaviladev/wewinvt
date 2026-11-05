@@ -303,6 +303,54 @@ test("lightbox traps Tab focus and hides navigation for a single work", () => {
   assert.equal(nextButton.hidden, true);
 });
 
+test("lightbox pulls Tab focus back when it sits outside the controls", () => {
+  const { container, document, closeButton, prevButton, nextButton } = mountWithLightbox({
+    emotes: [sampleWork("ana", 1), sampleWork("ana", 2)],
+    fanarts: [],
+  });
+  const [work] = workButtons(container.children[0]);
+  let prevented = 0;
+  const tab = (shiftKey) => document.keydown({ key: "Tab", shiftKey, preventDefault: () => (prevented += 1) });
+
+  work.listeners.click();
+  document.activeElement = null;
+  tab(false);
+  assert.equal(document.activeElement, prevButton);
+
+  document.activeElement = work;
+  tab(true);
+  assert.equal(document.activeElement, closeButton);
+  assert.equal(prevented, 2);
+
+  // Inside the controls, away from the edges, the browser keeps handling Tab.
+  document.activeElement = nextButton;
+  tab(false);
+  assert.equal(document.activeElement, nextButton);
+  assert.equal(prevented, 2);
+});
+
+test("thumbnail sizes follow the width each card layout renders", () => {
+  const sized = (artista, n) => ({ ...sampleWork(artista, n), width: 1200, height: 1200 });
+  const container = mountWithData({
+    emotes: [],
+    fanarts: [
+      sized("solo", 1),
+      sized("duo", 1),
+      sized("duo", 2),
+      ...[1, 2, 3, 4].map((n) => sized("wide", n)),
+    ],
+  });
+  const sizes = Object.fromEntries(
+    container.children.map((section) => [
+      titleText(section),
+      section.children[1].children[0].children[0].children[0].sizes,
+    ]),
+  );
+  assert.equal(sizes.solo, "(max-width: 560px) 42vw, (max-width: 900px) 46vw, min(31vw, 590px)");
+  assert.equal(sizes.duo, "(max-width: 560px) 42vw, (max-width: 900px) 23vw, min(16vw, 290px)");
+  assert.equal(sizes.wide, "(max-width: 560px) 28vw, 180px");
+});
+
 test("lightbox caption is built from text nodes, never markup", () => {
   const { container, caption } = mountWithLightbox({
     emotes: [sampleWork("ana", 1, "<img src=x onerror=alert(1)> larga descripción")],
