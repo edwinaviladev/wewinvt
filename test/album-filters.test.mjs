@@ -59,3 +59,48 @@ test("album page loads the filters before its renderer and exposes controls", ()
   assert.match(albumSource, /AlbumFilters\.filtrar/);
   assert.match(albumSource, /AlbumFilters\.progresoPorConjunto/);
 });
+
+test("collection id treats missing and base variants as normales", () => {
+  const filter = filters();
+
+  assert.equal(filter.coleccionDe({ id: "a" }), "normales");
+  assert.equal(filter.coleccionDe({ id: "a", variante: "base" }), "normales");
+  assert.equal(filter.coleccionDe({ id: "a", variante: "holo" }), "holo");
+});
+
+test("collections list puts normales first and derives variants from the data", () => {
+  const filter = filters();
+  const catalog = [
+    { id: "a", variante: "holo", nombreVariante: "Holo" },
+    { id: "b", variante: "base" },
+    { id: "c", variante: "prisma" },
+    { id: "d", variante: "holo", nombreVariante: "Holo" },
+  ];
+
+  assert.deepEqual(JSON.parse(JSON.stringify(filter.colecciones(catalog))), [
+    { id: "normales", nombre: "Normales" },
+    { id: "holo", nombre: "Holo" },
+    { id: "prisma", nombre: "prisma" },
+  ]);
+  assert.deepEqual(JSON.parse(JSON.stringify(filter.colecciones([]))), [{ id: "normales", nombre: "Normales" }]);
+});
+
+test("real catalog yields normales and holo collections", () => {
+  const catalogContext = {};
+  runInNewContext(catalogSource, catalogContext);
+  const lista = filters().colecciones(catalogContext.SOBRE_CATALOGO);
+
+  assert.deepEqual(Array.from(lista, (c) => c.id), ["normales", "holo"]);
+});
+
+test("collection resolution falls back to normales for unknown or missing ids", () => {
+  const filter = filters();
+  const lista = filter.colecciones([{ id: "a", variante: "holo", nombreVariante: "Holo" }]);
+
+  assert.equal(filter.resolverColeccion("holo", lista), "holo");
+  assert.equal(filter.resolverColeccion("nope", lista), "normales");
+  assert.equal(filter.resolverColeccion("<img onerror=x>", lista), "normales");
+  assert.equal(filter.resolverColeccion(null, lista), "normales");
+  assert.equal(filter.resolverColeccion(undefined, lista), "normales");
+  assert.equal(filter.resolverColeccion("constructor", lista), "normales");
+});
