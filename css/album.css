@@ -444,32 +444,24 @@ body.sin-scroll { overflow: hidden !important; }
 }
 
 /* ---------- Showcase oscuro del álbum público ----------
-   Todo lo que hay bajo el header del sitio es oscuro. El header conserva la
-   paleta crema del resto del sitio, y las cartas no se tocan. */
+   Los valores vienen de los tokens compartidos de paleta-editorial.css; los
+   --album-* son alias locales. Las cartas no se tocan. */
 
 body.album-page {
-  --album-bg: #1f1d1b;
-  --album-surface: #2a2724;
-  --album-surface-hover: #35312d;
-  --album-line: #3d3935;
-  /* Borde de controles: 4.4:1 sobre la página y 3.9:1 sobre la superficie */
-  --album-control: #8a8279;
-  --album-text: #f5f0e8;
-  --album-muted: #b5ada2;
-  --album-accent: #d4635b;
-  /* El acento como texto necesita más luminosidad: 5.7:1 sobre la superficie */
-  --album-accent-text: #e8857e;
-  --album-on-accent: #1f1d1b;
+  --album-bg: var(--color-bg);
+  --album-surface: var(--color-surface);
+  --album-surface-hover: var(--color-surface-hover);
+  --album-line: var(--color-border);
+  --album-control: var(--color-control);
+  --album-text: var(--color-ink);
+  --album-muted: var(--color-muted);
+  --album-accent: var(--color-accent);
+  --album-accent-text: var(--color-accent-text);
+  --album-on-accent: var(--color-on-accent);
   --caramelo: #f2b263;
   --rubor: var(--album-accent-text);
   background: var(--album-bg);
   color: var(--album-text);
-  color-scheme: dark;
-}
-
-body.album-page .site-header {
-  background: var(--color-bg);
-  color-scheme: light;
 }
 
 body.album-page .album-shell {
@@ -480,10 +472,6 @@ body.album-page .album-shell {
 body.album-page :focus-visible {
   outline: 2px solid var(--album-accent-text);
   outline-offset: 3px;
-}
-
-body.album-page .site-header :focus-visible {
-  outline-color: var(--color-accent);
 }
 
 body.album-page .album-head {

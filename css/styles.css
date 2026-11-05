@@ -4,21 +4,7 @@
    ========================================================================== */
 
 :root {
-    /* Colores base */
-    --bg: #f5f0e8;
-    --bg-deep: #eee7dc;
-    --surface: #fffcf6;
-    --surface-strong: #fffcf6;
-    --violet: #b84a43;
-    --cyan: #b84a43;
-    --gold: #825a21;
-    --pink: #8f3935;
-    --blue: #d9c8b5;
-    --green: #52664b;
-    --text: #242321;
-    --muted: #706a63;
-    --soft: #f0dfda;
-    --line: #e8dcd0;
+    /* Los colores viven en paleta-editorial.css, la única fuente de la paleta. */
 
     /* Tipografía */
     --font-heading:
