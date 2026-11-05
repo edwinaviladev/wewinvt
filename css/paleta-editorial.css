@@ -95,7 +95,7 @@ a:hover {
 
 a:focus-visible,
 button:focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-accent-text);
   outline-offset: 3px;
   box-shadow: var(--focus-ring);
   border-radius: var(--radius-sm);
@@ -146,7 +146,7 @@ h3 {
 }
 
 .home-page .manga-divider__panel--dots {
-  background-image: radial-gradient(circle, rgb(36 35 33 / 30%) 0.8px, transparent 1px);
+  background-image: radial-gradient(circle, rgb(245 240 232 / 30%) 0.8px, transparent 1px);
   background-size: 6px 6px;
 }
 
@@ -160,7 +160,7 @@ h3 {
   border: 2px solid var(--color-ink);
   background: var(--color-bg);
   box-shadow: 3px 3px 0 var(--color-ink);
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   font-family: var(--font-mono);
   font-size: clamp(0.62rem, 1.1vw, 0.78rem);
   font-weight: 700;
@@ -172,7 +172,7 @@ h3 {
 
 .eyebrow {
   margin-bottom: 0.8rem;
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   font-family: var(--font-mono);
   font-size: 0.68rem;
   font-weight: 700;
@@ -225,17 +225,17 @@ h3 {
 
 .button-primary {
   background: var(--color-accent);
-  color: #fffdf9;
+  color: var(--color-on-accent);
 }
 
 .button-primary:hover {
   background: var(--color-accent-hover);
-  color: #fffdf9;
+  color: var(--color-on-accent);
   box-shadow: none;
 }
 
 .button-secondary {
-  border-color: var(--color-border);
+  border-color: var(--color-control);
   background: transparent;
   color: var(--color-ink);
 }
@@ -261,9 +261,10 @@ h3 {
   color: var(--color-ink);
 }
 
+/* The logo is black hair on transparent: it needs a light mat on charcoal. */
 .brand img {
   border-radius: 50%;
-  background: var(--color-accent-soft);
+  background: var(--color-art-mat);
 }
 
 .nav-link {
@@ -282,7 +283,7 @@ h3 {
 }
 
 .nav-toggle {
-  border-color: var(--color-border);
+  border-color: var(--color-control);
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--color-ink);
@@ -359,6 +360,7 @@ h3 {
   width: 100%;
   height: auto;
   padding: 0.75rem 1rem;
+  background: var(--color-art-mat);
   object-fit: contain;
   object-position: center;
 }
@@ -527,7 +529,7 @@ h3 {
 }
 
 .highlight {
-  color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 
 .about-chips {
@@ -625,7 +627,7 @@ h3 {
 }
 
 .social-card[href*="twitch"] .social-icon {
-  color: #6441a5;
+  color: #b79df2;
 }
 
 .social-card:hover .social-icon {
@@ -674,7 +676,7 @@ h3 {
 
 .home-gallery-item a {
   display: block;
-  background: var(--color-surface);
+  background: var(--color-art-mat);
 }
 
 .home-gallery-item a:hover img {
@@ -727,6 +729,7 @@ h3 {
   width: 100%;
   max-height: 20rem;
   object-fit: contain;
+  background: var(--color-art-mat);
 }
 
 .album-teaser__art figcaption {
@@ -774,7 +777,7 @@ h3 {
 
 .clip-card__label {
   margin: 0 0 0.5rem;
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   font-family: var(--font-mono);
   font-size: 0.68rem;
   font-weight: 700;
@@ -788,7 +791,7 @@ h3 {
   min-height: 300px;
   aspect-ratio: 16 / 9;
   border: 0;
-  background: #17110f;
+  background: var(--color-bg);
 }
 
 .clip-card__link {
@@ -796,7 +799,7 @@ h3 {
   align-items: center;
   min-height: 2.75rem;
   margin-top: 0.5rem;
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 700;
@@ -829,7 +832,7 @@ h3 {
   border: 0;
   border-bottom: 1px solid var(--color-border);
   border-radius: 0;
-  background: transparent;
+  background: var(--color-art-mat);
   cursor: zoom-in;
 }
 
@@ -860,7 +863,7 @@ h3 {
 .fanart-card .tile-btn {
   border: 0;
   border-radius: 0;
-  background: var(--color-surface);
+  background: var(--color-art-mat);
 }
 
 .fanart-card--featured .tile-btn {
@@ -936,38 +939,44 @@ h3 {
 }
 
 .lightbox {
-  background: rgb(36 35 33 / 94%);
+  background: rgb(31 29 27 / 94%);
+}
+
+/* Transparent art with black lines needs the light mat inside the lightbox too. */
+.lb-img {
+  background: var(--color-art-mat);
 }
 
 .lb-btn,
 .lb-close {
-  border-color: rgb(255 252 246 / 30%);
+  border-color: var(--color-control);
   border-radius: 0;
-  background: rgb(36 35 33 / 92%);
-  color: #fffcf6;
+  background: var(--color-surface);
+  color: var(--color-ink);
 }
 
 .lb-btn:hover,
 .lb-close:hover {
   background: var(--color-accent-hover);
+  color: var(--color-on-accent);
 }
 
 .lb-caption {
-  border-color: rgb(255 252 246 / 18%);
-  background: rgb(36 35 33 / 92%);
-  color: #fffcf6;
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-ink);
 }
 
 .lb-caption a {
-  color: #fffcf6;
+  color: var(--color-ink);
 }
 
 .lb-caption a:hover {
-  color: #f0dfda;
+  color: var(--color-accent-text);
 }
 
 .notfound code {
-  color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 
 .notfound .lead {
@@ -975,6 +984,9 @@ h3 {
 }
 
 .notfound-emote {
+  padding: 0.4rem;
+  border-radius: 50%;
+  background: var(--color-art-mat);
   animation: none;
 }
 

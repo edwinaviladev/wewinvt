@@ -57,3 +57,37 @@ test("/album reads its palette from the shared tokens instead of repeating value
   }
   assert.doesNotMatch(css, /body\.album-page \.site-header \{[^}]*color-scheme:\s*light/);
 });
+
+
+const sinComentarios = (css) => css.replace(/\/\*[\s\S]*?\*\//g, "");
+
+/* Declarations of every rule whose selector list contains exactly this selector */
+function regla(css, selector) {
+  const bloques = [...sinComentarios(css).matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+    .filter(([, selectores]) => selectores.split(",").map((s) => s.trim()).includes(selector));
+  assert.ok(bloques.length, `no rule for ${selector}`);
+  return bloques.map((bloque) => bloque[2]).join("\n");
+}
+
+const PAGINAS_PUBLICAS = ["index.html", "emotes.html", "artistas.html", "album.html", "404.html"];
+
+test("the in-scope pages share the charcoal theme-color", () => {
+  for (const pagina of PAGINAS_PUBLICAS) {
+    assert.match(leer(pagina), /<meta name="theme-color" content="#1F1D1B" \/>/, pagina);
+  }
+});
+
+test("transparent artwork keeps a light mat on the dark pages", () => {
+  const editorial = leer("css/paleta-editorial.css");
+  for (const selector of [".brand img", ".hero-figure img", ".home-gallery-item a", ".tile-btn", ".fanart-card .tile-btn", ".lb-img", ".notfound-emote"]) {
+    assert.match(regla(editorial, selector), /background:\s*var\(--color-art-mat\)/, selector);
+  }
+  assert.match(regla(leer("css/artistas.css"), ".artist-work img"), /background:\s*var\(--color-art-mat\)/);
+});
+
+test("no light page color is hardcoded in the public stylesheets", () => {
+  for (const archivo of ["css/paleta-editorial.css", "css/home-cards.css", "css/gallery-filters.css", "css/artistas.css"]) {
+    const css = sinComentarios(leer(archivo)).replace(/:root\s*\{[^{}]*\}/g, "");
+    assert.doesNotMatch(css, /#(?:f5f0e8|fffcf6|fffdf9|f0dfda|eee7dc|e8dcd0)\b/i, archivo);
+  }
+});
