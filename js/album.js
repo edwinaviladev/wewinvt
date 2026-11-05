@@ -506,7 +506,7 @@
 
     const actualizar = () => {
       cajaCarta.innerHTML = "";
-      const carta = cartaObtenida(datos, { mece: datos.variante === "holo" });
+      const carta = cartaObtenida(datos, { mece: Carta.esEspecial(datos) });
       cajaCarta.append(carta);
       dejarDeInclinar();
       dejarDeInclinar = Carta.seguirInclinacion(carta);

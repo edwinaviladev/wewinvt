@@ -24,6 +24,16 @@
     <span class="card__patron"><i class="card__prisma"></i></span>
   `;
 
+  /* Gold: marco, hoja de oro y filigrana comparten el motor de inclinación del Holo */
+  const CAPAS_GOLD = `
+    <i class="card__prisma card__oro--claro"></i>
+    <i class="card__prisma card__oro--oscuro"></i>
+    <span class="card__oro-patron"><i class="card__prisma"></i></span>
+  `;
+
+  /* Variante distinta de la base (Holo, Gold…): la carta se mece sola */
+  const esEspecial = (datos) => Boolean(datos?.variante) && datos.variante !== "base";
+
   function etiquetaCarta(datos, nueva = false) {
     const etiquetas = [datos.nombreVariante, nueva ? "Nueva" : ""].filter(Boolean);
     const detalle = etiquetas.length ? `, ${etiquetas.join(", ")}` : "";
@@ -33,11 +43,13 @@
   function htmlFrente(datos, perezosa) {
     const catalogo = window.SOBRE_CATALOGO || [];
     const holo = datos.variante === "holo";
+    const gold = datos.variante === "gold";
     const numero = String(catalogo.indexOf(datos) + 1).padStart(3, "0");
     const carga = perezosa ? ' loading="lazy" decoding="async"' : "";
     return `
       <span class="card__face card__face--front">
         ${holo ? '<i class="card__prisma card__prisma--aro"></i>' : ""}
+        ${gold ? '<i class="card__prisma card__oro--aro"></i>' : ""}
         <span class="card__lamina">
           <span class="card__franja">
             <span class="card__name">${datos.nombre}</span>
@@ -46,6 +58,7 @@
           <span class="card__ventana">
             <img class="card__arte" src="${datos.src}" alt="${datos.alt}"${carga} draggable="false" />
             ${holo ? CAPAS_HOLO : ""}
+            ${gold ? CAPAS_GOLD : ""}
           </span>
           <span class="card__placa">
             <span class="card__chispas" aria-hidden="true">${"<i></i>".repeat(RAREZAS[datos.rareza].nivel)}</span>
@@ -59,6 +72,7 @@
         </span>
         <span class="card__nueva" aria-hidden="true">Nueva</span>
         <i class="card__brillo"></i>
+        ${gold ? `<span class="card__destellos" aria-hidden="true">${"<i></i>".repeat(4)}</span><span class="card__barrido" aria-hidden="true"></span>` : ""}
       </span>
     `;
   }
@@ -245,5 +259,5 @@
     };
   }
 
-  window.CartaWewin = { SERENO, RAREZAS, crearCarta, etiquetaCarta, conectar, meciendo, seguirInclinacion };
+  window.CartaWewin = { SERENO, RAREZAS, crearCarta, etiquetaCarta, esEspecial, conectar, meciendo, seguirInclinacion };
 })();
