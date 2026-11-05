@@ -91,3 +91,31 @@ test("no light page color is hardcoded in the public stylesheets", () => {
     assert.doesNotMatch(css, /#(?:f5f0e8|fffcf6|fffdf9|f0dfda|eee7dc|e8dcd0)\b/i, archivo);
   }
 });
+
+test("/sobre takes the site theme-color and a page class; both overlay pages stay untouched", () => {
+  const sobre = leer("sobre.html");
+  assert.match(sobre, /<meta name="theme-color" content="#1F1D1B" \/>/);
+  assert.match(sobre, /<body class="sobre-page">/);
+  for (const pagina of ["overlay.html", "overlay-config.html"]) {
+    const html = leer(pagina);
+    assert.match(html, /<meta name="theme-color" content="#100b0a" \/>/, pagina);
+    assert.doesNotMatch(html, /sobre-page/, pagina);
+  }
+});
+
+test("the /sobre palette in sobre.css is scoped to body.sobre-page and leaves :root alone", () => {
+  const css = leer("css/sobre.css");
+  const inicio = css.indexOf("PALETA DEL SITIO");
+  assert.ok(inicio > 0, "the scoped palette block is missing");
+  const bloque = sinComentarios(css.slice(css.lastIndexOf("/*", inicio)));
+  const selectores = [...bloque.matchAll(/([^{}]+)\{/g)].flatMap(([, lista]) => lista.split(",").map((s) => s.trim()));
+  assert.ok(selectores.length > 5);
+  for (const selector of selectores) assert.match(selector, /^body\.sobre-page(?:\s|:|$)/, selector);
+
+  const tokens = tokensDe(bloqueRaiz(css));
+  assert.equal(tokens["--bg"], "#120c0d");
+  assert.equal(tokens["--bg-deep"], "#090607");
+  assert.equal(tokens["--text"], "#f7efe0");
+  assert.equal(tokens["--muted"], "#c9bdb0");
+  assert.equal(tokens["--rojo"], "#d3142f");
+});

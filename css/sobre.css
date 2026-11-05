@@ -1262,3 +1262,85 @@ body.modo-overlay.is-transparente .velo {
   .rarity-splash.is-on::before { transform: none; }
   .rarity-splash.is-on span { transform: skewX(-10deg); opacity: 1; }
 }
+
+/* =========================================================
+   PALETA DEL SITIO · solo la página /sobre
+   overlay.html y overlay-config.html comparten esta hoja y conservan sus
+   colores: nada de este bloque los alcanza porque todo cuelga de
+   body.sobre-page. Los valores son los de la paleta de paleta-editorial.css
+   (esta página no carga esa hoja, para no tocar fuentes ni layout).
+   El sobre, las cartas, sus efectos y los colores de rareza no cambian.
+   ========================================================= */
+
+body.sobre-page {
+  --site-bg: #1f1d1b;
+  --site-bg-deep: #181716;
+  --site-surface: #2a2724;
+  --site-surface-hover: #35312d;
+  --site-control: #8a8279;
+  --site-text: #f5f0e8;
+  --site-muted: #b5ada2;
+  --site-accent: #d4635b;
+  --site-accent-text: #e8857e;
+  --site-on-accent: #1f1d1b;
+  color: var(--site-text);
+  background: radial-gradient(90% 70% at 50% 45%, var(--site-surface), var(--site-bg) 62%, var(--site-bg-deep));
+  color-scheme: dark;
+}
+
+body.sobre-page .hint,
+body.sobre-page .hud__count,
+body.sobre-page .hud__album,
+body.sobre-page .hud__config,
+body.sobre-page .back-link,
+body.sobre-page .final-label {
+  color: var(--site-muted);
+}
+
+body.sobre-page .hud__count b {
+  color: var(--site-accent-text);
+}
+
+body.sobre-page .hud__album,
+body.sobre-page .hud__config,
+body.sobre-page .hud__btn {
+  border-color: var(--site-control);
+  background: var(--site-surface);
+}
+
+body.sobre-page .hud__album:hover,
+body.sobre-page .hud__config:hover,
+body.sobre-page .hud__btn:hover {
+  border-color: var(--site-accent-text);
+}
+
+body.sobre-page .hud__album:hover,
+body.sobre-page .hud__config:hover,
+body.sobre-page .back-link:hover {
+  color: var(--site-accent-text);
+}
+
+body.sobre-page .btn:focus-visible {
+  outline-color: var(--site-accent-text);
+}
+
+body.sobre-page .btn--primary {
+  border-color: var(--site-accent);
+  background: var(--site-accent);
+  color: var(--site-on-accent);
+}
+
+body.sobre-page .btn--primary:hover {
+  border-color: var(--site-accent-text);
+  background: var(--site-accent-text);
+}
+
+body.sobre-page .btn--ghost {
+  border-color: var(--site-control);
+  background: transparent;
+  color: var(--site-text);
+}
+
+body.sobre-page .btn--ghost:hover {
+  background: var(--site-surface-hover);
+}
