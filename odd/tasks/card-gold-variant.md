@@ -50,6 +50,7 @@ Holo is the only special variant. The user wants a premium tier, approved the lo
   - Glint delays lost the cascade, so all four twinkled together. Confirmed and fixed after the review.
   - Rarity sparks under reduced motion: dismissed, because `Chispas.emitir` already returns early when `REDUCED` is set (`js/sobre.js:413`).
   - Gold markup had no repeatable test: added one. The reveal call sites still rely on the browser walk.
+- Fix `1124263`: 146 pass, 0 fail. In the browser the glints compute delays of 0s, 1.3s, 2.5s and 3.4s; the animation name is `none` until the card is `is-viva`, and no card in the album grid is live at rest. Assessment over `f619b91..1124263`: medium, `under_budget`, so this commit has no native review of its own.
 
 ## Next step
 User decides on push and pull request.
