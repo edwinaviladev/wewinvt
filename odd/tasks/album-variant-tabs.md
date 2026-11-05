@@ -25,7 +25,7 @@ The catalog holds a base and a Holo version of every card, mixed in one grid wit
 - [x] T3 `album.html`, `js/album.js`: Novedades belongs to the normal album and links to the Holo tab. Route: delegated, same writer.
 - [x] T4 Verify in a browser at desktop and phone widths. Route: inline.
 - [x] T5 `css/album.css`: dark showcase theme for everything on `/album` except the cards and site header. Route: delegated (writer trigger, 2+ non-trivial files).
-- [ ] T6 `album.html`, `js/album.js`, `css/album.css`, tests: one progress block with a bar split by rarity; series progress only with 2+ series. Route: delegated, same writer.
+- [x] T6 `album.html`, `js/album.js`, `css/album.css`, tests: one progress block with a bar split by rarity; series progress only with 2+ series. Route: delegated, same writer.
 - [ ] T7 `album.html`, `css/album.css`: filter toolbar, compact Novedades, rarity sections without boxes. Route: delegated, same writer.
 - [ ] T8 Verify contrast and layouts in a browser at desktop and phone widths. Route: inline.
 
@@ -63,6 +63,8 @@ The catalog holds a base and a Holo version of every card, mixed in one grid wit
 - Non-blocking review findings, fixed at the user's request: the tab handler now leaves Alt, Ctrl and Meta shortcuts to the browser, and `test/album-tabs.test.mjs` runs the real `js/album.js` on a small DOM stub in place of the static source checks.
 - Findings evidence: the modifier test failed before the fix; `node --test test/*.test.mjs` then gave 115 pass. Deliberately breaking collection scoping, filter restore and arrow wraparound each fails the new tests.
 - Second review over `174c4c6..95e9c4c`: approved. Its finding, that removing the static checks dropped `role`, `aria-controls` and the hidden Holo button, is fixed with direct assertions; 116 pass.
+- T5 a7a676c: dark showcase theme in `css/album.css` (tokens on `body.album-page`, header stays cream); node --test 116 pass.
+- T6: one progress block, bar split by rarity, series only with 2+; node --test 119 pass (hash recorded in the next commit).
 
 ## Next step
 T5. Afterwards the user decides on the pull request and whether card numbering should restart per album.

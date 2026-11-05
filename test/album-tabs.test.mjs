@@ -27,7 +27,11 @@ function createDom() {
       attributes: {},
       dataset: {},
       listeners: {},
-      style: { setProperty() {} },
+      style: {
+        setProperty(name, value) {
+          this[name] = value;
+        },
+      },
       classList: { add() {}, remove() {} },
       hidden: false,
       textContent: "",
@@ -147,6 +151,15 @@ async function mountAlbum({ search = "", owned = ["a", "b", "a-holo"], catalog =
     cardCount: () => cards().length,
     progress: () => `${dom.get("[data-total-obtenidas]").textContent}/${dom.get("[data-total-cartas]").textContent}`,
     filters: () => [dom.get("[data-filtro-rareza]").value, dom.get("[data-filtro-faltantes]").checked],
+    bar: () => dom.get("[data-barra]"),
+    segments: () =>
+      dom.get("[data-barra]").children.map((segment) => [
+        segment.dataset.rareza,
+        segment.style.flexGrow,
+        segment.children[0].style.width,
+        segment.attributes["aria-hidden"],
+      ]),
+    seriesCount: () => dom.get("[data-conjuntos]").children.length,
   };
 }
 
@@ -286,4 +299,47 @@ test("the Ver álbum Holo button hides when the catalog has no Holo cards", asyn
   assert.equal(album.tab("holo"), undefined);
   album.dom.get("[data-ver-holo]").listeners.click();
   assert.equal(album.selected(), "normales");
+});
+
+test("the progress bar has one segment per rarity sized by the active collection", async () => {
+  const album = await mountAlbum();
+
+  assert.equal(album.bar().attributes["aria-valuenow"], "67");
+  assert.deepEqual(album.segments(), [
+    ["rara", "2", "50%", "true"],
+    ["comun", "1", "100%", "true"],
+  ]);
+
+  album.tab("holo").listeners.click();
+  assert.equal(album.bar().attributes["aria-valuenow"], "33");
+  assert.deepEqual(album.segments(), [
+    ["rara", "2", "0%", "true"],
+    ["comun", "1", "100%", "true"],
+  ]);
+});
+
+test("the progress bar keeps its accessible name and hides segments from assistive tech", () => {
+  assert.match(albumHtml, /role="progressbar"[^>]*aria-label="Progreso de la colección"|aria-label="Progreso de la colección"[^>]*role="progressbar"/);
+  assert.ok(!albumHtml.includes("data-barra-fill"), "segments are built by js/album.js, not authored");
+});
+
+test("series progress renders only when the collection has two or more series", async () => {
+  const single = await mountAlbum();
+  assert.equal(single.seriesCount(), 0);
+
+  const twoSeries = CATALOG.map((carta) => ({
+    ...carta,
+    conjunto: carta.rareza === "comun" ? { id: "s1", nombre: "Serie 1" } : { id: "s2", nombre: "Serie 2" },
+  }));
+  const several = await mountAlbum({ catalog: twoSeries });
+  assert.equal(several.seriesCount(), 2);
+
+  several.tab("holo").listeners.click();
+  assert.equal(several.seriesCount(), 2);
+
+  const oneInHolo = twoSeries.map((carta) => (carta.variante === "holo" ? { ...carta, conjunto: { id: "s1", nombre: "Serie 1" } } : carta));
+  const mixed = await mountAlbum({ catalog: oneInHolo });
+  assert.equal(mixed.seriesCount(), 2);
+  mixed.tab("holo").listeners.click();
+  assert.equal(mixed.seriesCount(), 0);
 });

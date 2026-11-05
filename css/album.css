@@ -61,36 +61,6 @@ body.sin-scroll { overflow: hidden !important; }
   font-size: 14px;
 }
 
-.album-progreso {
-  max-width: 460px;
-  margin: 0 auto 16px;
-}
-
-.barra {
-  height: 14px;
-  border-radius: 999px;
-  border: 1px solid rgb(246 235 221 / 18%);
-  background: rgb(16 11 10 / 80%);
-  overflow: hidden;
-}
-
-.barra i {
-  display: block;
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--rojo-vivo), var(--caramelo));
-  box-shadow: 0 0 18px rgb(242 178 99 / 45%);
-  transition: width 1s cubic-bezier(0.2, 0.7, 0.3, 1);
-}
-
-.barra-texto {
-  margin: 10px 0 0;
-  font-family: var(--font-engine-mono);
-  font-size: 12px;
-  color: var(--muted);
-}
-.barra-texto b { color: var(--caramelo); font-size: 14px; }
-
 .album-stats {
   display: flex;
   flex-wrap: wrap;
@@ -234,27 +204,6 @@ body.sin-scroll { overflow: hidden !important; }
   font-size: 0.9rem;
   text-align: center;
 }
-
-.stat {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 14px;
-  border-radius: 999px;
-  border: 1px solid rgb(246 235 221 / 16%);
-  background: rgb(23 17 15 / 80%);
-  font-family: var(--font-engine-mono);
-  font-size: 11px;
-  color: var(--muted);
-}
-.stat i {
-  width: 9px;
-  height: 9px;
-  rotate: 45deg;
-  background: var(--c, #f2b263);
-  box-shadow: 0 0 8px var(--c, #f2b263);
-}
-.stat b { color: var(--text); }
 
 .album-acciones {
   display: flex;
@@ -677,64 +626,115 @@ body.album-page .btn--primary:hover {
   min-width: 0;
 }
 
-/* ---------- Progreso ---------- */
+/* ---------- Progreso: un solo bloque ---------- */
 
 body.album-page .album-progreso {
+  max-width: none;
   margin: 0 0 1rem;
-}
-
-body.album-page .barra {
-  height: 0.55rem;
+  padding: 1.25rem 1.5rem 1.1rem;
   border: 1px solid var(--album-line);
-  border-radius: 0;
   background: var(--album-surface);
 }
 
-body.album-page .barra i {
-  border-radius: 0;
-  background: var(--album-accent);
-  box-shadow: none;
-  transition: width 500ms ease;
+.album-progreso__fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.album-progreso__pct {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 0;
+  color: var(--album-muted);
+  font-size: 0.95rem;
+}
+
+.album-progreso__pct b {
+  color: var(--album-text);
+  font-family: var(--font-heading);
+  font-size: clamp(2.25rem, 5vw, 3.25rem);
+  font-weight: 500;
+  line-height: 1;
 }
 
 body.album-page .barra-texto {
+  margin: 0;
+  color: var(--album-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+body.album-page .barra-texto b {
+  color: var(--album-text);
+  font-size: inherit;
+}
+
+/* Una franja por rareza; su ancho sigue el total de cartas de esa rareza */
+.barra {
+  display: flex;
+  gap: 3px;
+  height: 12px;
+}
+
+.barra__tramo {
+  flex: 1 1 0;
+  min-width: 6px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--c) 16%, var(--album-bg));
+}
+
+.barra__tramo i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--c);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .barra__tramo i {
+    transition: width 500ms ease;
+  }
+}
+
+body.album-page .album-stats {
+  justify-content: flex-start;
+  gap: 0.35rem 1.5rem;
+  margin: 0.9rem 0 0;
+}
+
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   color: var(--album-muted);
   font-family: var(--font-mono);
   font-size: 0.7rem;
 }
 
-body.album-page .barra-texto b {
+.stat i {
+  width: 0.6rem;
+  height: 0.6rem;
+  background: var(--c);
+}
+
+.stat b {
   color: var(--album-text);
+  font-weight: 700;
 }
 
-body.album-page .album-stats {
-  justify-content: flex-start;
-  gap: 0.5rem;
-  margin: 0 0 1.25rem;
-}
-
-body.album-page .stat {
-  padding: 0.35rem 0.55rem;
-  border-color: var(--album-line);
-  border-radius: 0;
-  background: transparent;
-  color: var(--album-muted);
-  font-family: var(--font-mono);
-  font-size: 0.64rem;
-}
-
-body.album-page .stat i {
-  box-shadow: none;
-}
-
-body.album-page .stat b {
-  color: var(--album-text);
-}
-
-/* Progreso por serie */
+/* Progreso por serie: solo existe con 2 o más series */
 body.album-page .album-conjuntos {
   max-width: 58rem;
   margin: 0 0 1.25rem;
+}
+
+.album-conjuntos:empty {
+  display: none;
 }
 
 body.album-page .album-conjunto {
@@ -1001,6 +1001,10 @@ body.album-page .detalle-compartir-estado {
     justify-content: flex-start;
   }
 
+  body.album-page .album-progreso {
+    padding: 1rem;
+  }
+
   .album-novedades__carrusel {
     --holo-card-size: clamp(126px, 40vw, 160px);
   }
@@ -1009,7 +1013,5 @@ body.album-page .detalle-compartir-estado {
 /* ---------- Movimiento reducido ---------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .barra i,
-  body.album-page .barra i { transition: none; }
   .detalle-caja { animation: none; }
 }

@@ -153,6 +153,8 @@
     contenedor.innerHTML = "";
 
     const conjuntos = window.AlbumFilters.progresoPorConjunto(cartas, (id) => obtenidas(id) > 0);
+    /* Con una sola serie el progreso total ya lo dice todo */
+    if (conjuntos.length < 2) return;
     conjuntos.forEach((conjunto, index) => {
       const porcentaje = conjunto.total ? Math.round((conjunto.obtenidas / conjunto.total) * 100) : 0;
       const tarjeta = document.createElement("section");
@@ -276,8 +278,6 @@
 
     const barra = $("[data-barra]");
     if (barra) barra.setAttribute("aria-valuenow", String(pct));
-    const relleno = $("[data-barra-fill]");
-    if (relleno) relleno.style.width = `${pct}%`;
 
     if (mensajeVacio) {
       mensajeVacio.textContent =
@@ -293,6 +293,7 @@
 
     const stats = $("[data-stats]");
     stats.innerHTML = "";
+    if (barra) barra.innerHTML = "";
     ORDEN.forEach((clave) => {
       const grupo = cartasColeccion.filter((c) => c.rareza === clave);
       const tengo = grupo.filter((c) => obtenidas(c.id) > 0).length;
@@ -301,6 +302,22 @@
       chip.style.setProperty("--c", RAREZAS[clave].color);
       chip.innerHTML = `<i aria-hidden="true"></i>${RAREZAS[clave].nombre} <b>${tengo}/${grupo.length}</b>`;
       stats.append(chip);
+
+      /* Un tramo por rareza: su ancho sigue el total y el relleno, lo obtenido */
+      if (!barra || !grupo.length) return;
+      const tramo = document.createElement("span");
+      tramo.className = "barra__tramo";
+      tramo.dataset.rareza = clave;
+      tramo.setAttribute("aria-hidden", "true");
+      tramo.style.setProperty("--c", RAREZAS[clave].color);
+      tramo.style.flexGrow = String(grupo.length);
+      const relleno = document.createElement("i");
+      const ancho = `${Math.round((tengo / grupo.length) * 100)}%`;
+      tramo.appendChild(relleno);
+      barra.appendChild(tramo);
+      /* El ancho se asigna en el siguiente cuadro para que el CSS pueda animarlo */
+      if (typeof requestAnimationFrame === "function") requestAnimationFrame(() => (relleno.style.width = ancho));
+      else relleno.style.width = ancho;
     });
 
     renderProgresoConjuntos(cartasColeccion);
