@@ -50,5 +50,8 @@ The catalog holds a base and a Holo version of every card, mixed in one grid wit
 - Not verified: Twitch login and sync with a real account, real touch devices, production. Returning from the Twitch login opens Normales, as accepted in T2.
 - Card faces still number across the whole catalog, for example `#080` and `S1 · 80`, while each tab counts 40.
 
+- Review over `origin/master..174c4c6`: medium risk from `album.html`, user granted consent, reliability lens approved with no blocker.
+- Non-blocking review findings, open: tab tests are static source checks, so tab behavior has only the manual browser proof; the tablist key handler ignores modifiers, so Alt+ArrowLeft on a tab switches tabs instead of going back (`js/album.js:252`).
+
 ## Next step
-The user decides on push and pull request, and on whether card numbering should restart per album.
+The user decides on the open review findings, push and pull request, and whether card numbering should restart per album.
