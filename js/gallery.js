@@ -201,6 +201,13 @@
         applyFilters();
       });
     }
+    // Deep link: emotes.html?artista=<name> preselects an existing artist; unknown names are ignored.
+    if (typeof location !== 'undefined' && typeof URLSearchParams !== 'undefined') {
+      var requestedArtist = new URLSearchParams(location.search).get('artista');
+      if (requestedArtist !== null && artistNames.indexOf(requestedArtist) !== -1) {
+        artistFilter.value = requestedArtist;
+      }
+    }
     applyFilters();
   }
 

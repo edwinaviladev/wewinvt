@@ -129,6 +129,30 @@ test("profile links are labelled by platform and malformed URLs render no link",
   assert.equal(links.e.textContent, "Perfil ↗");
 });
 
+test("credited artists link to their filtered gallery and Anónimo does not", () => {
+  const container = mountWithData({
+    emotes: [
+      { src: "img/a.webp", alt: "a", artista: "Ana & Co" },
+      { src: "img/b.webp", alt: "b" },
+    ],
+    fanarts: [],
+  });
+  const galleryLink = (section) => section.children.find((child) => child.tagName === "a");
+  const byName = Object.fromEntries(container.children.map((s) => [titleText(s), s]));
+  assert.equal(galleryLink(byName["Ana & Co"]).href, "emotes.html?artista=Ana%20%26%20Co");
+  assert.equal(galleryLink(byName["Ana & Co"]).textContent, "Ver en galería");
+  assert.equal(galleryLink(byName["Anónimo"]), undefined);
+});
+
+test("every real data artist gets a gallery link except Anónimo", () => {
+  const { container } = mountArtists();
+  container.children.forEach((section) => {
+    const link = section.children.find((child) => child.tagName === "a");
+    if (titleText(section) === "Anónimo") assert.equal(link, undefined);
+    else assert.equal(link.href, "emotes.html?artista=" + encodeURIComponent(titleText(section)));
+  });
+});
+
 function interactiveElement(tagName) {
   return {
     ...element(tagName),

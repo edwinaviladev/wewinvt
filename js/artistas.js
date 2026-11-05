@@ -214,6 +214,16 @@
         header.appendChild(link);
       }
 
+      // Anonymous works have no credited artist, so there is no filtered gallery to link to.
+      const credited = artist.works.some((work) => work.artista && work.artista.trim());
+      let galleryLink = null;
+      if (credited) {
+        galleryLink = document.createElement("a");
+        galleryLink.className = "artist-card__gallery";
+        galleryLink.href = `emotes.html?artista=${encodeURIComponent(artist.name)}`;
+        galleryLink.textContent = "Ver en galería";
+      }
+
       const list = document.createElement("ul");
       list.className = "artist-works";
       list.setAttribute("aria-label", `Obras de ${artist.name}`);
@@ -249,6 +259,7 @@
       });
 
       section.append(header, list);
+      if (galleryLink) section.appendChild(galleryLink);
       container.appendChild(section);
     });
 })();
