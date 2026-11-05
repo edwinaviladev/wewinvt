@@ -63,11 +63,15 @@
 
 .artist-works {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
   gap: clamp(0.75rem, 2vw, 1rem);
   padding: 0;
   margin: 0;
   list-style: none;
+}
+
+.artist-card--wide .artist-works {
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
 }
 
 .artist-work {
@@ -100,6 +104,12 @@
 
 .lb-btn[hidden] {
   display: none;
+}
+
+/* Full descriptions wrap, so the caption needs its own width and a softer radius. */
+.lb-caption {
+  width: max-content;
+  border-radius: 1rem;
 }
 
 .lb-caption__type {
@@ -150,6 +160,13 @@
   }
 }
 
+/* Keep the phone arrows above a caption that can wrap to several lines. */
+@media (max-width: 640px) {
+  .lb-btn {
+    bottom: 8rem;
+  }
+}
+
 @media (max-width: 560px) {
   .artists-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -157,6 +174,10 @@
 
   .artist-works {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .artist-card--wide .artist-works {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

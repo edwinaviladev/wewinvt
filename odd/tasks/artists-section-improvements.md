@@ -27,7 +27,7 @@ Production review of `/artistas` (1024px wide, 13 artists, 40 works, no console 
 - [x] T1 `js/artistas.js`, `css/artistas.css`, tests: compact card grid and useful headers. Route: delegated (writer trigger, 2+ non-trivial files).
 - [x] T2 `artistas.html`, `js/artistas.js`, `css/artistas.css`, tests: works open in a lightbox. Route: delegated, same writer.
 - [x] T3 `js/gallery.js`, `js/artistas.js`, tests: `emotes.html?artista=<name>` deep link and `Ver en galería`. Route: delegated, same writer.
-- [ ] T4 Verify in a browser at desktop and phone widths. Route: inline.
+- [x] T4 Verify in a browser at desktop and phone widths. Route: inline. Accepted change: the walk found layout defects the tests could not see, fixed in `css/artistas.css`.
 
 ## Acceptance criteria
 - Artists with fewer than 4 works share rows; artists with 4 or more use the full width. Order stays alphabetical.
@@ -47,5 +47,12 @@ Production review of `/artistas` (1024px wide, 13 artists, 40 works, no console 
 - T2 65effee: 92 tests pass.
 - T3 ca3699d: 96 tests pass.
 
+- T4 local browser, after the fixes: `/artistas` 5,615px to 3,902px at 1024px wide, 7,717px to 6,647px at 375px, no horizontal overflow, no console errors.
+- T4 fixes: works stacked in one column in narrow cards, so the first pass only reached 4,928px; phone height had risen to 8,126px; the lightbox caption was 187px wide and covered the phone arrows.
+- T4 lightbox: opens by click, moves within the artist with wrap, closes with Escape, returns focus; arrows hidden for a single work.
+- T4 deep link: `?artista=vtkairo` selects the filter and shows 9 works; `?artista=nadie` is ignored and shows 40.
+- Not verified: real touch devices, and production, since nothing is deployed.
+- Review assessment over `master..HEAD`: medium risk from `artistas.html`, `review_due: false`, reason `under_budget`, so no native review ran.
+
 ## Next step
-T4: verify in a browser at desktop and phone widths.
+The user decides on push and pull request. `Josswarz` and `koru` get a profile button once the user supplies their profiles.
