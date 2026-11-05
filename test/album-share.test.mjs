@@ -243,7 +243,7 @@ function montarDetalle({ cantidad = 1, compartir = async () => "downloaded" } = 
     document: { body: { classList: { add() {} } } },
     CATALOGO: [datos, {}, {}],
     RAREZAS: { epica: { nombre: "Épica", color: "#b994ff" } },
-    Carta: { seguirInclinacion: () => () => {} },
+    Carta: { esEspecial: () => false, seguirInclinacion: () => () => {} },
     numeroDe: () => "#001",
     obtenidas: () => cantidad,
     cartaObtenida: () => ({

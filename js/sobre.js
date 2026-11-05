@@ -495,7 +495,7 @@
   }
 
   /* Efectos por rareza (compartidos entre modos), justo cuando la carta da la cara */
-  function efectosRareza(rareza, el) {
+  function efectosRareza(rareza, el, gold = false) {
     const c = rectoEnEscena(el);
     const color = RAREZAS[rareza].color;
 
@@ -505,10 +505,10 @@
       Chispas.emitir(c.x, c.y, 46, { colores: [color, "#d9fff4", "#fff"], vel: 340, grav: 240, vida: 0.9 });
     } else if (rareza === "epica") {
       Chispas.emitir(c.x, c.y, 90, { colores: [color, "#ff9b4b", "#fff"], vel: 520, grav: 260, vida: 1.1, grosor: 2.4 });
-      mostrarSplash(`¡${RAREZAS[rareza].nombre}!`, color);
+      if (!gold) mostrarSplash(`¡${RAREZAS[rareza].nombre}!`, color);
     } else {
       Chispas.emitir(c.x, c.y, 190, { colores: [color, "#ff8d3c", "#fff4d2"], vel: 760, grav: 380, vida: 1.5, grosor: 2.8 });
-      mostrarSplash(`¡${RAREZAS[rareza].nombre}!`, color);
+      if (!gold) mostrarSplash(`¡${RAREZAS[rareza].nombre}!`, color);
       /* Lluvia de brasas desde arriba */
       if (!REDUCED) {
         for (let i = 0; i < 6; i++) {
@@ -521,10 +521,27 @@
       }
     }
 
+    if (gold) efectosGold(rareza, el, c);
+
     setTimeout(() => {
       el.classList.remove("is-lenta", "is-al-frente");
       if (rareza === "legendaria") aclararEscena();
     }, REDUCED ? 800 : rareza === "legendaria" ? 2100 : 700);
+  }
+
+  /* Gold: barrido de luz, polvo de oro y una cinta propia. En épica y legendaria
+     esta cinta reemplaza a la de la rareza (no salen dos seguidas) */
+  const ORO_GOLD = "#f3cd6b";
+  function efectosGold(rareza, el, c) {
+    el.classList.add("is-barrido");
+    if (!REDUCED) {
+      Chispas.emitir(c.x, c.y, 120, {
+        colores: ["#fff4bf", ORO_GOLD, "#e0ac36", "#fff"],
+        vel: 480, grav: 300, vida: 1.4, grosor: 2.4,
+      });
+    }
+    const conRareza = rareza === "epica" || rareza === "legendaria";
+    mostrarSplash(conRareza ? `¡${RAREZAS[rareza].nombre} Gold!` : "¡Gold!", ORO_GOLD);
   }
 
   /* Cinta con el nombre de la rareza (épica / legendaria) */
@@ -532,6 +549,7 @@
     const splash = $("[data-splash]");
     if (!splash) return;
     splash.querySelector("span").textContent = nombre;
+    splash.classList.toggle("is-larga", nombre.length > 12);
     splash.style.setProperty("--r-splash", color);
     splash.hidden = false;
     splash.classList.remove("is-on");
@@ -658,8 +676,8 @@
     if (nueva) btn.classList.add("is-new");
     btn.setAttribute("aria-label", Carta.etiquetaCarta(datos, nueva));
     AudioFX.sting(datos.rareza);
-    efectosRareza(datos.rareza, btn);
-    if (datos.variante === "holo") Carta.meciendo(btn, true);
+    efectosRareza(datos.rareza, btn, datos.variante === "gold");
+    if (Carta.esEspecial(datos)) Carta.meciendo(btn, true);
 
     reveladas++;
     if (reveladas === cartasActuales.length) terminar();
@@ -792,8 +810,8 @@
     btn.classList.add("is-revealed");
     if (nueva) btn.classList.add("is-new");
     AudioFX.sting(datos.rareza);
-    efectosRareza(datos.rareza, btn);
-    if (datos.variante === "holo") Carta.meciendo(btn, true);
+    efectosRareza(datos.rareza, btn, datos.variante === "gold");
+    if (Carta.esEspecial(datos)) Carta.meciendo(btn, true);
 
     /* Se muestra un momento y sale de pantalla */
     await espera(HOLD_MS[datos.rareza]);
@@ -842,7 +860,7 @@
     contenedor.classList.remove("is-out");
 
     cartas.forEach((datos, i) => {
-      const btn = crearCarta(datos, i, { soloFrente: true, mece: datos.variante === "holo" });
+      const btn = crearCarta(datos, i, { soloFrente: true, mece: Carta.esEspecial(datos) });
       btn.style.setProperty("--d", `${i * 0.14}s`);
       const nueva = idsNuevosCanje.has(datos.id);
       if (nueva) btn.classList.add("is-new");

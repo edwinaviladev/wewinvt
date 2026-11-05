@@ -1274,6 +1274,12 @@ body.modo-overlay.is-transparente .velo {
   opacity: 0;
 }
 
+/* "¡Legendaria Gold!" es más larga: baja el tamaño para que quepa en el móvil */
+.rarity-splash.is-larga span {
+  padding: 0 4%;
+  font-size: clamp(26px, 6vw, 68px);
+}
+
 .rarity-splash.is-on::before { animation: cinta 1.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 .rarity-splash.is-on span { animation: letrero 1.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 

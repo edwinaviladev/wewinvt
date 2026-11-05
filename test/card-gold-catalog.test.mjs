@@ -88,3 +88,82 @@ test("Gold motion is gated: glints on live cards, sweep on demand, both off for 
   assert.doesNotMatch(css, /is-revealed \.card__barrido/);
   assert.match(css, /prefers-reduced-motion: reduce\) \{\s*\.card__destellos,\s*\.card__barrido \{ display: none; \}/);
 });
+
+/* ---- Reveal effects, run from the real sobre.js source on stubs ---- */
+const { readFileSync: leer } = await import("node:fs");
+const { runInNewContext } = await import("node:vm");
+const sobreSource = leer(new URL("../js/sobre.js", import.meta.url), "utf8");
+
+function efectos({ reduced = false } = {}) {
+  const inicio = sobreSource.indexOf("  function efectosRareza(");
+  const fin = sobreSource.indexOf("  /* Cinta con el nombre de la rareza", inicio);
+  assert.ok(inicio >= 0 && fin > inicio, "efectosRareza and efectosGold should be present in sobre.js");
+  const emitidas = [];
+  const cintas = [];
+  const timers = [];
+  const contexto = {
+    REDUCED: reduced,
+    RAREZAS: {
+      comun: { nombre: "Común", color: "#d9cbb9" },
+      rara: { nombre: "Rara", color: "#9fecd6" },
+      epica: { nombre: "Épica", color: "#c8aefc" },
+      legendaria: { nombre: "Legendaria", color: "#ffd27a" },
+    },
+    Chispas: { emitir: (...args) => emitidas.push(args) },
+    rectoEnEscena: () => ({ x: 10, y: 20 }),
+    mostrarSplash: (texto, color) => cintas.push([texto, color]),
+    aclararEscena() {},
+    setTimeout: (fn) => timers.push(fn),
+    stage: { clientWidth: 400 },
+    Math,
+  };
+  runInNewContext(`${sobreSource.slice(inicio, fin)}\nglobalThis.efectosRareza = efectosRareza;`, contexto);
+  return { run: contexto.efectosRareza, emitidas, cintas };
+}
+
+function carta() {
+  const clases = new Set();
+  return { clases, classList: { add: (c) => clases.add(c), remove: (c) => clases.delete(c) } };
+}
+
+for (const [rareza, texto] of [["comun", "¡Gold!"], ["rara", "¡Gold!"], ["epica", "¡Épica Gold!"], ["legendaria", "¡Legendaria Gold!"]]) {
+  test(`revealing a Gold ${rareza} sweeps, throws gold dust and shows one ribbon`, () => {
+    const { run, emitidas, cintas } = efectos();
+    const el = carta();
+    run(rareza, el, true);
+    assert.ok(el.clases.has("is-barrido"));
+    assert.ok(emitidas.some(([, , , opciones]) => opciones.colores.includes("#f3cd6b")));
+    assert.deepEqual(cintas, [[texto, "#f3cd6b"]]);
+  });
+}
+
+test("non-Gold reveals are unchanged: no sweep, plain rarity ribbon only for epica and legendaria", () => {
+  for (const [rareza, cintasEsperadas] of [["comun", []], ["rara", []], ["epica", [["¡Épica!", "#c8aefc"]]], ["legendaria", [["¡Legendaria!", "#ffd27a"]]]]) {
+    const { run, cintas } = efectos();
+    const el = carta();
+    run(rareza, el);
+    assert.ok(!el.clases.has("is-barrido"), rareza);
+    assert.deepEqual(cintas, cintasEsperadas, rareza);
+  }
+});
+
+test("with reduced motion Gold throws no dust but still shows its ribbon", () => {
+  const { run, emitidas, cintas } = efectos({ reduced: true });
+  const el = carta();
+  run("comun", el, true);
+  assert.ok(!emitidas.some(([, , , opciones]) => opciones.colores.includes("#f3cd6b")));
+  assert.deepEqual(cintas, [["¡Gold!", "#f3cd6b"]]);
+});
+
+test("every sway check goes through the shared special-variant predicate", () => {
+  const albumSource = leer(new URL("../js/album.js", import.meta.url), "utf8");
+  assert.doesNotMatch(sobreSource, /variante === "holo"/);
+  assert.doesNotMatch(albumSource, /mece: datos\.variante === "holo"/);
+  const cartaSource = leer(new URL("../js/carta.js", import.meta.url), "utf8");
+  const ventana = {};
+  runInNewContext(cartaSource.slice(cartaSource.indexOf("const esEspecial"), cartaSource.indexOf("\n", cartaSource.indexOf("const esEspecial"))) + "\nglobalThis.f = esEspecial;", ventana);
+  assert.equal(ventana.f({ variante: "gold" }), true);
+  assert.equal(ventana.f({ variante: "holo" }), true);
+  assert.equal(ventana.f({ variante: "base" }), false);
+  assert.equal(ventana.f({}), false);
+});
