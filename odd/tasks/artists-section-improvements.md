@@ -53,7 +53,8 @@ Production review of `/artistas` (1024px wide, 13 artists, 40 works, no console 
 - T4 deep link: `?artista=vtkairo` selects the filter and shows 9 works; `?artista=nadie` is ignored and shows 40.
 - Not verified: real touch devices, and production, since nothing is deployed.
 - Review over `master..5c65fce`: medium risk from `artistas.html`, user granted consent, reliability lens approved with no blocker.
-- Non-blocking review findings, open: the lightbox Tab trap lets focus escape when it sits outside the first and last buttons (`js/artistas.js:149-155`); the `sizes` hint understates wide thumbnails above 560px (`js/artistas.js:69`); no test proves every artist name matches a gallery filter option.
+- Non-blocking review findings, fixed at the user's request: the lightbox Tab trap let focus escape when it sat outside the first and last buttons; the `sizes` hint understated wide thumbnails above 560px; no test proved every artist link selects a gallery filter option.
+- Findings evidence: 99 tests pass; the two new tests in `test/artistas.test.mjs` fail without the fix. In a browser at 800px, real Tab presses stay inside the lightbox after focus leaves its controls, and a 348px thumbnail loads the 640w file.
 
 ## Next step
 The user decides on push and pull request. `Josswarz` and `koru` get a profile button once the user supplies their profiles.
