@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
@@ -86,10 +86,50 @@ test("transparent artwork keeps a light mat on the dark pages", () => {
 });
 
 test("no light page color is hardcoded in the public stylesheets", () => {
-  for (const archivo of ["css/paleta-editorial.css", "css/home-cards.css", "css/gallery-filters.css", "css/artistas.css"]) {
+  for (const archivo of ["css/styles.css", "css/paleta-editorial.css", "css/home-cards.css", "css/gallery-filters.css", "css/artistas.css"]) {
     const css = sinComentarios(leer(archivo)).replace(/:root\s*\{[^{}]*\}/g, "");
     assert.doesNotMatch(css, /#(?:f5f0e8|fffcf6|fffdf9|f0dfda|eee7dc|e8dcd0)\b/i, archivo);
   }
+});
+
+test("the legacy color aliases resolve in the shared palette for every page using styles.css", () => {
+  const tokens = tokensDe(bloqueRaiz(leer("css/paleta-editorial.css")));
+  for (const alias of ["--bg", "--bg-deep", "--surface", "--surface-strong", "--violet", "--cyan", "--gold", "--pink", "--blue", "--green", "--text", "--muted", "--soft", "--line"]) {
+    assert.ok(tokens[alias], `${alias} is missing`);
+    const referencia = tokens[alias].match(/^var\((--[\w-]+)\)$/)?.[1];
+    if (referencia) assert.ok(tokens[referencia], `${alias} points at undefined ${referencia}`);
+  }
+
+  const paginas = readdirSync(new URL("../", import.meta.url)).filter((archivo) => archivo.endsWith(".html"));
+  const conEstilos = paginas.filter((pagina) => leer(pagina).includes("css/styles.css"));
+  assert.ok(conEstilos.length >= PAGINAS_PUBLICAS.length);
+  for (const pagina of conEstilos) {
+    const html = leer(pagina);
+    assert.ok(html.indexOf("css/paleta-editorial.css") > html.indexOf("css/styles.css"), `${pagina} must load the palette after styles.css`);
+  }
+});
+
+test("the /sobre copy of the palette matches the shared tokens", () => {
+  const compartidos = tokensDe(bloqueRaiz(leer("css/paleta-editorial.css")));
+  const sobre = tokensDe(sinComentarios(leer("css/sobre.css")).match(/body\.sobre-page \{([^{}]*)\}/)[1]);
+  const equivalencias = {
+    "--site-bg": "--color-bg",
+    "--site-bg-deep": "--bg-deep",
+    "--site-surface": "--color-surface",
+    "--site-surface-hover": "--color-surface-hover",
+    "--site-control": "--color-control",
+    "--site-text": "--color-ink",
+    "--site-muted": "--color-muted",
+    "--site-accent": "--color-accent",
+    "--site-accent-text": "--color-accent-text",
+    "--site-on-accent": "--color-on-accent",
+  };
+  for (const [local, compartido] of Object.entries(equivalencias)) {
+    assert.ok(compartidos[compartido], `${compartido} is missing`);
+    assert.equal(sobre[local], compartidos[compartido], local);
+  }
+  const sinEquivalente = Object.keys(sobre).filter((nombre) => nombre.startsWith("--site-") && !equivalencias[nombre]);
+  assert.deepEqual(sinEquivalente, []);
 });
 
 test("/sobre takes the site theme-color and a page class; both overlay pages stay untouched", () => {

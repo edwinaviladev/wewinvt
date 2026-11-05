@@ -46,6 +46,7 @@ Three palettes coexist: cream on home, gallery, artists and 404; charcoal on `/a
 - T4 overlays: `css/sobre.css` only gained `body.sobre-page` rules, with no lines removed. `overlay.html` and `overlay-config.html` keep `#100b0a`, `--bg` `#120c0d` and `--rojo` `#d3142f`, and no HTML or JS changed there.
 - T4 also checked: lightbox mat, mobile menu with a real tap, and 404 emote mat.
 - Returning browsers can see the old palette until cached CSS expires, as happened locally; `/css/*` has a 10-minute `max-age` in production.
+- Review over `f3fdebe..65b8fdb`: medium risk, user granted consent, reliability lens approved with no blocker. Its three test suggestions are added to `test/site-palette.test.mjs`: the `/sobre` palette copy matches the shared tokens, legacy aliases resolve on every page using `css/styles.css`, and the light color guard scans `css/styles.css`. 130 pass; six deliberate breakages each fail the suite.
 - Not verified: hover states by eye, the full pack opening on `/sobre`, real touch devices, production. Tiles show their light mat while lazy images load.
 
 ## Next step
