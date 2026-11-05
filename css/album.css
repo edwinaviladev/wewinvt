@@ -913,7 +913,7 @@ body.album-page .album-novedades__variantes > p {
   scrollbar-color: var(--album-accent) transparent;
 }
 
-.album-novedades__carrusel:focus-visible {
+body.album-page .album-novedades__carrusel:focus-visible {
   outline-offset: -2px;
 }
 

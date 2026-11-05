@@ -37,7 +37,7 @@ The catalog holds a base and a Holo version of every card, mixed in one grid wit
 - Tabs follow the ARIA tabs pattern, including arrow keys.
 - Owned cards and the sealed packs count are unchanged; the card detail still opens.
 
-- Redesign, chosen by the user as direction A, dark showcase: the page below the site header is dark; card artwork and card faces are unchanged.
+- Redesign, chosen by the user as direction A, dark showcase: the page below the site header is dark; card artwork and revealed card faces are unchanged. Backs of undiscovered cards are dimmed so they recede on the dark page.
 - Text and control contrast on the dark surfaces meets WCAG AA.
 - One progress block shows the percentage, the count and a bar split by rarity with visible counts per rarity. Series progress appears only with 2 or more series.
 - Filters sit in a left-aligned toolbar. Novedades takes clearly less height than its current 1,009px at 1280px wide. Rarity sections have no box.
@@ -68,7 +68,9 @@ The catalog holds a base and a Holo version of every card, mixed in one grid wit
 - T7 6c03efe: filter toolbar, boxless rarity sections and compact Novedades; node --test 119 pass.
 - T8 local browser with seeded test data, removed afterwards: every text style outside the cards measures at least 4.5:1 against its background on both tabs and in the card detail. Header stays cream, focus ring is visible.
 - T8 layout: at 1280px, Novedades is 463px high (was 1,009px), the page went from 6,297px to 5,411px, and the bar shows fills per rarity after a tab switch. At 375px there is no horizontal overflow and Novedades stacks at 843px.
-- Not verified: hover states by eye, a catalog with 2 or more series in a browser (covered by tests), real touch devices, production.
+- Review over `72ae54c..f3ce4d2`: medium risk from `album.html`, user granted consent, reliability lens approved with no blocker. Its three findings are resolved: bar segments now persist between renders, the carousel focus selector wins, and the criterion allows dimmed backs on undiscovered cards.
+- Findings evidence: 121 tests pass. In a browser, `transitionrun` fires for the three segments whose width changes on a tab switch and none fires on a filter change; the keyboard-focused carousel has a -2px outline offset.
+- Not verified: hover states by eye, the fill animation on first page load, a catalog with 2 or more series in a browser (covered by tests), real touch devices, production.
 
 ## Next step
 The user decides on the pull request and whether card numbering should restart per album.

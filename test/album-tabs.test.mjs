@@ -17,7 +17,7 @@ const CATALOG = [
 ];
 
 function createDom() {
-  const dom = { activeElement: null, nodes: new Map(), tabs: [] };
+  const dom = { activeElement: null, nodes: new Map(), tabs: [], layoutReads: [] };
 
   dom.element = (tagName) => {
     let html = "";
@@ -38,6 +38,10 @@ function createDom() {
       value: "",
       checked: false,
       tabIndex: 0,
+      get offsetWidth() {
+        dom.layoutReads.push(node.style.width);
+        return 0;
+      },
       get innerHTML() {
         return html;
       },
@@ -281,6 +285,39 @@ test("each collection shows its own empty message", async () => {
   album.tab("normales").listeners.click();
   assert.equal(message.hidden, true);
   assert.equal(message.textContent, "Aún no tienes cartas");
+});
+
+test("bar segments persist across renders so their fill can animate", async () => {
+  const album = await mountAlbum();
+  const [rara, comun] = album.bar().children;
+
+  assert.deepEqual(album.dom.layoutReads, [undefined, undefined]);
+  assert.equal(rara.children[0].style.width, "50%");
+  assert.equal(comun.children[0].style.width, "100%");
+
+  album.tab("holo").listeners.click();
+  assert.equal(album.bar().children[0], rara);
+  assert.equal(album.bar().children[1], comun);
+  assert.equal(rara.children[0].style.width, "0%");
+  assert.equal(comun.children[0].style.width, "100%");
+
+  album.setFilters("rara", true);
+  assert.equal(album.bar().children[0], rara);
+  assert.equal(album.dom.layoutReads.length, 2);
+});
+
+test("bar segments are rebuilt when the rarities in a collection differ", async () => {
+  const album = await mountAlbum({
+    catalog: [
+      { id: "a", rareza: "comun", variante: "base" },
+      { id: "b", rareza: "rara", variante: "base" },
+      { id: "a-holo", rareza: "comun", variante: "holo", nombreVariante: "Holo" },
+    ],
+  });
+
+  assert.deepEqual(Array.from(album.bar().children, (segment) => segment.dataset.rareza), ["rara", "comun"]);
+  album.tab("holo").listeners.click();
+  assert.deepEqual(Array.from(album.bar().children, (segment) => segment.dataset.rareza), ["comun"]);
 });
 
 test("the Ver álbum Holo button activates and focuses the Holo tab", async () => {

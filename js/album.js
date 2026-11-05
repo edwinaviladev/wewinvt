@@ -264,6 +264,38 @@
     activarColeccion(COLECCIONES[siguiente].id, { enfocar: true });
   });
 
+  /* Un tramo por rareza: su ancho sigue el total y el relleno, lo obtenido.
+     Los tramos se reutilizan entre renders para que el CSS anime el cambio de ancho. */
+  const tramosBarra = new Map();
+
+  function pintarBarra(barra, cartas) {
+    const presentes = ORDEN.filter((clave) => cartas.some((c) => c.rareza === clave));
+    if (presentes.join() !== [...tramosBarra.keys()].join()) {
+      barra.innerHTML = "";
+      tramosBarra.clear();
+      presentes.forEach((clave) => {
+        const tramo = document.createElement("span");
+        tramo.className = "barra__tramo";
+        tramo.dataset.rareza = clave;
+        tramo.setAttribute("aria-hidden", "true");
+        tramo.style.setProperty("--c", RAREZAS[clave].color);
+        const relleno = document.createElement("i");
+        tramo.appendChild(relleno);
+        barra.appendChild(tramo);
+        /* Fija el ancho inicial de 0 antes de asignar el real, para que haya transición */
+        void relleno.offsetWidth;
+        tramosBarra.set(clave, { tramo, relleno });
+      });
+    }
+    presentes.forEach((clave) => {
+      const grupo = cartas.filter((c) => c.rareza === clave);
+      const tengo = grupo.filter((c) => obtenidas(c.id) > 0).length;
+      const { tramo, relleno } = tramosBarra.get(clave);
+      tramo.style.flexGrow = String(grupo.length);
+      relleno.style.width = `${Math.round((tengo / grupo.length) * 100)}%`;
+    });
+  }
+
   function render() {
     const coleccionInfo = COLECCIONES.find((c) => c.id === coleccionActiva);
     const cartasColeccion = cartasDe(coleccionActiva);
@@ -293,7 +325,7 @@
 
     const stats = $("[data-stats]");
     stats.innerHTML = "";
-    if (barra) barra.innerHTML = "";
+    if (barra) pintarBarra(barra, cartasColeccion);
     ORDEN.forEach((clave) => {
       const grupo = cartasColeccion.filter((c) => c.rareza === clave);
       const tengo = grupo.filter((c) => obtenidas(c.id) > 0).length;
@@ -302,22 +334,6 @@
       chip.style.setProperty("--c", RAREZAS[clave].color);
       chip.innerHTML = `<i aria-hidden="true"></i>${RAREZAS[clave].nombre} <b>${tengo}/${grupo.length}</b>`;
       stats.append(chip);
-
-      /* Un tramo por rareza: su ancho sigue el total y el relleno, lo obtenido */
-      if (!barra || !grupo.length) return;
-      const tramo = document.createElement("span");
-      tramo.className = "barra__tramo";
-      tramo.dataset.rareza = clave;
-      tramo.setAttribute("aria-hidden", "true");
-      tramo.style.setProperty("--c", RAREZAS[clave].color);
-      tramo.style.flexGrow = String(grupo.length);
-      const relleno = document.createElement("i");
-      const ancho = `${Math.round((tengo / grupo.length) * 100)}%`;
-      tramo.appendChild(relleno);
-      barra.appendChild(tramo);
-      /* El ancho se asigna en el siguiente cuadro para que el CSS pueda animarlo */
-      if (typeof requestAnimationFrame === "function") requestAnimationFrame(() => (relleno.style.width = ancho));
-      else relleno.style.width = ancho;
     });
 
     renderProgresoConjuntos(cartasColeccion);
