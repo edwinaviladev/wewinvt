@@ -693,6 +693,165 @@ body {
   background: repeating-linear-gradient(118deg, transparent 0 8%, #fff 11%, #ffd0f0 13%, #bff6ff 15%, transparent 18% 36%);
 }
 
+/* --- Gold: laca negra y oro líquido. Mismo motor de inclinación que el Holo
+   (solo transform); la rareza se sigue leyendo por sus estrellas. --- */
+
+.card[data-variante="gold"] {
+  --carta-tinta: #0c0906;
+  --carta-papel: #fbf0d0;
+  --carta-hueso: #cdb27a;
+  --oro: #e6b94e;
+  --papel-arte: #f6e4ae;
+  --tono-arte: rgb(150 96 16 / 30%);
+  --sombra-carta:
+    0 calc(var(--cw) * 0.05) calc(var(--cw) * 0.1) rgb(0 0 0 / 60%),
+    0 0 calc(var(--cw) * 0.1) rgb(255 196 84 / 30%);
+}
+
+.card[data-variante="gold"] .card__face--front { background: #0b0805; }
+
+/* Marco de oro líquido */
+.card__oro--aro {
+  z-index: 1;
+  background: repeating-linear-gradient(118deg, #5c3b0b, #b9851f 8%, #fff4bf 14%, #e0ac36 20%, #7a5212 30%, #f3cd6b 38%, #5c3b0b 46%);
+}
+
+.card__oro--claro {
+  z-index: 2;
+  mix-blend-mode: multiply;
+  opacity: 0.42;
+  background: repeating-linear-gradient(118deg, #e8c578, #fff6da 9%, #f0cf80 18%, #c99a3e 28%, #fff1c4 38%, #e8c578 46%);
+}
+
+.card__oro--oscuro {
+  z-index: 3;
+  mix-blend-mode: color-dodge;
+  opacity: 0.5;
+  background: repeating-linear-gradient(118deg, #1a0f02, #6b4509 10%, #a8761a 15%, #3a2404 24%, #1a0f02 46%);
+}
+
+/* En los emotes la hoja de oro queda detrás de la figura */
+.card[data-variante="gold"][data-tipo="emote"] .card__oro--claro { z-index: 0; opacity: 1; }
+.card[data-variante="gold"][data-tipo="emote"] .card__oro--oscuro { opacity: 0.3; }
+
+/* Viñeta dorada: los bordes del arte parecen bañados en oro */
+.card[data-variante="gold"] .card__ventana::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  box-shadow: inset 0 0 calc(var(--cw) * 0.13) rgb(236 172 48 / 72%);
+}
+
+/* Abanico art déco y monograma W que se encienden cuando pasa la luz */
+.card__oro-patron {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: hard-light;
+  opacity: 0.8;
+  --filigrana: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' fill='none' stroke='%23000' stroke-width='1.5'%3E%3Cpath d='M4 30a14 14 0 0 1 28 0M9 30a9 9 0 0 1 18 0M14 30a4 4 0 0 1 8 0M18 16v14M8 20l10 10M28 20 18 30'/%3E%3Cpath d='M38 44l4 12 4-8 4 8 4-12' stroke-width='2.2'/%3E%3Cpath d='M50 8l5 5-5 5-5-5z' fill='%23000' stroke='none'/%3E%3C/svg%3E");
+  -webkit-mask: var(--filigrana);
+  mask: var(--filigrana);
+  -webkit-mask-size: calc(var(--cw) * 0.2);
+  mask-size: calc(var(--cw) * 0.2);
+}
+
+.card__oro-patron .card__prisma {
+  background: repeating-linear-gradient(118deg, transparent 0 9%, #fff8dc 12%, #ffd873 14%, #fff8dc 16%, transparent 19% 38%);
+}
+
+/* Placas de laca negra con oro grabado */
+.card[data-variante="gold"] .card__franja,
+.card[data-variante="gold"] .card__placa { border-color: var(--oro); }
+
+.card[data-variante="gold"] .card__name {
+  color: transparent;
+  background: linear-gradient(172deg, #fff7d0, #f2c65f 52%, #b47c1c);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.card[data-variante="gold"] .card__num { color: var(--oro); }
+
+.card[data-variante="gold"] .card__variante {
+  color: #1b1205;
+  background: linear-gradient(100deg, #b9851f, #fff4bf 42%, #e0ac36 70%, #fff0b4);
+}
+
+/* Filete grabado fino, en todas las rarezas */
+.card[data-variante="gold"] .card__lamina::after {
+  content: "";
+  position: absolute;
+  inset: calc(var(--cw) * 0.008);
+  z-index: 5;
+  border: 1px solid rgb(240 200 100 / 62%);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Destellos sobre el metal: solo titilan en la carta activa, así las
+   cuadrículas grandes del álbum se quedan quietas */
+.card__destellos {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: block;
+  pointer-events: none;
+}
+
+.card__destellos i {
+  position: absolute;
+  width: calc(var(--cw) * 0.13);
+  aspect-ratio: 1;
+  background: radial-gradient(closest-side, #fff, #ffe6a0 60%, transparent);
+  clip-path: polygon(50% 0, 54% 46%, 100% 50%, 54% 54%, 50% 100%, 46% 54%, 0 50%, 46% 46%);
+  opacity: 0;
+}
+
+.card.is-viva .card__destellos i { animation: destello 4.2s ease-in-out infinite; }
+.card__destellos i:nth-child(1) { left: 5%; top: 14%; }
+.card__destellos i:nth-child(2) { right: 7%; top: 48%; animation-delay: 1.3s; }
+.card__destellos i:nth-child(3) { left: 24%; bottom: 21%; animation-delay: 2.5s; }
+.card__destellos i:nth-child(4) { right: 4%; bottom: 24%; animation-delay: 3.4s; }
+
+@keyframes destello {
+  0%, 78%, 100% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+  88% { opacity: 1; transform: scale(1) rotate(35deg); }
+}
+
+/* Al revelarla: un barrido de luz por la cara. Solo con .is-barrido (lo pone
+   sobre.js), porque en el álbum las cartas nacen reveladas */
+.card__barrido {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.card__barrido::after {
+  content: "";
+  position: absolute;
+  inset: -30% -60%;
+  background: linear-gradient(112deg, transparent 42%, rgb(255 244 200 / 92%) 50%, transparent 58%);
+  transform: translateX(-70%);
+}
+
+.card.is-barrido .card__barrido::after { animation: barrido 1.15s 0.35s ease-out both; }
+
+@keyframes barrido { to { transform: translateX(70%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .card__destellos,
+  .card__barrido { display: none; }
+}
+
 /* Brillo: una luz blanca que sigue al puntero en toda la carta */
 .card__brillo {
   position: absolute;
@@ -710,7 +869,8 @@ body {
 }
 
 .card[data-rareza="legendaria"] .card__brillo,
-.card[data-variante="holo"] .card__brillo { mix-blend-mode: overlay; }
+.card[data-variante="holo"] .card__brillo,
+.card[data-variante="gold"] .card__brillo { mix-blend-mode: overlay; }
 
 /* Carga antes de revelar */
 .card.is-cargando::before {

@@ -2,12 +2,14 @@
  * Catálogo de cartas del prototipo "Sobre coleccionable".
  * Cada entrada base: id, tipo (emote|fanart), src, nombre (en carta), alt, artista y rareza.
  * `conjunto` opcional tiene forma { id, nombre }; si falta, pertenece a Serie 1.
- * Al final, cada carta se expande en una versión base (90) y una Holo (10).
+ * Al final, cada carta se expande en una versión base (88) y una Holo (10), y todas las
+ * versiones Gold (2) van después de esas entradas, en el mismo orden, para que el número
+ * de carta (posición en el catálogo) de las existentes no cambie nunca.
  * Rarezas: comun | rara | epica | legendaria (misma paleta del sitio).
  */
 const CONJUNTO_SERIE_1 = { id: "serie-1", nombre: "Serie 1" };
 
-globalThis.SOBRE_CATALOGO = [
+const CARTAS_BASE = [
   /* ---------- Emotes ---------- */
   { id: "lentes-oscuros", tipo: "emote", src: "img/emotes/lentes-oscuros.webp", nombre: "Modo cool", alt: "Emote de Wewin con lentes oscuros: modo cool", artista: "skyshinez_", rareza: "comun", lore: "Dicen que estos lentes aparecen justo antes de cada decisión cuestionable. Nadie sabe quién los deja ahí." },
   { id: "angustia", tipo: "emote", src: "img/emotes/angustia.webp", nombre: "Tristeza", alt: "Emote de Wewin llorando de angustia", artista: "skyshinez_", rareza: "comun" },
@@ -51,11 +53,13 @@ globalThis.SOBRE_CATALOGO = [
   { id: "dino-pijama", tipo: "fanart", src: "img/fanarts/dino-pijama.webp", nombre: "Disfraz de Godzilla", alt: "Fanart de Wewin con pijama de dinosaurio", artista: "cosmic_alexs", rareza: "rara" },
   { id: "cumpleanos-pixel", tipo: "fanart", src: "img/fanarts/cumpleanos-pixel.webp", nombre: "Cumpleaños pixel", alt: "Fanart pixel art de cumpleaños de Wewin con chibis de Red, Goku, Luffy y Edward", artista: "Josswarz", rareza: "epica" },
   { id: "proyectado", tipo: "fanart", src: "img/fanarts/proyectado.webp", nombre: "Proyectado", alt: "Fanart de Wewin vestido de rojo frente a un campo de batalla", artista: "darklobo117", rareza: "legendaria" },
-].flatMap((carta) => {
+];
+
+const CARTAS_BASE_Y_HOLO = CARTAS_BASE.flatMap((carta) => {
   const grupoId = carta.id;
   const conjunto = carta.conjunto || CONJUNTO_SERIE_1;
   return [
-    { ...carta, grupoId, conjunto, variante: "base", pesoVariante: 90 },
+    { ...carta, grupoId, conjunto, variante: "base", pesoVariante: 88 },
     {
       ...carta,
       id: `${grupoId}-holo`,
@@ -67,3 +71,16 @@ globalThis.SOBRE_CATALOGO = [
     },
   ];
 });
+
+/* Las Gold van al final: así la numeración (#001…) de las demás no se mueve */
+const CARTAS_GOLD = CARTAS_BASE.map((carta) => ({
+  ...carta,
+  id: `${carta.id}-gold`,
+  grupoId: carta.id,
+  conjunto: carta.conjunto || CONJUNTO_SERIE_1,
+  variante: "gold",
+  nombreVariante: "Gold",
+  pesoVariante: 2,
+}));
+
+globalThis.SOBRE_CATALOGO = [...CARTAS_BASE_Y_HOLO, ...CARTAS_GOLD];

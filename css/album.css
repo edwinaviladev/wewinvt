@@ -278,6 +278,11 @@ body.sin-scroll { overflow: hidden !important; }
   --sombra-carta: 0 10px 20px rgb(36 35 33 / 24%);
 }
 
+/* Gold conserva su resplandor dorado en el álbum */
+.album-seccion .card[data-variante="gold"] {
+  --sombra-carta: 0 10px 20px rgb(0 0 0 / 40%), 0 0 calc(var(--cw) * 0.1) rgb(255 196 84 / 30%);
+}
+
 /* El catálogo fuera de pantalla no se pinta */
 #catalogo-cartas .album-seccion {
   content-visibility: auto;
