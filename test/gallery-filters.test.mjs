@@ -37,7 +37,7 @@ function element(tagName) {
   };
 }
 
-function mountGallery() {
+function mountGallery(search) {
   const window = {};
   runInNewContext(dataSource, { window });
 
@@ -101,7 +101,9 @@ function mountGallery() {
     contains: () => true,
   };
 
-  runInNewContext(gallerySource, { document, window });
+  const context = { document, window };
+  if (search !== undefined) Object.assign(context, { location: { search }, URLSearchParams });
+  runInNewContext(gallerySource, context);
   return {
     window,
     document,
@@ -171,4 +173,53 @@ test("combined filters show the no-results message when nothing matches", () => 
 
   assert.equal(filterCount.textContent, "0 obras");
   assert.equal(filterEmpty.hidden, false);
+});
+
+test("?artista= preselects an existing artist and filters the gallery", () => {
+  const { window, artistFilter, filterCount, fanartList } = mountGallery("?artista=vtkairo");
+  const works = [...window.WEWIN.fanarts, ...window.WEWIN.emotes].filter((work) => work.artista === "vtkairo");
+
+  assert.equal(artistFilter.value, "vtkairo");
+  assert.equal(filterCount.textContent, works.length + (works.length === 1 ? " obra" : " obras"));
+  assert.ok(fanartList.children.some((item) => item.hidden));
+});
+
+test("every gallery link on the artists page selects a real filter option", () => {
+  const window = {};
+  runInNewContext(dataSource, { window });
+  const created = [];
+  const node = (tagName) => {
+    const item = { ...element(tagName), append() {} };
+    created.push(item);
+    return item;
+  };
+  const artistasSource = readFileSync(new URL("../js/artistas.js", import.meta.url), "utf8");
+  const document = {
+    querySelector: (selector) => (selector === "[data-artistas]" ? node("div") : null),
+    createElement: node,
+  };
+  runInNewContext(artistasSource, { window, document, URL });
+
+  const links = created.filter((item) => String(item.href).startsWith("emotes.html?artista="));
+  const credited = new Set(
+    [...window.WEWIN.emotes, ...window.WEWIN.fanarts].map((work) => work.artista).filter(Boolean),
+  );
+  assert.equal(links.length, credited.size);
+
+  links.forEach(({ href }) => {
+    const search = href.slice(href.indexOf("?"));
+    const expected = new URLSearchParams(search).get("artista");
+    const { artistFilter, filterCount } = mountGallery(search);
+    assert.equal(artistFilter.value, expected, href);
+    assert.ok(Number(filterCount.textContent.split(" ")[0]) > 0, href);
+  });
+});
+
+test("?artista= with an unknown, partial or empty name is ignored", () => {
+  for (const search of ["?artista=nadie", "?artista=vtkai", "?artista=", "?otro=1", ""]) {
+    const { window, artistFilter, filterCount } = mountGallery(search);
+    const total = window.WEWIN.emotes.length + window.WEWIN.fanarts.length;
+    assert.equal(artistFilter.value, "all", search);
+    assert.equal(filterCount.textContent, total + " obras", search);
+  }
 });

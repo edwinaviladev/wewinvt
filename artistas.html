@@ -84,6 +84,20 @@
       </div>
     </footer>
 
+    <!-- Lightbox de las obras de cada artista -->
+    <div class="lightbox" data-lightbox hidden role="dialog" aria-modal="true" aria-label="Vista previa de la imagen">
+      <img
+        class="lb-img"
+        data-lightbox-img
+        src="data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E"
+        alt=""
+      />
+      <button class="lb-btn lb-prev" data-lightbox-prev type="button" aria-label="Imagen anterior">‹</button>
+      <button class="lb-btn lb-next" data-lightbox-next type="button" aria-label="Imagen siguiente">›</button>
+      <button class="lb-close" data-lightbox-close type="button" aria-label="Cerrar vista previa">✕</button>
+      <p class="lb-caption" data-lightbox-caption></p>
+    </div>
+
     <script src="js/data.js" defer></script>
     <script src="js/main.js" defer></script>
     <script src="js/artistas.js" defer></script>

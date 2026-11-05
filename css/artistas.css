@@ -8,7 +8,8 @@
 
 .artists-grid {
   display: grid;
-  gap: clamp(2.75rem, 6vw, 4.5rem);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(2rem, 4vw, 3rem) clamp(1.25rem, 3vw, 2.5rem);
 }
 
 .artist-card {
@@ -17,49 +18,60 @@
   border-top: 1px solid var(--color-border);
 }
 
+.artist-card--wide {
+  grid-column: 1 / -1;
+}
+
 .artist-card__header {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "title profile"
+    "count profile";
   align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
+  column-gap: 1rem;
   margin-bottom: 1rem;
 }
 
 .artist-card__title {
+  grid-area: title;
   min-width: 0;
   margin: 0;
   font-family: var(--font-heading);
-  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
   font-weight: 500;
   overflow-wrap: anywhere;
 }
 
-.artist-card__title a {
-  color: inherit;
-  text-decoration-color: var(--color-accent);
-  text-underline-offset: 0.18em;
-}
-
-.artist-card__title a:hover {
-  color: var(--color-accent);
-}
-
 .artist-card__count {
-  flex: none;
-  margin: 0;
+  grid-area: count;
+  margin: 0.15rem 0 0;
   color: var(--color-muted);
   font-family: var(--font-mono);
   font-size: 0.68rem;
+}
+
+.artist-card__profile {
+  grid-area: profile;
+  align-self: start;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   white-space: nowrap;
+  text-underline-offset: 0.18em;
 }
 
 .artist-works {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
   gap: clamp(0.75rem, 2vw, 1rem);
   padding: 0;
   margin: 0;
   list-style: none;
+}
+
+.artist-card--wide .artist-works {
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
 }
 
 .artist-work {
@@ -69,6 +81,42 @@
 
 .artist-work figure {
   margin: 0;
+}
+
+.artist-work__open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: zoom-in;
+}
+
+.artist-work__open:hover img {
+  outline: 1px solid var(--color-accent);
+}
+
+.artist-work__open:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.lb-btn[hidden] {
+  display: none;
+}
+
+/* Full descriptions wrap, so the caption needs its own width and a softer radius. */
+.lb-caption {
+  width: max-content;
+  border-radius: 1rem;
+}
+
+.lb-caption__type {
+  margin-right: 0.6em;
+  font-size: 0.7em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .artist-work img {
@@ -102,15 +150,42 @@
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+@media (max-width: 900px) {
+  .artists-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Keep the phone arrows above a caption that can wrap to several lines. */
+@media (max-width: 640px) {
+  .lb-btn {
+    bottom: 8rem;
+  }
 }
 
 @media (max-width: 560px) {
-  .artist-card__header {
-    align-items: flex-start;
+  .artists-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .artist-works {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .artist-card--wide .artist-works {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.artist-card__gallery {
+  display: inline-block;
+  margin-top: 0.85rem;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-underline-offset: 0.18em;
 }
