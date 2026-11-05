@@ -27,7 +27,7 @@ The catalog holds a base and a Holo version of every card, mixed in one grid wit
 - [x] T5 `css/album.css`: dark showcase theme for everything on `/album` except the cards and site header. Route: delegated (writer trigger, 2+ non-trivial files).
 - [x] T6 `album.html`, `js/album.js`, `css/album.css`, tests: one progress block with a bar split by rarity; series progress only with 2+ series. Route: delegated, same writer.
 - [x] T7 `album.html`, `css/album.css`: filter toolbar, compact Novedades, rarity sections without boxes. Route: delegated, same writer.
-- [ ] T8 Verify contrast and layouts in a browser at desktop and phone widths. Route: inline.
+- [x] T8 Verify contrast and layouts in a browser at desktop and phone widths. Route: inline.
 
 ## Acceptance criteria
 - `/album` opens on Normales, showing only base cards; the Holo tab shows only Holo cards.
@@ -65,7 +65,10 @@ The catalog holds a base and a Holo version of every card, mixed in one grid wit
 - Second review over `174c4c6..95e9c4c`: approved. Its finding, that removing the static checks dropped `role`, `aria-controls` and the hidden Holo button, is fixed with direct assertions; 116 pass.
 - T5 a7a676c: dark showcase theme in `css/album.css` (tokens on `body.album-page`, header stays cream); node --test 116 pass.
 - T6 c319d13: one progress block, bar split by rarity, series only with 2+; node --test 119 pass .
-- T7: filter toolbar, boxless rarity sections and compact Novedades; node --test 119 pass. Measured locally at 1280px: Novedades 463px high (was 1,009px), filters on one row; at 375px no horizontal overflow on either tab. Contrast and layout verification in the browser remains T8.
+- T7 6c03efe: filter toolbar, boxless rarity sections and compact Novedades; node --test 119 pass.
+- T8 local browser with seeded test data, removed afterwards: every text style outside the cards measures at least 4.5:1 against its background on both tabs and in the card detail. Header stays cream, focus ring is visible.
+- T8 layout: at 1280px, Novedades is 463px high (was 1,009px), the page went from 6,297px to 5,411px, and the bar shows fills per rarity after a tab switch. At 375px there is no horizontal overflow and Novedades stacks at 843px.
+- Not verified: hover states by eye, a catalog with 2 or more series in a browser (covered by tests), real touch devices, production.
 
 ## Next step
-T8. Afterwards the user decides on the pull request and whether card numbering should restart per album.
+The user decides on the pull request and whether card numbering should restart per album.
