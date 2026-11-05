@@ -61,36 +61,6 @@ body.sin-scroll { overflow: hidden !important; }
   font-size: 14px;
 }
 
-.album-progreso {
-  max-width: 460px;
-  margin: 0 auto 16px;
-}
-
-.barra {
-  height: 14px;
-  border-radius: 999px;
-  border: 1px solid rgb(246 235 221 / 18%);
-  background: rgb(16 11 10 / 80%);
-  overflow: hidden;
-}
-
-.barra i {
-  display: block;
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--rojo-vivo), var(--caramelo));
-  box-shadow: 0 0 18px rgb(242 178 99 / 45%);
-  transition: width 1s cubic-bezier(0.2, 0.7, 0.3, 1);
-}
-
-.barra-texto {
-  margin: 10px 0 0;
-  font-family: var(--font-engine-mono);
-  font-size: 12px;
-  color: var(--muted);
-}
-.barra-texto b { color: var(--caramelo); font-size: 14px; }
-
 .album-stats {
   display: flex;
   flex-wrap: wrap;
@@ -234,27 +204,6 @@ body.sin-scroll { overflow: hidden !important; }
   font-size: 0.9rem;
   text-align: center;
 }
-
-.stat {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 14px;
-  border-radius: 999px;
-  border: 1px solid rgb(246 235 221 / 16%);
-  background: rgb(23 17 15 / 80%);
-  font-family: var(--font-engine-mono);
-  font-size: 11px;
-  color: var(--muted);
-}
-.stat i {
-  width: 9px;
-  height: 9px;
-  rotate: 45deg;
-  background: var(--c, #f2b263);
-  box-shadow: 0 0 8px var(--c, #f2b263);
-}
-.stat b { color: var(--text); }
 
 .album-acciones {
   display: flex;
@@ -494,31 +443,47 @@ body.sin-scroll { overflow: hidden !important; }
   .detalle-dato { grid-template-columns: 74px 1fr; }
 }
 
-/* ---------- Tratamiento editorial del álbum público ---------- */
+/* ---------- Showcase oscuro del álbum público ----------
+   Todo lo que hay bajo el header del sitio es oscuro. El header conserva la
+   paleta crema del resto del sitio, y las cartas no se tocan. */
 
 body.album-page {
-  --bg: var(--color-bg);
-  --bg-deep: #eee7dc;
-  --text: var(--color-ink);
-  --muted: var(--color-muted);
-  --font-engine-body: var(--font-body);
-  --font-engine-display: var(--font-heading);
-  --font-engine-mono: var(--font-mono);
-  --caramelo: #825a21;
-  --rojo: var(--color-accent);
-  --rojo-vivo: var(--color-accent-hover);
-  --rubor: var(--color-accent-hover);
-  background: var(--color-bg);
-  color: var(--color-ink);
+  --album-bg: #1f1d1b;
+  --album-surface: #2a2724;
+  --album-surface-hover: #35312d;
+  --album-line: #3d3935;
+  /* Borde de controles: 4.4:1 sobre la página y 3.9:1 sobre la superficie */
+  --album-control: #8a8279;
+  --album-text: #f5f0e8;
+  --album-muted: #b5ada2;
+  --album-accent: #d4635b;
+  /* El acento como texto necesita más luminosidad: 5.7:1 sobre la superficie */
+  --album-accent-text: #e8857e;
+  --album-on-accent: #1f1d1b;
+  --caramelo: #f2b263;
+  --rubor: var(--album-accent-text);
+  background: var(--album-bg);
+  color: var(--album-text);
+  color-scheme: dark;
 }
 
 body.album-page .site-header {
   background: var(--color-bg);
+  color-scheme: light;
 }
 
 body.album-page .album-shell {
   max-width: var(--content-width);
   padding: clamp(3.5rem, 7vw, 6rem) var(--page-gutter) 5rem;
+}
+
+body.album-page :focus-visible {
+  outline: 2px solid var(--album-accent-text);
+  outline-offset: 3px;
+}
+
+body.album-page .site-header :focus-visible {
+  outline-color: var(--color-accent);
 }
 
 body.album-page .album-head {
@@ -528,7 +493,7 @@ body.album-page .album-head {
 }
 
 body.album-page .eyebrow {
-  color: var(--color-accent);
+  color: var(--album-accent-text);
   font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: 0.12em;
@@ -541,6 +506,7 @@ body.album-page .album-head .eyebrow {
 body.album-page .album-head h1 {
   max-width: 14ch;
   margin-top: 0;
+  color: var(--album-text);
   font-family: var(--font-heading);
   font-size: clamp(2.8rem, 6vw, 4.8rem);
   font-weight: 500;
@@ -549,72 +515,23 @@ body.album-page .album-head h1 {
 
 body.album-page .album-sub {
   margin: 0 0 1.5rem;
-  color: var(--color-muted);
+  color: var(--album-muted);
   font-size: 1rem;
 }
 
 body.album-page .album-vacio {
-  color: var(--color-accent-hover);
+  color: var(--album-accent-text);
 }
 
 body.album-page .album-identidad {
   margin: 0 0 0.75rem;
-  color: var(--color-muted);
+  color: var(--album-muted);
   font-family: var(--font-mono);
   font-size: 0.7rem;
 }
 
-body.album-page .album-identidad b,
-body.album-page .barra-texto b {
-  color: var(--color-accent-hover);
-}
-
-body.album-page .album-progreso {
-  margin: 0 0 1rem;
-}
-
-body.album-page .barra {
-  height: 0.55rem;
-  border: 1px solid var(--color-border);
-  border-radius: 0;
-  background: var(--color-accent-soft);
-}
-
-body.album-page .barra i {
-  border-radius: 0;
-  background: var(--color-accent);
-  box-shadow: none;
-  transition: width 500ms ease;
-}
-
-body.album-page .barra-texto {
-  color: var(--color-muted);
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-}
-
-body.album-page .album-stats {
-  justify-content: flex-start;
-  gap: 0.5rem;
-  margin: 0 0 1.25rem;
-}
-
-body.album-page .stat {
-  padding: 0.35rem 0.55rem;
-  border-color: var(--color-border);
-  border-radius: 0;
-  background: transparent;
-  color: var(--color-muted);
-  font-family: var(--font-mono);
-  font-size: 0.64rem;
-}
-
-body.album-page .stat i {
-  box-shadow: none;
-}
-
-body.album-page .stat b {
-  color: var(--color-ink);
+body.album-page .album-identidad b {
+  color: var(--album-text);
 }
 
 body.album-page .album-acciones {
@@ -632,32 +549,274 @@ body.album-page .btn {
 }
 
 body.album-page .btn--ghost {
-  border-color: var(--color-border);
+  border-color: var(--album-control);
   background: transparent;
-  color: var(--color-ink);
+  color: var(--album-text);
 }
 
 body.album-page .btn--ghost:hover {
-  border-color: var(--color-accent);
-  background: var(--color-accent-soft);
+  border-color: var(--album-accent-text);
+  background: var(--album-surface-hover);
 }
 
 body.album-page .btn--primary {
-  background: var(--color-accent);
-  color: #fffdf9;
+  border-color: var(--album-accent);
+  background: var(--album-accent);
+  color: var(--album-on-accent);
 }
 
+body.album-page .btn--primary:hover {
+  border-color: var(--album-accent-text);
+  background: var(--album-accent-text);
+}
+
+/* ---------- Pestañas de colección ---------- */
+
+.album-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--album-line);
+}
+
+.album-tab {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--album-control);
+  border-radius: 0;
+  background: transparent;
+  color: var(--album-text);
+  font: 700 0.95rem var(--font-body);
+  cursor: pointer;
+}
+
+.album-tab__cuenta {
+  color: var(--album-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 400;
+}
+
+.album-tab:hover {
+  border-color: var(--album-accent-text);
+  background: var(--album-surface-hover);
+}
+
+.album-tab[aria-selected="true"] {
+  border-color: var(--album-accent);
+  background: var(--album-accent);
+  color: var(--album-on-accent);
+}
+
+.album-tab[aria-selected="true"] .album-tab__cuenta {
+  color: var(--album-on-accent);
+}
+
+.album-tab[aria-selected="true"]:hover {
+  border-color: var(--album-accent-text);
+  background: var(--album-accent-text);
+}
+
+.album-panel {
+  min-width: 0;
+}
+
+/* ---------- Progreso: un solo bloque ---------- */
+
+body.album-page .album-progreso {
+  max-width: none;
+  margin: 0 0 1rem;
+  padding: 1.25rem 1.5rem 1.1rem;
+  border: 1px solid var(--album-line);
+  background: var(--album-surface);
+}
+
+.album-progreso__fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.album-progreso__pct {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin: 0;
+  color: var(--album-muted);
+  font-size: 0.95rem;
+}
+
+.album-progreso__pct b {
+  color: var(--album-text);
+  font-family: var(--font-heading);
+  font-size: clamp(2.25rem, 5vw, 3.25rem);
+  font-weight: 500;
+  line-height: 1;
+}
+
+body.album-page .barra-texto {
+  margin: 0;
+  color: var(--album-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+body.album-page .barra-texto b {
+  color: var(--album-text);
+  font-size: inherit;
+}
+
+/* Una franja por rareza; su ancho sigue el total de cartas de esa rareza */
+.barra {
+  display: flex;
+  gap: 3px;
+  height: 12px;
+}
+
+.barra__tramo {
+  flex: 1 1 0;
+  min-width: 6px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--c) 16%, var(--album-bg));
+}
+
+.barra__tramo i {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: var(--c);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .barra__tramo i {
+    transition: width 500ms ease;
+  }
+}
+
+body.album-page .album-stats {
+  justify-content: flex-start;
+  gap: 0.35rem 1.5rem;
+  margin: 0.9rem 0 0;
+}
+
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--album-muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+.stat i {
+  width: 0.6rem;
+  height: 0.6rem;
+  background: var(--c);
+}
+
+.stat b {
+  color: var(--album-text);
+  font-weight: 700;
+}
+
+/* Progreso por serie: solo existe con 2 o más series */
+body.album-page .album-conjuntos {
+  max-width: 58rem;
+  margin: 0 0 1.25rem;
+}
+
+.album-conjuntos:empty {
+  display: none;
+}
+
+body.album-page .album-conjunto {
+  border-color: var(--album-line);
+  background: var(--album-surface);
+}
+
+body.album-page .album-conjunto__header h2 {
+  color: var(--album-text);
+}
+
+body.album-page .album-conjunto__header span,
+body.album-page .album-conjunto__texto {
+  color: var(--album-muted);
+}
+
+body.album-page .album-conjunto__barra {
+  border-color: var(--album-line);
+  background: var(--album-bg);
+}
+
+body.album-page .album-conjunto__barra i {
+  background: var(--album-accent);
+}
+
+/* ---------- Filtros: barra de herramientas ---------- */
+
+body.album-page .album-filtros {
+  align-items: end;
+  justify-content: flex-start;
+  gap: 0.75rem 1rem;
+  margin: 1.75rem 0 1rem;
+}
+
+body.album-page .album-filtros > label:not(.album-filtro-toggle) {
+  color: var(--album-muted);
+}
+
+body.album-page .album-filtros select {
+  border-color: var(--album-control);
+  background: var(--album-surface);
+  color: var(--album-text);
+  color-scheme: dark;
+}
+
+body.album-page .album-filtros select:hover {
+  border-color: var(--album-accent-text);
+}
+
+body.album-page .album-filtro-toggle {
+  color: var(--album-text);
+}
+
+body.album-page .album-filtro-toggle input {
+  accent-color: var(--album-accent);
+}
+
+body.album-page .album-filtro-resultados {
+  flex-basis: auto;
+  align-self: center;
+  margin-left: 0.25rem;
+  color: var(--album-muted);
+  text-align: left;
+}
+
+body.album-page .album-filtro-vacio {
+  color: var(--album-accent-text);
+}
+
+/* ---------- Secciones por rareza: cartas directo sobre la página ---------- */
+
 body.album-page .album-seccion {
-  margin: 2rem 0;
-  padding: clamp(1rem, 2vw, 1.5rem);
-  border: 1px solid color-mix(in srgb, var(--c) 32%, var(--color-border));
-  border-radius: 0.2rem;
-  background: var(--color-surface);
+  margin: 2.5rem 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
   box-shadow: none;
 }
 
 body.album-page .album-rareza h2 {
-  color: var(--color-ink);
+  color: var(--album-text);
   font-family: var(--font-heading);
   font-size: clamp(1.35rem, 2.5vw, 2rem);
   font-weight: 600;
@@ -666,65 +825,96 @@ body.album-page .album-rareza h2 {
 }
 
 body.album-page .album-rareza h2::before {
-  color: var(--c, var(--color-accent));
+  color: var(--c, var(--album-accent));
   text-shadow: none;
 }
 
 body.album-page .album-rareza .conteo {
   padding: 0.3rem 0.5rem;
-  border-color: color-mix(in srgb, var(--c) 40%, var(--color-border));
+  border-color: color-mix(in srgb, var(--c) 55%, var(--album-line));
   border-radius: 0;
-  background: var(--color-bg);
-  color: var(--color-ink);
+  background: var(--album-surface);
+  color: var(--album-text);
   font-size: 0.68rem;
 }
 
 body.album-page .album-rareza .linea {
-  background: var(--color-border);
+  background: var(--album-line);
   opacity: 1;
 }
 
-body.album-page .album-novedades {
-  --c: var(--color-accent);
+body.album-page .album-grid {
+  justify-content: start;
 }
 
-body.album-page .album-novedades__copy {
-  max-width: 52rem;
-  margin: -0.5rem 0 1.5rem;
-  color: var(--color-muted);
+/* Cartas aún sin descubrir: el reverso apenas se despega de la página oscura */
+body.album-page .card--locked .card__face--back {
+  background-color: #24201e;
+  opacity: 0.34;
+  filter: brightness(0.8);
+}
+
+/* ---------- Novedades: banda compacta ---------- */
+
+body.album-page .album-novedades {
+  --c: var(--album-accent);
+  --album-card-size: clamp(150px, 13vw, 176px);
+  margin: 0 0 2rem;
+  padding: 1rem 1.5rem 1.25rem;
+  border: 1px solid var(--album-line);
+  background: var(--album-surface);
+}
+
+body.album-page .album-novedades .album-rareza {
+  margin-bottom: 1rem;
+}
+
+.album-novedades__cuerpo {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+body.album-page .album-novedades__destacada {
+  justify-content: start;
 }
 
 body.album-page .album-novedades__variantes {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--color-border);
+  min-width: 0;
+  padding-left: 1.5rem;
+  border-left: 1px solid var(--album-line);
 }
 
 body.album-page .album-novedades__variantes h3 {
-  margin: 0 0 0.35rem;
-  color: var(--color-ink);
+  margin: 0 0 0.2rem;
+  color: var(--album-text);
   font-family: var(--font-heading);
-  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  font-size: 1.15rem;
 }
 
 body.album-page .album-novedades__variantes > p {
-  margin: 0 0 1rem;
-  color: var(--color-muted);
-  font-size: 0.9rem;
+  margin: 0 0 0.5rem;
+  color: var(--album-muted);
+  font-size: 0.85rem;
 }
 
 .album-novedades__carrusel {
-  --holo-card-size: clamp(160px, 18vw, 210px);
+  --holo-card-size: clamp(150px, 13vw, 176px);
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: var(--holo-card-size);
   grid-template-rows: auto;
-  gap: clamp(0.75rem, 2vw, 1.25rem);
+  gap: clamp(0.75rem, 1.5vw, 1.1rem);
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  padding: 0.5rem 0.25rem 1rem;
+  padding: 0.25rem 0.25rem 0.75rem;
   scroll-snap-type: x mandatory;
-  scrollbar-color: var(--color-accent) transparent;
+  scrollbar-color: var(--album-accent) transparent;
+}
+
+body.album-page .album-novedades__carrusel:focus-visible {
+  outline-offset: -2px;
 }
 
 .album-novedades__carrusel .card {
@@ -733,28 +923,75 @@ body.album-page .album-novedades__variantes > p {
   touch-action: pan-x;
 }
 
-body.album-page .album-novedades__acciones {
-  margin: 1.25rem 0 0;
+body.album-page .album-novedades__pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-top: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--album-line);
 }
+
+body.album-page .album-novedades__copy {
+  flex: 1 1 24rem;
+  max-width: 44rem;
+  margin: 0;
+  color: var(--album-muted);
+  font-size: 0.9rem;
+}
+
+body.album-page .album-novedades__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+/* ---------- Pie ---------- */
 
 body.album-page .album-pie {
   justify-content: flex-start;
   margin-top: 2rem;
   padding-top: 1rem;
-  border-top: 1px solid var(--color-border);
-  color: var(--color-muted);
+  border-top: 1px solid var(--album-line);
+  color: var(--album-muted);
   font-size: 0.67rem;
 }
 
 body.album-page .album-pie b {
-  color: var(--color-accent-hover);
+  color: var(--album-text);
 }
 
+body.album-page .site-footer {
+  border-top-color: var(--album-line);
+  background: var(--album-bg);
+}
+
+body.album-page .site-footer .footer-bar {
+  color: var(--album-muted);
+}
+
+body.album-page .site-footer .footer-bar a {
+  color: var(--album-text);
+}
+
+body.album-page .site-footer .footer-bar a:hover {
+  color: var(--album-accent-text);
+}
+
+/* ---------- Detalle de carta ---------- */
+
 body.album-page .detalle {
-  background: rgb(36 35 33 / 82%);
+  background: rgb(31 29 27 / 90%);
 }
 
 body.album-page .detalle-info {
+  align-self: center;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--album-line);
+  background: var(--album-surface);
   color: #fffcf6;
 }
 
@@ -763,12 +1000,25 @@ body.album-page .detalle-dato b {
   color: #fffcf6;
 }
 
+body.album-page .detalle-info h3 {
+  font-family: var(--font-heading);
+}
+
+body.album-page .detalle-lore {
+  border-left-color: var(--album-accent);
+  color: var(--album-accent-text);
+}
+
 body.album-page .detalle-dato span {
   color: #d9c8b5;
 }
 
 body.album-page .detalle-dato a {
   color: #f0dfda;
+}
+
+body.album-page .detalle-compartir {
+  border-top-color: var(--album-line);
 }
 
 body.album-page .detalle-cerrar {
@@ -795,28 +1045,65 @@ body.album-page .detalle-compartir-estado {
   color: #d9c8b5;
 }
 
+/* ---------- Teléfono ---------- */
+
+@media (max-width: 760px) {
+  .album-novedades__cuerpo {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  body.album-page .album-novedades__variantes {
+    padding-top: 1rem;
+    padding-left: 0;
+    border-top: 1px solid var(--album-line);
+    border-left: 0;
+  }
+}
+
 @media (max-width: 640px) {
   body.album-page .album-head {
     margin-bottom: 1.5rem;
   }
 
-  body.album-page .album-stats {
-    justify-content: flex-start;
-  }
-
+  body.album-page .album-stats,
   body.album-page .album-acciones {
     justify-content: flex-start;
   }
 
+  body.album-page .album-progreso {
+    padding: 1rem;
+  }
+
+  body.album-page .album-filtros {
+    gap: 0.75rem;
+  }
+
+  body.album-page .album-filtro-resultados {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+
+  body.album-page .album-seccion {
+    margin: 1.75rem 0;
+    padding: 0;
+  }
+
+  body.album-page .album-novedades {
+    padding: 0.85rem 1rem 1rem;
+  }
+
   .album-novedades__carrusel {
     --holo-card-size: clamp(126px, 40vw, 160px);
+  }
+
+  body.album-page .album-novedades__acciones .btn {
+    flex: 1 1 auto;
   }
 }
 
 /* ---------- Movimiento reducido ---------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .barra i,
-  body.album-page .barra i { transition: none; }
   .detalle-caja { animation: none; }
 }

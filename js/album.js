@@ -27,6 +27,24 @@
   const limpiarFiltros = $("[data-limpiar-filtros]");
   const resultadosFiltro = $("[data-filtro-resultados]");
   const sinResultados = $("[data-filtro-vacio]");
+  const mensajeVacio = $("[data-vacio]");
+  const textoVacioNormales = mensajeVacio ? mensajeVacio.textContent : "";
+  const contenedorTabs = $("[data-tabs]");
+  const panel = $("[data-panel]");
+  const novedades = $("[data-novedades]");
+  const botonVerHolo = $("[data-ver-holo]");
+
+  /* Colecciones: "normales" + una por variante presente en los datos */
+  const COLECCIONES = window.AlbumFilters.colecciones(CATALOGO);
+  const COLECCION_HOLO = COLECCIONES.find((c) => c.id === "holo") || null;
+  const cartasDe = (id) => CATALOGO.filter((c) => window.AlbumFilters.coleccionDe(c) === id);
+  const consulta = new URLSearchParams(location.search);
+  let coleccionActiva = window.AlbumFilters.resolverColeccion(consulta.get("coleccion"), COLECCIONES);
+  /* Cada colección conserva sus propios filtros */
+  const estadoFiltros = {};
+  COLECCIONES.forEach((c) => {
+    estadoFiltros[c.id] = { rareza: "all", soloFaltantes: false };
+  });
 
   try {
     coleccion = JSON.parse(localStorage.getItem("wewinvt_coleccion") || "{}");
@@ -129,12 +147,14 @@
   /* =========================================================
      RENDER
      ========================================================= */
-  function renderProgresoConjuntos() {
+  function renderProgresoConjuntos(cartas) {
     const contenedor = $("[data-conjuntos]");
     if (!contenedor || !window.AlbumFilters) return;
     contenedor.innerHTML = "";
 
-    const conjuntos = window.AlbumFilters.progresoPorConjunto(CATALOGO, (id) => obtenidas(id) > 0);
+    const conjuntos = window.AlbumFilters.progresoPorConjunto(cartas, (id) => obtenidas(id) > 0);
+    /* Con una sola serie el progreso total ya lo dice todo */
+    if (conjuntos.length < 2) return;
     conjuntos.forEach((conjunto, index) => {
       const porcentaje = conjunto.total ? Math.round((conjunto.obtenidas / conjunto.total) * 100) : 0;
       const tarjeta = document.createElement("section");
@@ -168,9 +188,119 @@
     });
   }
 
+  function sincronizarControlesFiltro() {
+    const estado = estadoFiltros[coleccionActiva];
+    if (filtroRareza) filtroRareza.value = estado.rareza;
+    if (filtroFaltantes) filtroFaltantes.checked = estado.soloFaltantes;
+  }
+
+  function leerControlesFiltro() {
+    estadoFiltros[coleccionActiva] = {
+      rareza: filtroRareza?.value || "all",
+      soloFaltantes: Boolean(filtroFaltantes?.checked),
+    };
+  }
+
+  function construirTabs() {
+    if (!contenedorTabs) return;
+    contenedorTabs.innerHTML = "";
+    COLECCIONES.forEach((coleccion) => {
+      const tab = document.createElement("button");
+      tab.type = "button";
+      tab.className = "album-tab";
+      tab.id = `album-tab-${coleccion.id}`;
+      tab.setAttribute("role", "tab");
+      tab.setAttribute("aria-controls", "album-panel");
+      tab.dataset.coleccion = coleccion.id;
+      const nombre = document.createElement("span");
+      nombre.textContent = coleccion.nombre;
+      const cuenta = document.createElement("span");
+      cuenta.className = "album-tab__cuenta";
+      cuenta.dataset.tabCuenta = "";
+      tab.append(nombre, cuenta);
+      tab.addEventListener("click", () => activarColeccion(coleccion.id));
+      contenedorTabs.append(tab);
+    });
+  }
+
+  function pintarTabs() {
+    if (!contenedorTabs) return;
+    contenedorTabs.querySelectorAll("[role=tab]").forEach((tab) => {
+      const id = tab.dataset.coleccion;
+      const cartas = cartasDe(id);
+      const tengo = cartas.filter((c) => obtenidas(c.id) > 0).length;
+      tab.querySelector("[data-tab-cuenta]").textContent = `${tengo}/${cartas.length}`;
+      const activa = id === coleccionActiva;
+      tab.setAttribute("aria-selected", String(activa));
+      tab.tabIndex = activa ? 0 : -1;
+    });
+    if (panel) panel.setAttribute("aria-labelledby", `album-tab-${coleccionActiva}`);
+  }
+
+  function activarColeccion(id, { enfocar = false } = {}) {
+    const destino = window.AlbumFilters.resolverColeccion(id, COLECCIONES);
+    if (destino !== coleccionActiva) {
+      leerControlesFiltro();
+      coleccionActiva = destino;
+      sincronizarControlesFiltro();
+      const url = location.pathname + (destino === "normales" ? "" : `?coleccion=${encodeURIComponent(destino)}`);
+      history.replaceState(null, "", url);
+    }
+    render();
+    if (enfocar) document.getElementById(`album-tab-${destino}`)?.focus();
+  }
+
+  contenedorTabs?.addEventListener("keydown", (e) => {
+    /* Alt+← y similares son atajos del navegador */
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
+    const indice = COLECCIONES.findIndex((c) => c.id === coleccionActiva);
+    let siguiente;
+    if (e.key === "ArrowRight") siguiente = (indice + 1) % COLECCIONES.length;
+    else if (e.key === "ArrowLeft") siguiente = (indice - 1 + COLECCIONES.length) % COLECCIONES.length;
+    else if (e.key === "Home") siguiente = 0;
+    else siguiente = COLECCIONES.length - 1;
+    e.preventDefault();
+    activarColeccion(COLECCIONES[siguiente].id, { enfocar: true });
+  });
+
+  /* Un tramo por rareza: su ancho sigue el total y el relleno, lo obtenido.
+     Los tramos se reutilizan entre renders para que el CSS anime el cambio de ancho. */
+  const tramosBarra = new Map();
+
+  function pintarBarra(barra, cartas) {
+    const presentes = ORDEN.filter((clave) => cartas.some((c) => c.rareza === clave));
+    if (presentes.join() !== [...tramosBarra.keys()].join()) {
+      barra.innerHTML = "";
+      tramosBarra.clear();
+      presentes.forEach((clave) => {
+        const tramo = document.createElement("span");
+        tramo.className = "barra__tramo";
+        tramo.dataset.rareza = clave;
+        tramo.setAttribute("aria-hidden", "true");
+        tramo.style.setProperty("--c", RAREZAS[clave].color);
+        const relleno = document.createElement("i");
+        tramo.appendChild(relleno);
+        barra.appendChild(tramo);
+        /* Fija el ancho inicial de 0 antes de asignar el real, para que haya transición */
+        void relleno.offsetWidth;
+        tramosBarra.set(clave, { tramo, relleno });
+      });
+    }
+    presentes.forEach((clave) => {
+      const grupo = cartas.filter((c) => c.rareza === clave);
+      const tengo = grupo.filter((c) => obtenidas(c.id) > 0).length;
+      const { tramo, relleno } = tramosBarra.get(clave);
+      tramo.style.flexGrow = String(grupo.length);
+      relleno.style.width = `${Math.round((tengo / grupo.length) * 100)}%`;
+    });
+  }
+
   function render() {
-    const total = CATALOGO.length;
-    const cuantas = CATALOGO.filter((c) => obtenidas(c.id) > 0).length;
+    const coleccionInfo = COLECCIONES.find((c) => c.id === coleccionActiva);
+    const cartasColeccion = cartasDe(coleccionActiva);
+    const total = cartasColeccion.length;
+    const cuantas = cartasColeccion.filter((c) => obtenidas(c.id) > 0).length;
     const pct = total ? Math.round((cuantas / total) * 100) : 0;
 
     $("[data-total-cartas]").textContent = String(total);
@@ -180,15 +310,24 @@
 
     const barra = $("[data-barra]");
     if (barra) barra.setAttribute("aria-valuenow", String(pct));
-    const relleno = $("[data-barra-fill]");
-    if (relleno) relleno.style.width = `${pct}%`;
 
-    $("[data-vacio]").hidden = cuantas !== 0;
+    if (mensajeVacio) {
+      mensajeVacio.textContent =
+        coleccionActiva === "normales"
+          ? textoVacioNormales
+          : `Aún no tienes cartas ${coleccionInfo.nombre}. Cada carta puede salir en versión ${coleccionInfo.nombre} al canjear el gacha.`;
+      mensajeVacio.hidden = cuantas !== 0;
+    }
+
+    pintarTabs();
+    if (novedades) novedades.hidden = coleccionActiva !== "normales";
+    if (botonVerHolo) botonVerHolo.hidden = !COLECCION_HOLO;
 
     const stats = $("[data-stats]");
     stats.innerHTML = "";
+    if (barra) pintarBarra(barra, cartasColeccion);
     ORDEN.forEach((clave) => {
-      const grupo = CATALOGO.filter((c) => c.rareza === clave);
+      const grupo = cartasColeccion.filter((c) => c.rareza === clave);
       const tengo = grupo.filter((c) => obtenidas(c.id) > 0).length;
       const chip = document.createElement("span");
       chip.className = "stat";
@@ -197,13 +336,10 @@
       stats.append(chip);
     });
 
-    renderProgresoConjuntos();
+    renderProgresoConjuntos(cartasColeccion);
 
-    const filtros = {
-      rareza: filtroRareza?.value || "all",
-      soloFaltantes: Boolean(filtroFaltantes?.checked),
-    };
-    const filtradas = window.AlbumFilters.filtrar(CATALOGO, filtros, (id) => obtenidas(id) > 0);
+    const filtros = estadoFiltros[coleccionActiva];
+    const filtradas = window.AlbumFilters.filtrar(cartasColeccion, filtros, (id) => obtenidas(id) > 0);
     if (resultadosFiltro) resultadosFiltro.textContent = `${filtradas.length} cartas mostradas`;
     if (sinResultados) sinResultados.hidden = filtradas.length > 0;
 
@@ -211,7 +347,7 @@
     album.innerHTML = "";
 
     ORDEN.forEach((clave) => {
-      const grupoCompleto = CATALOGO.filter((c) => c.rareza === clave);
+      const grupoCompleto = cartasColeccion.filter((c) => c.rareza === clave);
       const grupo = filtradas.filter((c) => c.rareza === clave);
       if (!grupo.length) return;
       const tengo = grupoCompleto.filter((c) => obtenidas(c.id) > 0).length;
@@ -256,13 +392,23 @@
     if (totalHolo) totalHolo.textContent = `${variantesHolo.length} de ${todasLasVariantesHolo.length}`;
   }
 
-  filtroRareza?.addEventListener("change", render);
-  filtroFaltantes?.addEventListener("change", render);
+  const alCambiarFiltro = () => {
+    leerControlesFiltro();
+    render();
+  };
+  filtroRareza?.addEventListener("change", alCambiarFiltro);
+  filtroFaltantes?.addEventListener("change", alCambiarFiltro);
   limpiarFiltros?.addEventListener("click", () => {
     filtroRareza.value = "all";
     filtroFaltantes.checked = false;
-    render();
+    alCambiarFiltro();
   });
+  botonVerHolo?.addEventListener("click", () => {
+    if (COLECCION_HOLO) activarColeccion(COLECCION_HOLO.id, { enfocar: true });
+  });
+
+  construirTabs();
+  sincronizarControlesFiltro();
 
   /* En la cuadrícula la carta queda plana y quieta; solo se inclina la que se toca */
   function cartaObtenida(datos, opciones = { plana: true }) {

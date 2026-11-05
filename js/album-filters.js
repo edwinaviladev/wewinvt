@@ -35,5 +35,30 @@ window.AlbumFilters = (() => {
     return [...progreso.values()].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
   }
 
-  return { filtrar, progresoPorConjunto };
+  const COLECCION_NORMAL = "normales";
+
+  function coleccionDe(carta) {
+    const variante = carta && carta.variante;
+    return !variante || variante === "base" ? COLECCION_NORMAL : String(variante);
+  }
+
+  function colecciones(cartas) {
+    const lista = [{ id: COLECCION_NORMAL, nombre: "Normales" }];
+    const vistas = new Set([COLECCION_NORMAL]);
+    (cartas || []).forEach((carta) => {
+      const id = coleccionDe(carta);
+      if (vistas.has(id)) return;
+      vistas.add(id);
+      lista.push({ id, nombre: carta.nombreVariante || id });
+    });
+    return lista;
+  }
+
+  function resolverColeccion(id, disponibles) {
+    const lista = Array.isArray(disponibles) ? disponibles : [];
+    const encontrada = typeof id === "string" && lista.some((coleccion) => coleccion.id === id);
+    return encontrada ? id : COLECCION_NORMAL;
+  }
+
+  return { filtrar, progresoPorConjunto, coleccionDe, colecciones, resolverColeccion };
 })();
