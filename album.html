@@ -84,6 +84,15 @@
 
           <p class="album-identidad" data-identidad>Colección local en este navegador</p>
 
+          <div class="album-acciones">
+            <button class="btn btn--ghost" data-conectar type="button">Conectar con Twitch</button>
+            <button class="btn btn--ghost" data-salir type="button" hidden>Salir</button>
+          </div>
+        </header>
+
+        <div class="album-tabs" role="tablist" aria-label="Colecciones del álbum" data-tabs></div>
+
+        <div class="album-panel" id="album-panel" role="tabpanel" data-panel>
           <div class="album-progreso">
             <div class="barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-barra>
               <i data-barra-fill style="width: 0%"></i>
@@ -95,61 +104,56 @@
 
           <div class="album-stats" data-stats></div>
 
-          <div class="album-acciones">
-            <button class="btn btn--ghost" data-conectar type="button">Conectar con Twitch</button>
-            <button class="btn btn--ghost" data-salir type="button" hidden>Salir</button>
+          <section class="album-seccion album-novedades" data-novedades aria-labelledby="novedades-titulo">
+            <header class="album-rareza">
+              <h2 id="novedades-titulo">Novedades de cartas</h2>
+              <span class="conteo"><span data-novedades-holo-count>0</span> variantes Holo</span>
+              <span class="linea" aria-hidden="true"></span>
+            </header>
+            <p class="album-novedades__copy">
+              Proyectado se suma como carta legendaria. Explora la carta y las versiones Holo de toda la colección.
+            </p>
+            <div class="album-grid album-novedades__destacada" data-novedad-proyectado></div>
+
+            <div class="album-novedades__variantes">
+              <h3>Variantes Holo</h3>
+              <p>Una muestra de cada rareza; cada versión se colecciona por separado. Todas siguen en el catálogo completo.</p>
+              <div
+                class="album-novedades__carrusel"
+                data-novedades-holo
+                role="region"
+                aria-label="Variantes Holo; desplázate horizontalmente para recorrerlas"
+                tabindex="0"
+              ></div>
+            </div>
+
+            <p class="album-novedades__acciones">
+              <a class="btn btn--ghost" href="#catalogo-cartas">Ver catálogo completo</a>
+            </p>
+          </section>
+
+          <div class="album-filtros" role="group" aria-label="Filtros del catálogo">
+            <label for="album-filtro-rareza">
+              <span>Rareza</span>
+              <select id="album-filtro-rareza" data-filtro-rareza>
+                <option value="all">Todas</option>
+                <option value="comun">Común</option>
+                <option value="rara">Rara</option>
+                <option value="epica">Épica</option>
+                <option value="legendaria">Legendaria</option>
+              </select>
+            </label>
+            <label class="album-filtro-toggle" for="album-filtro-faltantes">
+              <input id="album-filtro-faltantes" data-filtro-faltantes type="checkbox" />
+              Solo las que me faltan
+            </label>
+            <button class="btn btn--ghost" data-limpiar-filtros type="button">Limpiar filtros</button>
+            <p class="album-filtro-resultados" data-filtro-resultados aria-live="polite"></p>
           </div>
-        </header>
+          <p class="album-filtro-vacio" data-filtro-vacio hidden>No hay cartas con esos filtros. Prueba otra combinación.</p>
 
-        <section class="album-seccion album-novedades" aria-labelledby="novedades-titulo">
-          <header class="album-rareza">
-            <h2 id="novedades-titulo">Novedades de cartas</h2>
-            <span class="conteo"><span data-novedades-holo-count>0</span> variantes Holo</span>
-            <span class="linea" aria-hidden="true"></span>
-          </header>
-          <p class="album-novedades__copy">
-            Proyectado se suma como carta legendaria. Explora la carta y las versiones Holo de toda la colección.
-          </p>
-          <div class="album-grid album-novedades__destacada" data-novedad-proyectado></div>
-
-          <div class="album-novedades__variantes">
-            <h3>Variantes Holo</h3>
-            <p>Una muestra de cada rareza; cada versión se colecciona por separado. Todas siguen en el catálogo completo.</p>
-            <div
-              class="album-novedades__carrusel"
-              data-novedades-holo
-              role="region"
-              aria-label="Variantes Holo; desplázate horizontalmente para recorrerlas"
-              tabindex="0"
-            ></div>
-          </div>
-
-          <p class="album-novedades__acciones">
-            <a class="btn btn--ghost" href="#catalogo-cartas">Ver catálogo completo</a>
-          </p>
-        </section>
-
-        <div class="album-filtros" role="group" aria-label="Filtros del catálogo">
-          <label for="album-filtro-rareza">
-            <span>Rareza</span>
-            <select id="album-filtro-rareza" data-filtro-rareza>
-              <option value="all">Todas</option>
-              <option value="comun">Común</option>
-              <option value="rara">Rara</option>
-              <option value="epica">Épica</option>
-              <option value="legendaria">Legendaria</option>
-            </select>
-          </label>
-          <label class="album-filtro-toggle" for="album-filtro-faltantes">
-            <input id="album-filtro-faltantes" data-filtro-faltantes type="checkbox" />
-            Solo las que me faltan
-          </label>
-          <button class="btn btn--ghost" data-limpiar-filtros type="button">Limpiar filtros</button>
-          <p class="album-filtro-resultados" data-filtro-resultados aria-live="polite"></p>
+          <div id="catalogo-cartas" data-album></div>
         </div>
-        <p class="album-filtro-vacio" data-filtro-vacio hidden>No hay cartas con esos filtros. Prueba otra combinación.</p>
-
-        <div id="catalogo-cartas" data-album></div>
 
         <footer class="album-pie">
           <span>Sobres abiertos: <b data-sobres>0</b></span>

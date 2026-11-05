@@ -647,6 +647,67 @@ body.album-page .btn--primary {
   color: #fffdf9;
 }
 
+/* ---------- Pestañas de colección ---------- */
+
+body.album-page .album-conjuntos {
+  max-width: 58rem;
+  margin: 0 0 1.25rem;
+}
+
+.album-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.album-tab {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  min-height: 44px;
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font: 700 0.95rem var(--font-body);
+  cursor: pointer;
+}
+
+.album-tab__cuenta {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 400;
+}
+
+.album-tab:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.album-tab[aria-selected="true"] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #fffdf9;
+}
+
+.album-tab[aria-selected="true"] .album-tab__cuenta {
+  color: #fffdf9;
+}
+
+.album-tab:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.album-panel {
+  min-width: 0;
+}
+
 body.album-page .album-seccion {
   margin: 2rem 0;
   padding: clamp(1rem, 2vw, 1.5rem);

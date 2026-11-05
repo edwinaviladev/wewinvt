@@ -104,3 +104,50 @@ test("collection resolution falls back to normales for unknown or missing ids", 
   assert.equal(filter.resolverColeccion(undefined, lista), "normales");
   assert.equal(filter.resolverColeccion("constructor", lista), "normales");
 });
+
+test("album page orders head, tablist, tabpanel and footer", () => {
+  const order = [
+    'class="album-head"',
+    'role="tablist"',
+    'role="tabpanel"',
+    "data-barra-fill",
+    "data-conjuntos",
+    "data-stats",
+    "data-novedades",
+    "data-filtro-rareza",
+    'id="catalogo-cartas"',
+    'class="album-pie"',
+  ].map((marker) => albumHtml.indexOf(marker));
+
+  assert.ok(order.every((index) => index >= 0));
+  assert.deepEqual(order, [...order].sort((a, b) => a - b));
+  assert.match(albumHtml, /id="album-panel"/);
+  assert.ok(albumHtml.indexOf("data-sobres") > albumHtml.indexOf('class="album-pie"'));
+});
+
+test("album renderer builds ARIA tabs and scopes the view to the active collection", () => {
+  assert.match(albumSource, /setAttribute\("role", "tab"\)/);
+  assert.match(albumSource, /"aria-selected"/);
+  assert.match(albumSource, /"aria-controls"/);
+  assert.match(albumSource, /"aria-labelledby"/);
+  assert.match(albumSource, /tab\.tabIndex = activa \? 0 : -1/);
+  for (const key of ["ArrowLeft", "ArrowRight", "Home", "End"]) {
+    assert.ok(albumSource.includes(`"${key}"`), `${key} should be handled`);
+  }
+  assert.match(albumSource, /AlbumFilters\.resolverColeccion\(consulta\.get\("coleccion"\)/);
+  assert.match(albumSource, /history\.replaceState\(null, "", url\)/);
+  assert.match(albumSource, /estadoFiltros\[coleccionActiva\]/);
+  assert.match(albumSource, /progresoPorConjunto\(cartas,/);
+});
+
+test("collection ids from the URL never reach innerHTML", () => {
+  const asignaciones = albumSource.match(/innerHTML\s*=[^;]*;/g) || [];
+  assert.ok(asignaciones.length > 0);
+  for (const asignacion of asignaciones) {
+    assert.doesNotMatch(asignacion, /coleccion|consulta|destino|location/i, `unsafe interpolation: ${asignacion}`);
+  }
+});
+
+test("variant empty message is built from the collection name", () => {
+  assert.match(albumSource, /Aún no tienes cartas \$\{coleccionInfo\.nombre\}\. Cada carta puede salir en versión \$\{coleccionInfo\.nombre\} al canjear el gacha\./);
+});
