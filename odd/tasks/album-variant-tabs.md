@@ -23,7 +23,7 @@ The catalog holds a base and a Holo version of every card, mixed in one grid wit
 - [x] T1 `js/album-filters.js`, tests: split the catalog into collections. Route: delegated (writer trigger, 2+ non-trivial files).
 - [x] T2 `album.html`, `js/album.js`, `css/album.css`, tests: tabs with scoped catalog, progress and filters. Route: delegated, same writer.
 - [x] T3 `album.html`, `js/album.js`: Novedades belongs to the normal album and links to the Holo tab. Route: delegated, same writer.
-- [ ] T4 Verify in a browser at desktop and phone widths. Route: inline.
+- [x] T4 Verify in a browser at desktop and phone widths. Route: inline.
 
 ## Acceptance criteria
 - `/album` opens on Normales, showing only base cards; the Holo tab shows only Holo cards.
@@ -38,8 +38,17 @@ The catalog holds a base and a Holo version of every card, mixed in one grid wit
 
 ## Progress and evidence
 - T1 05d9cd1: collection helpers in AlbumFilters; node --test 103 pass.
-- T2 (this commit): tabs, scoped render, per-collection filters, URL; node --test 107 pass (1b258b9).
-- T3: Novedades on Normales only, Holo link; node --test 108 pass.
+- T2 1b258b9: tabs, scoped render, per-collection filters, URL; node --test 107 pass.
+- T3 f3b1614: Novedades on Normales only, Holo link; node --test 108 pass.
+- T4 local browser at 1024px, with seeded test data removed afterwards: Normales 3/40 showing only base cards and Holo 1/40 showing only Holo cards, with progress, series and stats scoped to the tab; packs count unchanged at 7.
+- T4 filters: Holo `legendaria` plus only-missing showed 4 cards, Normales stayed unfiltered, and the Holo filters came back on return. Clearing affected only the active tab.
+- T4 keyboard and URL: ArrowLeft and End switch tabs and move focus; the URL becomes `?coleccion=holo` or empty with no new history entry. `Ver álbum Holo` activates and focuses the tab.
+- T4 fallback: an HTML payload in `?coleccion=` opens Normales and nothing is injected. The Holo empty message shows when no Holo card is owned. The card detail opens on a Holo card and closes with Escape.
+- T4 phone at 375px: no horizontal overflow, tabs 44px tall.
+- The only console errors are 404s for `/api/config`, which the local static server does not serve.
+- Line endings of `js/album-filters.js` restored to LF after T1 converted them to CRLF.
+- Not verified: Twitch login and sync with a real account, real touch devices, production. Returning from the Twitch login opens Normales, as accepted in T2.
+- Card faces still number across the whole catalog, for example `#080` and `S1 · 80`, while each tab counts 40.
 
 ## Next step
-T4 (parent browser verification).
+The user decides on push and pull request, and on whether card numbering should restart per album.
