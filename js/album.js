@@ -249,6 +249,8 @@
   }
 
   contenedorTabs?.addEventListener("keydown", (e) => {
+    /* Alt+← y similares son atajos del navegador */
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
     if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
     const indice = COLECCIONES.findIndex((c) => c.id === coleccionActiva);
     let siguiente;

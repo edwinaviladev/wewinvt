@@ -125,21 +125,6 @@ test("album page orders head, tablist, tabpanel and footer", () => {
   assert.ok(albumHtml.indexOf("data-sobres") > albumHtml.indexOf('class="album-pie"'));
 });
 
-test("album renderer builds ARIA tabs and scopes the view to the active collection", () => {
-  assert.match(albumSource, /setAttribute\("role", "tab"\)/);
-  assert.match(albumSource, /"aria-selected"/);
-  assert.match(albumSource, /"aria-controls"/);
-  assert.match(albumSource, /"aria-labelledby"/);
-  assert.match(albumSource, /tab\.tabIndex = activa \? 0 : -1/);
-  for (const key of ["ArrowLeft", "ArrowRight", "Home", "End"]) {
-    assert.ok(albumSource.includes(`"${key}"`), `${key} should be handled`);
-  }
-  assert.match(albumSource, /AlbumFilters\.resolverColeccion\(consulta\.get\("coleccion"\)/);
-  assert.match(albumSource, /history\.replaceState\(null, "", url\)/);
-  assert.match(albumSource, /estadoFiltros\[coleccionActiva\]/);
-  assert.match(albumSource, /progresoPorConjunto\(cartas,/);
-});
-
 test("collection ids from the URL never reach innerHTML", () => {
   const asignaciones = albumSource.match(/innerHTML\s*=[^;]*;/g) || [];
   assert.ok(asignaciones.length > 0);
@@ -148,17 +133,9 @@ test("collection ids from the URL never reach innerHTML", () => {
   }
 });
 
-test("variant empty message is built from the collection name", () => {
-  assert.match(albumSource, /Aún no tienes cartas \$\{coleccionInfo\.nombre\}\. Cada carta puede salir en versión \$\{coleccionInfo\.nombre\} al canjear el gacha\./);
-});
-
 test("novedades belongs to the normal album and links to the holo tab", () => {
   assert.match(albumHtml, /Una muestra de cada rareza; cada versión se colecciona en su propio álbum\./);
   assert.doesNotMatch(albumHtml, /Todas siguen en el catálogo completo/);
   assert.match(albumHtml, /<button[^>]*data-ver-holo[^>]*>Ver álbum Holo<\/button>/);
   assert.match(albumHtml, /href="#catalogo-cartas">Ver catálogo completo/);
-  assert.match(albumSource, /novedades\.hidden = coleccionActiva !== "normales"/);
-  assert.match(albumSource, /botonVerHolo\.hidden = !COLECCION_HOLO/);
-  assert.match(albumSource, /botonVerHolo\?\.addEventListener\("click"/);
-  assert.match(albumSource, /activarColeccion\(COLECCION_HOLO\.id, \{ enfocar: true \}\)/);
 });

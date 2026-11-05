@@ -51,7 +51,8 @@ The catalog holds a base and a Holo version of every card, mixed in one grid wit
 - Card faces still number across the whole catalog, for example `#080` and `S1 · 80`, while each tab counts 40.
 
 - Review over `origin/master..174c4c6`: medium risk from `album.html`, user granted consent, reliability lens approved with no blocker.
-- Non-blocking review findings, open: tab tests are static source checks, so tab behavior has only the manual browser proof; the tablist key handler ignores modifiers, so Alt+ArrowLeft on a tab switches tabs instead of going back (`js/album.js:252`).
+- Non-blocking review findings, fixed at the user's request: the tab handler now leaves Alt, Ctrl and Meta shortcuts to the browser, and `test/album-tabs.test.mjs` runs the real `js/album.js` on a small DOM stub in place of the static source checks.
+- Findings evidence: the modifier test failed before the fix; `node --test test/*.test.mjs` then gave 115 pass. Deliberately breaking collection scoping, filter restore and arrow wraparound each fails the new tests.
 
 ## Next step
-The user decides on the open review findings, push and pull request, and whether card numbering should restart per album.
+The user decides on push and pull request, and whether card numbering should restart per album.
