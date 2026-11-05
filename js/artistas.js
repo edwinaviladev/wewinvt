@@ -70,6 +70,102 @@
     img.src = candidates[0].split(" ")[0];
   }
 
+  /* Lightbox (optional: the page works without its markup). */
+
+  // 1px transparent image shown while closed so the browser never loads the page as an image.
+  const PLACEHOLDER =
+    "data:image/svg+xml;charset=utf-8," +
+    encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>');
+
+  const lightbox = document.querySelector("[data-lightbox]");
+  const lightboxImg = lightbox && lightbox.querySelector("[data-lightbox-img]");
+  const lightboxCaption = lightbox && lightbox.querySelector("[data-lightbox-caption]");
+  const closeButton = lightbox && lightbox.querySelector("[data-lightbox-close]");
+  const prevButton = lightbox && lightbox.querySelector("[data-lightbox-prev]");
+  const nextButton = lightbox && lightbox.querySelector("[data-lightbox-next]");
+  const lightboxReady = Boolean(lightboxImg && lightboxCaption && closeButton && prevButton && nextButton);
+
+  let currentWorks = [];
+  let currentIndex = 0;
+  let lastTrigger = null;
+
+  function renderLightbox() {
+    const work = currentWorks[currentIndex];
+    if (!work) return;
+    lightboxImg.src = work.src;
+    lightboxImg.alt = work.alt;
+    lightboxCaption.textContent = "";
+    const type = document.createElement("strong");
+    type.className = "lb-caption__type";
+    type.textContent = work.category;
+    const description = document.createElement("span");
+    description.textContent = work.alt;
+    lightboxCaption.append(type, description);
+    const single = currentWorks.length < 2;
+    prevButton.hidden = single;
+    nextButton.hidden = single;
+  }
+
+  function openLightbox(works, index, trigger) {
+    currentWorks = works;
+    currentIndex = index;
+    lastTrigger = trigger || null;
+    renderLightbox();
+    lightbox.hidden = false;
+    document.body.style.overflow = "hidden";
+    closeButton.focus();
+    document.addEventListener("keydown", onKeydown);
+  }
+
+  function closeLightbox() {
+    lightbox.hidden = true;
+    document.body.style.overflow = "";
+    lightboxImg.src = PLACEHOLDER;
+    lightboxImg.alt = "";
+    document.removeEventListener("keydown", onKeydown);
+    if (lastTrigger && document.contains(lastTrigger)) lastTrigger.focus();
+  }
+
+  function step(direction) {
+    if (currentWorks.length < 2) return;
+    currentIndex = (currentIndex + direction + currentWorks.length) % currentWorks.length;
+    renderLightbox();
+  }
+
+  function onKeydown(event) {
+    if (event.key === "Escape") {
+      closeLightbox();
+    } else if (event.key === "ArrowLeft") {
+      step(-1);
+    } else if (event.key === "ArrowRight") {
+      step(1);
+    } else if (event.key === "Tab") {
+      const focusable = Array.from(
+        lightbox.querySelectorAll('button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'),
+      ).filter((node) => !node.hidden);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  }
+
+  if (lightboxReady) {
+    lightbox.addEventListener("click", (event) => {
+      if (event.target === lightbox) closeLightbox();
+    });
+    closeButton.addEventListener("click", closeLightbox);
+    prevButton.addEventListener("click", () => step(-1));
+    nextButton.addEventListener("click", () => step(1));
+    lightboxImg.src = PLACEHOLDER;
+  }
+
   const byArtist = new Map();
   [
     ["fanarts", "Fanart"],
@@ -121,13 +217,23 @@
       const list = document.createElement("ul");
       list.className = "artist-works";
       list.setAttribute("aria-label", `Obras de ${artist.name}`);
-      artist.works.forEach((work) => {
+      artist.works.forEach((work, workIndex) => {
         const item = document.createElement("li");
         item.className = "artist-work";
         const figure = document.createElement("figure");
         const img = document.createElement("img");
         configureImage(img, work, work.category === "Emote" ? "emote" : "fanart");
-        figure.appendChild(img);
+        if (lightboxReady) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "artist-work__open";
+          button.setAttribute("aria-label", `Ver en grande: ${work.alt}`);
+          button.addEventListener("click", () => openLightbox(artist.works, workIndex, button));
+          button.appendChild(img);
+          figure.appendChild(button);
+        } else {
+          figure.appendChild(img);
+        }
 
         const caption = document.createElement("figcaption");
         const category = document.createElement("span");

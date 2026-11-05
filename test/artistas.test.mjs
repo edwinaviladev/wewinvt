@@ -128,3 +128,163 @@ test("profile links are labelled by platform and malformed URLs render no link",
   assert.equal(links.d, undefined);
   assert.equal(links.e.textContent, "Perfil ↗");
 });
+
+function interactiveElement(tagName) {
+  return {
+    ...element(tagName),
+    listeners: {},
+    hidden: false,
+    style: {},
+    textContent: "",
+    addEventListener(name, listener) {
+      this.listeners[name] = listener;
+    },
+    querySelector() {
+      return null;
+    },
+    querySelectorAll() {
+      return [];
+    },
+  };
+}
+
+function mountWithLightbox(data) {
+  let document;
+  const make = (tagName) => {
+    const node = interactiveElement(tagName);
+    node.focus = () => {
+      document.activeElement = node;
+    };
+    return node;
+  };
+  const container = make("div");
+  const lightbox = make("div");
+  lightbox.hidden = true;
+  const lightboxImg = make("img");
+  const caption = make("p");
+  const closeButton = make("button");
+  const prevButton = make("button");
+  const nextButton = make("button");
+  const parts = {
+    "[data-lightbox-img]": lightboxImg,
+    "[data-lightbox-caption]": caption,
+    "[data-lightbox-close]": closeButton,
+    "[data-lightbox-prev]": prevButton,
+    "[data-lightbox-next]": nextButton,
+  };
+  lightbox.querySelector = (selector) => parts[selector] || null;
+  lightbox.querySelectorAll = () => [prevButton, nextButton, closeButton];
+  document = {
+    body: { style: {} },
+    activeElement: null,
+    keydown: null,
+    querySelector(selector) {
+      if (selector === "[data-artistas]") return container;
+      if (selector === "[data-lightbox]") return lightbox;
+      return null;
+    },
+    createElement: make,
+    createTextNode: (textContent) => ({ textContent }),
+    addEventListener(name, listener) {
+      if (name === "keydown") this.keydown = listener;
+    },
+    removeEventListener(name) {
+      if (name === "keydown") this.keydown = null;
+    },
+    contains: () => true,
+  };
+  runInNewContext(artistasSource, { window: { WEWIN: data }, document, URL });
+  return { container, document, lightbox, lightboxImg, caption, closeButton, prevButton, nextButton };
+}
+
+const sampleWork = (artista, n, alt = `Obra ${n} de ${artista}`) => ({ src: `img/${artista}-${n}.webp`, alt, artista });
+
+function workButtons(section) {
+  return section.children[1].children.map((item) => item.children[0].children[0]);
+}
+
+test("each work becomes a labelled button and the lightbox starts closed with a placeholder", () => {
+  const { container, lightbox, lightboxImg } = mountWithLightbox({
+    emotes: [sampleWork("ana", 1), sampleWork("ana", 2)],
+    fanarts: [sampleWork("ben", 1)],
+  });
+  assert.equal(lightbox.hidden, true);
+  assert.match(lightboxImg.src, /^data:image\/svg\+xml/);
+  const [button] = workButtons(container.children[0]);
+  assert.equal(button.tagName, "button");
+  assert.equal(button.type, "button");
+  assert.equal(button.attributes["aria-label"], "Ver en grande: Obra 1 de ana");
+});
+
+test("lightbox opens, steps within the artist's works with wrap, and closes returning focus", () => {
+  const ctx = mountWithLightbox({
+    emotes: [sampleWork("ana", 1), sampleWork("ana", 2), sampleWork("ana", 3)],
+    fanarts: [sampleWork("ben", 1), sampleWork("ben", 2)],
+  });
+  const { container, document, lightbox, lightboxImg, caption, closeButton, prevButton } = ctx;
+  const [first, , third] = workButtons(container.children[0]);
+
+  first.listeners.click();
+  assert.equal(lightbox.hidden, false);
+  assert.equal(document.body.style.overflow, "hidden");
+  assert.equal(document.activeElement, closeButton);
+  assert.equal(lightboxImg.src, "img/ana-1.webp");
+  assert.equal(prevButton.hidden, false);
+  assert.equal(caption.children[0].textContent, "Emote");
+  assert.equal(caption.children[1].textContent, "Obra 1 de ana");
+
+  document.keydown({ key: "ArrowLeft" });
+  assert.equal(lightboxImg.src, "img/ana-3.webp");
+  document.keydown({ key: "ArrowRight" });
+  document.keydown({ key: "ArrowRight" });
+  assert.equal(lightboxImg.src, "img/ana-2.webp");
+  document.keydown({ key: "ArrowRight" });
+  document.keydown({ key: "ArrowRight" });
+  assert.equal(lightboxImg.src, "img/ana-1.webp");
+
+  document.keydown({ key: "Escape" });
+  assert.equal(lightbox.hidden, true);
+  assert.equal(document.body.style.overflow, "");
+  assert.match(lightboxImg.src, /^data:image\/svg\+xml/);
+  assert.equal(document.activeElement, first);
+  assert.equal(document.keydown, null);
+
+  third.listeners.click();
+  ctx.nextButton.listeners.click();
+  assert.equal(lightboxImg.src, "img/ana-1.webp");
+  lightbox.listeners.click({ target: lightbox });
+  assert.equal(lightbox.hidden, true);
+  assert.equal(document.activeElement, third);
+});
+
+test("lightbox traps Tab focus and hides navigation for a single work", () => {
+  const { container, document, closeButton, prevButton, nextButton } = mountWithLightbox({
+    emotes: [sampleWork("ana", 1), sampleWork("ana", 2)],
+    fanarts: [sampleWork("ben", 1)],
+  });
+  const prevented = [];
+  const tab = (shiftKey) => document.keydown({ key: "Tab", shiftKey, preventDefault: () => prevented.push(true) });
+
+  workButtons(container.children[0])[0].listeners.click();
+  document.activeElement = closeButton;
+  tab(false);
+  assert.equal(document.activeElement, prevButton);
+  tab(true);
+  assert.equal(document.activeElement, closeButton);
+  assert.equal(prevented.length, 2);
+  document.keydown({ key: "Escape" });
+
+  workButtons(container.children[1])[0].listeners.click();
+  assert.equal(prevButton.hidden, true);
+  assert.equal(nextButton.hidden, true);
+});
+
+test("lightbox caption is built from text nodes, never markup", () => {
+  const { container, caption } = mountWithLightbox({
+    emotes: [sampleWork("ana", 1, "<img src=x onerror=alert(1)> larga descripción")],
+    fanarts: [],
+  });
+  workButtons(container.children[0])[0].listeners.click();
+  assert.equal(caption.children[1].textContent, "<img src=x onerror=alert(1)> larga descripción");
+  assert.equal(caption.innerHTML, undefined);
+});

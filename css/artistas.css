@@ -79,6 +79,36 @@
   margin: 0;
 }
 
+.artist-work__open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: zoom-in;
+}
+
+.artist-work__open:hover img {
+  outline: 1px solid var(--color-accent);
+}
+
+.artist-work__open:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.lb-btn[hidden] {
+  display: none;
+}
+
+.lb-caption__type {
+  margin-right: 0.6em;
+  font-size: 0.7em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .artist-work img {
   display: block;
   width: 100%;
