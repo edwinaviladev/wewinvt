@@ -5,6 +5,7 @@ import { runInNewContext } from "node:vm";
 
 const filtersSource = readFileSync(new URL("../js/album-filters.js", import.meta.url), "utf8");
 const albumSource = readFileSync(new URL("../js/album.js", import.meta.url), "utf8");
+const albumHtml = readFileSync(new URL("../album.html", import.meta.url), "utf8");
 
 const CATALOG = [
   { id: "a", rareza: "comun", variante: "base" },
@@ -80,7 +81,7 @@ function createDom() {
   return dom;
 }
 
-async function mountAlbum({ search = "", owned = ["a", "b", "a-holo"] } = {}) {
+async function mountAlbum({ search = "", owned = ["a", "b", "a-holo"], catalog = CATALOG } = {}) {
   const dom = createDom();
   const replaced = [];
   dom.get("[data-vacio]").textContent = "Aún no tienes cartas";
@@ -96,7 +97,7 @@ async function mountAlbum({ search = "", owned = ["a", "b", "a-holo"] } = {}) {
     contains: () => true,
   };
   const window = {
-    SOBRE_CATALOGO: CATALOG,
+    SOBRE_CATALOGO: catalog,
     CartaWewin: {
       crearCarta(datos) {
         const card = dom.element("button");
@@ -162,6 +163,12 @@ test("album opens on Normales with only base cards and its own progress", async 
   assert.equal(album.tab("normales").tabIndex, 0);
   assert.equal(album.tab("holo").tabIndex, -1);
   assert.equal(album.tab("holo").querySelector("[data-tab-cuenta]").textContent, "1/3");
+
+  for (const id of ["normales", "holo"]) {
+    assert.equal(album.tab(id).attributes.role, "tab");
+    assert.equal(album.tab(id).attributes["aria-controls"], "album-panel");
+  }
+  assert.match(albumHtml, /id="album-panel"[^>]*role="tabpanel"|role="tabpanel"[^>]*id="album-panel"/);
 });
 
 test("clicking the Holo tab scopes the album and updates the URL without history", async () => {
@@ -270,4 +277,13 @@ test("the Ver álbum Holo button activates and focuses the Holo tab", async () =
   album.dom.get("[data-ver-holo]").listeners.click();
   assert.equal(album.selected(), "holo");
   assert.equal(album.dom.activeElement, album.tab("holo"));
+});
+
+test("the Ver álbum Holo button hides when the catalog has no Holo cards", async () => {
+  const album = await mountAlbum({ catalog: CATALOG.filter((carta) => carta.variante === "base"), owned: ["a"] });
+
+  assert.equal(album.dom.get("[data-ver-holo]").hidden, true);
+  assert.equal(album.tab("holo"), undefined);
+  album.dom.get("[data-ver-holo]").listeners.click();
+  assert.equal(album.selected(), "normales");
 });
