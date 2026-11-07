@@ -53,6 +53,10 @@ Holo and Gold change the card surface. The user wants a variant that shows energ
 - Reduced motion: unit tests cover no burst with the ribbon kept, and `css/sobre.css` hides flames, embers and wave. Not emulated live.
 - Not checked: real phone performance of the flame layers, and draws through the deployed worker. `worker.js` reads the same catalog, so real redemptions roll Aura only after it is deployed.
 - Known gap: from reading `js/album-share.js`, the share PNG prints the "Aura" label but no energy layers. It treats every variant the same way. Not run in the browser.
+- Assessment over `5bb94d8..3c76282`: medium, under budget. Native review granted by the user: one reliability lens, approved, acknowledged. Three non-blocking findings:
+  - Reduced motion turns off every animation on Aura cards, which could stall a step waiting on `animationend`: dismissed, because no card code uses it. The only `.finished` in `js/` is the album's view transition (`js/album.js:478`).
+  - Aura sections replace the section spacing, with only a browser walk as proof: accepted. The gap between Aura sections differs slightly from other tabs, and no test pins the cards' grid position.
+  - The Gold order test name still says "after every other entry", but it now checks only the Gold slice: open. Aura order is covered in `test/card-aura-catalog.test.mjs`.
 
 ## Next step
-Native review, then the user decides on push and pull request. `feat/card-gold-variant` is not merged yet, so this branch carries Gold too.
+The user decides on push and pull request. `feat/card-gold-variant` is not merged yet, so this branch carries Gold too. Real redemptions roll Aura only after the worker is deployed.
