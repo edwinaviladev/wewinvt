@@ -150,10 +150,9 @@ test("the Aura card sheen blends like Holo and Gold", () => {
   assert.match(css, /\.card\[data-variante="aura"\] \.card__brillo \{ mix-blend-mode: overlay; \}/);
 });
 
-test("the album keeps the Aura card shadow and clips the page horizontally", () => {
+test("the album keeps the Aura card shadow", () => {
   const album = leer("../css/album.css");
   assert.match(album, /\.album-seccion \.card\[data-variante="aura"\] \{\s*--sombra-carta:/);
-  assert.match(album, /body\.album-page \{[^}]*overflow-x: clip;/);
 });
 
 /* ---- Reveal effects, run from the real sobre.js source on stubs ---- */
@@ -268,4 +267,20 @@ test("album grid cards are flat and do not sway, so Aura rests still there", () 
 test("the Aura wave is switched off by the reduced-motion rule", () => {
   assert.match(leer("../css/sobre.css"), /\.card\.is-onda \.aura__onda \{ animation: aura-onda/);
   assert.match(leer("../css/sobre.css"), /prefers-reduced-motion: reduce\) \{[^@]*\.aura__onda \{ display: none !important; \}/);
+});
+
+test("Aura layers stay outside the flipping 3D space, so flames never cross the card face", () => {
+  const conAura = marcadoDe("headpat-aura");
+  assert.ok(conAura.indexOf("card__aura") < conAura.indexOf("card__incl"));
+  assert.ok(conAura.indexOf("aura__frente") > conAura.lastIndexOf("</span>\n      </span>"));
+  assert.doesNotMatch(leer("../css/sobre.css"), /\.(card__aura|aura__frente) \{ transform: translateZ/);
+});
+
+test("containers that clip give the Aura energy room without a sideways page scroll", () => {
+  const album = leer("../css/album.css");
+  assert.match(album, /#catalogo-cartas \.album-seccion:has\(\.card\[data-variante="aura"\]\) \{[^}]*--aura-margen/);
+  /* On body, next to its overflow-y: auto, clip would compute to a scrollable hidden */
+  assert.match(album, /body\.album-page #album-contenido \{ overflow-x: clip; \}/);
+  assert.doesNotMatch(album, /body\.album-page \{[^}]*overflow-x/);
+  assert.match(leer("../css/sobre.css"), /\.hand:has\(\.card\[data-variante="aura"\]\) \{[^}]*padding-block/);
 });

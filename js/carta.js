@@ -107,15 +107,17 @@
     btn.dataset.variante = datos.variante || "base";
     if (datos.nombre.length > 16) btn.dataset.largo = "2";
     else if (datos.nombre.length > 13) btn.dataset.largo = "1";
+    /* Las capas de Aura van fuera de .card__incl: dentro de su espacio 3D, la cara
+       cruzaría el plano del aura durante el giro y las llamas la taparían */
     btn.innerHTML = `
+      ${datos.variante === "aura" ? `<span class="card__aura" aria-hidden="true">${CAPAS_AURA_ATRAS}</span>` : ""}
       <span class="card__incl">
-        ${datos.variante === "aura" ? `<span class="card__aura" aria-hidden="true">${CAPAS_AURA_ATRAS}</span>` : ""}
         <span class="card__inner">
           ${soloFrente ? "" : '<span class="card__face card__face--back"></span>'}
           ${htmlFrente(datos, soloFrente)}
         </span>
-        ${datos.variante === "aura" ? `<span class="aura__frente" aria-hidden="true">${CAPAS_AURA_FRENTE}</span>` : ""}
       </span>
+      ${datos.variante === "aura" ? `<span class="aura__frente" aria-hidden="true">${CAPAS_AURA_FRENTE}</span>` : ""}
     `;
     conectar(btn, { mece });
     return btn;

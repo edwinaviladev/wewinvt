@@ -927,10 +927,12 @@ body {
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.35s ease;
+  /* Misma inclinación que .card__incl */
+  transform: rotateX(calc(var(--my) * -9deg)) rotateY(calc(var(--mx) * 12deg));
 }
 
-.card__aura { transform: translateZ(-2px); }
-.aura__frente { transform: translateZ(2px); }
+.card--plana:not(.is-viva) .card__aura,
+.card--plana:not(.is-viva) .aura__frente { transform: none; }
 .card.is-revealed .card__aura,
 .card.is-revealed .aura__frente { opacity: 1; }
 
@@ -1610,6 +1612,11 @@ body.modo-overlay.is-transparente .velo {
   }
   .hand::-webkit-scrollbar { display: none; }
   .hand.is-repartiendo { overflow: visible; }
+  /* El carrusel recorta en vertical: con Aura crece lo que sale la energía sin mover las cartas */
+  .hand:has(.card[data-variante="aura"]) {
+    padding-block: calc(var(--cw) * 0.6);
+    margin-block: calc(34px - var(--cw) * 0.6);
+  }
   .hand .card { scroll-snap-align: center; touch-action: pan-x; }
 
   /* El enlace de volver ya lleva al álbum; el HUD no se le encima */
