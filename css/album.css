@@ -283,6 +283,11 @@ body.sin-scroll { overflow: hidden !important; }
   --sombra-carta: 0 10px 20px rgb(0 0 0 / 40%), 0 0 calc(var(--cw) * 0.1) rgb(255 196 84 / 30%);
 }
 
+/* Aura saca su resplandor de sus propias capas: aquí solo conserva la sombra oscura */
+.album-seccion .card[data-variante="aura"] {
+  --sombra-carta: 0 10px 20px rgb(0 0 0 / 40%);
+}
+
 /* El catálogo fuera de pantalla no se pinta */
 #catalogo-cartas .album-seccion {
   content-visibility: auto;
@@ -467,6 +472,8 @@ body.album-page {
   --rubor: var(--album-accent-text);
   background: var(--album-bg);
   color: var(--album-text);
+  /* La energía de las cartas Aura sobresale de la cuadrícula: sin scroll horizontal */
+  overflow-x: clip;
 }
 
 body.album-page .album-shell {

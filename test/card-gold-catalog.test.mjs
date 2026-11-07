@@ -6,7 +6,7 @@ import "../js/sorteo.js";
 const catalogo = globalThis.SOBRE_CATALOGO;
 const { construirCartas } = globalThis.SOBRE_SORTEO;
 
-const noGold = catalogo.filter((c) => c.variante !== "gold");
+const baseYHolo = catalogo.filter((c) => c.variante === "base" || c.variante === "holo");
 const gold = catalogo.filter((c) => c.variante === "gold");
 
 test("every base card has exactly one Gold version", () => {
@@ -24,8 +24,8 @@ test("every base card has exactly one Gold version", () => {
 
 test("Gold entries come after every other entry, in base order", () => {
   const primeraGold = catalogo.findIndex((c) => c.variante === "gold");
-  assert.equal(primeraGold, noGold.length);
-  assert.ok(catalogo.slice(primeraGold).every((c) => c.variante === "gold"));
+  assert.equal(primeraGold, baseYHolo.length);
+  assert.ok(catalogo.slice(primeraGold, primeraGold + gold.length).every((c) => c.variante === "gold"));
   const ordenBases = catalogo.filter((c) => c.variante === "base").map((c) => c.id);
   assert.deepEqual(gold.map((c) => c.grupoId), ordenBases);
 });
@@ -34,24 +34,24 @@ test("existing ids keep their position: base then holo per card", () => {
   const esperado = catalogo
     .filter((c) => c.variante === "base")
     .flatMap((c) => [c.id, `${c.id}-holo`]);
-  assert.deepEqual(noGold.map((c) => c.id), esperado);
+  assert.deepEqual(baseYHolo.map((c) => c.id), esperado);
   assert.equal(catalogo[0].id, "lentes-oscuros");
   assert.equal(catalogo[1].id, "lentes-oscuros-holo");
 });
 
-test("every group weighs 88 base, 10 holo and 2 gold", () => {
+test("every group weighs 84 base, 10 holo, 2 gold and 4 aura", () => {
   const grupos = Map.groupBy(catalogo, (c) => c.grupoId);
   assert.ok(grupos.size > 0);
   for (const [grupo, variantes] of grupos) {
     const pesos = Object.fromEntries(variantes.map((c) => [c.variante, c.pesoVariante]));
-    assert.deepEqual(pesos, { base: 88, holo: 10, gold: 2 }, grupo);
+    assert.deepEqual(pesos, { base: 84, holo: 10, gold: 2, aura: 4 }, grupo);
   }
   catalogo.forEach((c) => assert.ok(c.conjunto?.id, c.id));
 });
 
 test("a pack can yield a Gold card when the dice land on it", () => {
-  /* Siempre ~0.995: la rareza más alta y el último tramo del peso (el 2% de Gold) */
-  const cartas = construirCartas(catalogo, { random: () => 0.995 });
+  /* Siempre 0.95: cae en el tramo del peso 94-96 (el 2% de Gold), entre Holo y Aura */
+  const cartas = construirCartas(catalogo, { random: () => 0.95 });
   assert.equal(cartas.length, 3);
   cartas.forEach((c) => assert.equal(c.variante, "gold"));
   assert.equal(new Set(cartas.map((c) => c.grupoId)).size, 3);
@@ -151,7 +151,7 @@ for (const [rareza, texto] of [["comun", "¡Gold!"], ["rara", "¡Gold!"], ["epic
   test(`revealing a Gold ${rareza} sweeps, throws gold dust and shows one ribbon`, () => {
     const { run, emitidas, cintas } = efectos();
     const el = carta();
-    run(rareza, el, true);
+    run(rareza, el, "gold");
     assert.ok(el.clases.has("is-barrido"));
     assert.ok(emitidas.some(([, , , opciones]) => opciones.colores.includes("#f3cd6b")));
     assert.deepEqual(cintas, [[texto, "#f3cd6b"]]);
@@ -171,7 +171,7 @@ test("non-Gold reveals are unchanged: no sweep, plain rarity ribbon only for epi
 test("with reduced motion Gold throws no dust but still shows its ribbon", () => {
   const { run, emitidas, cintas } = efectos({ reduced: true });
   const el = carta();
-  run("comun", el, true);
+  run("comun", el, "gold");
   assert.ok(!emitidas.some(([, , , opciones]) => opciones.colores.includes("#f3cd6b")));
   assert.deepEqual(cintas, [["¡Gold!", "#f3cd6b"]]);
 });

@@ -854,6 +854,228 @@ body {
   .card__barrido { display: none; }
 }
 
+/* --- Aura: energía que sale de la carta, con el color de su rareza. Las capas
+   viven fuera de la cara (halo y llamas detrás, brasas delante) y solo se ven con
+   la carta revelada. El movimiento corre únicamente en cartas vivas (.is-viva):
+   en reposo, como en las cuadrículas del álbum, quedan el halo y el anillo quietos. --- */
+
+.card[data-variante="aura"] {
+  --aura-nucleo: #fff;
+  --aura-color: #bcdcff;
+  --carta-tinta: #08060c;
+  --carta-papel: #f8f2ea;
+  --carta-hueso: #b9aeb4;
+  --papel-arte: #15111b;
+  --tono-arte: color-mix(in srgb, var(--aura-color) 15%, transparent);
+  --marco: linear-gradient(150deg, var(--aura-nucleo), var(--aura-color) 10%, #0b0810 32%, #0b0810 68%, var(--aura-color) 90%, var(--aura-nucleo));
+  --sombra-carta: 0 calc(var(--cw) * 0.05) calc(var(--cw) * 0.1) rgb(0 0 0 / 60%);
+}
+
+.card[data-variante="aura"][data-rareza="rara"] { --aura-nucleo: #dcfff6; --aura-color: #34e6c0; }
+.card[data-variante="aura"][data-rareza="epica"] { --aura-nucleo: #f1e4ff; --aura-color: #a764ff; }
+.card[data-variante="aura"][data-rareza="legendaria"] { --aura-nucleo: #fff0b8; --aura-color: #ff8a2c; }
+
+.card[data-variante="aura"] .card__face--front { background: var(--marco); }
+
+.card[data-variante="aura"] .card__name {
+  color: var(--aura-nucleo);
+  text-shadow: 0 0 calc(var(--cw) * 0.04) var(--aura-color);
+}
+
+.card[data-variante="aura"] .card__num { color: var(--aura-nucleo); }
+
+.card[data-variante="aura"] .card__franja,
+.card[data-variante="aura"] .card__placa { border-color: var(--aura-color); }
+
+.card[data-variante="aura"] .card__variante {
+  color: #09060c;
+  background: linear-gradient(100deg, var(--aura-color), var(--aura-nucleo));
+}
+
+.card[data-variante="aura"] .card__chispas i {
+  background: var(--aura-nucleo);
+  box-shadow: 0 0 6px var(--aura-color);
+}
+
+/* Energía dentro de la ventana: detrás de la figura en los emotes y solo el borde en los fanarts */
+.aura-fondo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+  background: radial-gradient(58% 52% at 50% 54%, var(--aura-nucleo), var(--aura-color) 42%, transparent 100%);
+  opacity: 0.85;
+}
+
+.card[data-tipo="fanart"] .aura-fondo { display: none; }
+
+.card[data-variante="aura"] .card__ventana::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  box-shadow: inset 0 0 calc(var(--cw) * 0.1) color-mix(in srgb, var(--aura-color) 80%, transparent);
+}
+
+.card__aura,
+.aura__frente {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.card__aura { transform: translateZ(-2px); }
+.aura__frente { transform: translateZ(2px); }
+.card.is-revealed .card__aura,
+.card.is-revealed .aura__frente { opacity: 1; }
+
+/* 1. Halo */
+.aura__halo {
+  position: absolute;
+  inset: calc(var(--cw) * 0.012);
+  display: block;
+  border-radius: calc(var(--cw) * 0.06);
+  background: var(--aura-color);
+  box-shadow:
+    0 0 calc(var(--cw) * 0.1) calc(var(--cw) * 0.03) var(--aura-color),
+    0 0 calc(var(--cw) * 0.36) calc(var(--cw) * 0.09) color-mix(in srgb, var(--aura-color) 42%, transparent);
+  opacity: 0.95;
+}
+
+/* 2. Anillo de luz que recorre el borde */
+.aura__anillo {
+  position: absolute;
+  inset: calc(var(--cw) * -0.016);
+  display: block;
+  filter: drop-shadow(0 0 calc(var(--cw) * 0.03) var(--aura-color));
+}
+
+.aura__anillo > span {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  border-radius: calc(var(--cw) * 0.066);
+  padding: calc(var(--cw) * 0.018);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+.aura__anillo i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  width: 190%;
+  aspect-ratio: 1;
+  margin-left: -95%;
+  margin-top: -95%;
+  background: conic-gradient(transparent 0 40%, var(--aura-color) 62%, var(--aura-nucleo) 72%, transparent 76%, transparent 86%, var(--aura-color) 96%, var(--aura-nucleo) 99%, transparent);
+}
+
+/* 3. Llamas: ruido pregenerado que sube, en dos capas. Sin filtros SVG en vivo */
+.aura__humo {
+  position: absolute;
+  inset: -26% -36%;
+  display: block;
+  overflow: hidden;
+  --forma: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cfilter id='b' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='4'/%3E%3C/filter%3E%3Crect x='17' y='9' width='66' height='78' rx='6' filter='url(%23b)'/%3E%3C/svg%3E");
+  -webkit-mask: var(--forma) 0 0 / 100% 100% no-repeat;
+  mask: var(--forma) 0 0 / 100% 100% no-repeat;
+  --ruido: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='440'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.055 .017' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 4.2 0 0 0 -1.7'/%3E%3C/filter%3E%3Crect width='360' height='440' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.aura__humo i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 200%;
+  display: block;
+  background: var(--aura-color);
+  -webkit-mask: var(--ruido) 0 0 / 100% 50%;
+  mask: var(--ruido) 0 0 / 100% 50%;
+}
+
+.aura__humo--2 i {
+  background: var(--aura-nucleo);
+  -webkit-mask-position: 40% 0;
+  mask-position: 40% 0;
+  opacity: 0.75;
+}
+
+/* 4. Brasas delante de los bordes */
+.aura__chispa {
+  position: absolute;
+  bottom: 6%;
+  display: block;
+  width: calc(var(--cw) * 0.022);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--aura-nucleo);
+  box-shadow: 0 0 calc(var(--cw) * 0.03) var(--aura-color);
+  opacity: 0;
+}
+
+/* Onda al revelar: solo con .is-onda (lo pone sobre.js) */
+.aura__onda {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  width: calc(var(--cw) * 1.1);
+  aspect-ratio: 1;
+  margin: calc(var(--cw) * -0.55) 0 0 calc(var(--cw) * -0.55);
+  border-radius: 50%;
+  border: calc(var(--cw) * 0.03) solid var(--aura-nucleo);
+  box-shadow: 0 0 calc(var(--cw) * 0.1) var(--aura-color), inset 0 0 calc(var(--cw) * 0.1) var(--aura-color);
+  opacity: 0;
+}
+
+.card.is-onda .aura__onda { animation: aura-onda 0.9s cubic-bezier(0.15, 0.7, 0.3, 1) both; }
+
+/* Movimiento: solo en cartas vivas. El nombre `aura` ya lo usa la carga previa a revelar */
+.card.is-viva .aura__halo { animation: aura-respira 3.4s ease-in-out infinite; }
+.card.is-viva .aura__anillo i { animation: aura-gira 4.2s linear infinite; }
+.card.is-viva .aura__humo--1 i { animation: aura-sube 5.5s linear infinite; }
+.card.is-viva .aura__humo--2 i { animation: aura-sube 3.6s linear infinite; }
+.card.is-viva .aura__chispa { animation: aura-chispa 2.8s ease-out infinite; animation-delay: var(--d); }
+.card.is-viva .aura-fondo { animation: aura-late 3.4s ease-in-out infinite; }
+.card:not(.is-viva) .aura__humo,
+.card:not(.is-viva) .aura__chispa { display: none; }
+
+@keyframes aura-respira {
+  0%, 100% { transform: scale(0.95); opacity: 0.74; }
+  50% { transform: scale(1.05); opacity: 0.95; }
+}
+@keyframes aura-gira { to { transform: rotate(360deg); } }
+@keyframes aura-sube { to { transform: translateY(-50%); } }
+@keyframes aura-late { 0%, 100% { opacity: 0.68; } 50% { opacity: 0.95; } }
+@keyframes aura-chispa {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  14% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--x), calc(var(--cw) * -1.05)) scale(0.2); }
+}
+@keyframes aura-onda {
+  0% { opacity: 1; transform: scale(0.2); }
+  100% { opacity: 0; transform: scale(2.2); }
+}
+
+/* Movimiento reducido: solo quedan el halo y el anillo quietos */
+@media (prefers-reduced-motion: reduce) {
+  .card[data-variante="aura"],
+  .card[data-variante="aura"] * { animation: none !important; }
+  .aura__humo,
+  .aura__chispa,
+  .aura__onda { display: none !important; }
+}
+
 /* Brillo: una luz blanca que sigue al puntero en toda la carta */
 .card__brillo {
   position: absolute;
@@ -872,7 +1094,8 @@ body {
 
 .card[data-rareza="legendaria"] .card__brillo,
 .card[data-variante="holo"] .card__brillo,
-.card[data-variante="gold"] .card__brillo { mix-blend-mode: overlay; }
+.card[data-variante="gold"] .card__brillo,
+.card[data-variante="aura"] .card__brillo { mix-blend-mode: overlay; }
 
 /* Carga antes de revelar */
 .card.is-cargando::before {
