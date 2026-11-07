@@ -18,7 +18,7 @@ Holo and Gold change the card surface. The user wants a variant that shows energ
 - Out of scope: the "Variantes Holo" showcase in Novedades, and pack odds per rarity.
 - Vanilla CSS and JS with no dependencies. UI strings in the project's Spanish.
 - TDD: no project or session configuration found, so ordinary functional checks. Runner: `node --test test/*.test.mjs`.
-- Branch `feat/card-aura-variant`, stacked on `feat/card-gold-variant`, which is not merged yet.
+- Branch `feat/card-aura-variant`, cut from `feat/card-gold-variant`, which `master` now holds.
 - Delivery: `single-pr`. Forecast is about 350 authored lines. Push, pull request and merge remain the user's decisions.
 
 ## Tasks
@@ -59,4 +59,4 @@ Holo and Gold change the card surface. The user wants a variant that shows energ
   - The Gold order test name still says "after every other entry", but it now checks only the Gold slice: open. Aura order is covered in `test/card-aura-catalog.test.mjs`.
 
 ## Next step
-The user decides on push and pull request. `feat/card-gold-variant` is not merged yet, so this branch carries Gold too. Real redemptions roll Aura only after the worker is deployed.
+Pull request against `master`, which already holds Gold (#13). Real redemptions roll Aura only after the worker is deployed.
