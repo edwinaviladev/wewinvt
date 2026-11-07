@@ -155,3 +155,117 @@ test("the album keeps the Aura card shadow and clips the page horizontally", () 
   assert.match(album, /\.album-seccion \.card\[data-variante="aura"\] \{\s*--sombra-carta:/);
   assert.match(album, /body\.album-page \{[^}]*overflow-x: clip;/);
 });
+
+/* ---- Reveal effects, run from the real sobre.js source on stubs ---- */
+const sobreSource = leer("../js/sobre.js");
+
+function efectos({ reduced = false } = {}) {
+  const inicio = sobreSource.indexOf("  function efectosRareza(");
+  const fin = sobreSource.indexOf("  /* Cinta con el nombre de la rareza", inicio);
+  assert.ok(inicio >= 0 && fin > inicio, "efectosRareza and efectosAura should be present in sobre.js");
+  const emitidas = [];
+  const cintas = [];
+  const contexto = {
+    REDUCED: reduced,
+    RAREZAS: {
+      comun: { nombre: "Común", color: "#d9cbb9" },
+      rara: { nombre: "Rara", color: "#9fecd6" },
+      epica: { nombre: "Épica", color: "#c8aefc" },
+      legendaria: { nombre: "Legendaria", color: "#ffd27a" },
+    },
+    Chispas: { emitir: (...args) => emitidas.push(args) },
+    rectoEnEscena: () => ({ x: 10, y: 20 }),
+    mostrarSplash: (texto, color) => cintas.push([texto, color]),
+    aclararEscena() {},
+    setTimeout() {},
+    stage: { clientWidth: 400 },
+    Math,
+  };
+  runInNewContext(`${sobreSource.slice(inicio, fin)}\nglobalThis.efectosRareza = efectosRareza;`, contexto);
+  return { run: contexto.efectosRareza, emitidas, cintas };
+}
+
+function carta() {
+  const clases = new Set();
+  return { clases, classList: { add: (c) => clases.add(c), remove: (c) => clases.delete(c) } };
+}
+
+const COLOR_AURA = { comun: "#bcdcff", rara: "#34e6c0", epica: "#a764ff", legendaria: "#ff8a2c" };
+const TEXTO_AURA = { comun: "¡Aura!", rara: "¡Aura!", epica: "¡Épica Aura!", legendaria: "¡Legendaria Aura!" };
+
+for (const rareza of Object.keys(COLOR_AURA)) {
+  test(`revealing an Aura ${rareza} plays the wave, a 70-particle burst and one ribbon`, () => {
+    const { run, emitidas, cintas } = efectos();
+    const el = carta();
+    run(rareza, el, "aura");
+    assert.ok(el.clases.has("is-onda"));
+    const estallido = emitidas.filter(([, , , opciones]) => opciones.colores.includes(COLOR_AURA[rareza]));
+    assert.equal(estallido.length, 1);
+    assert.equal(estallido[0][2], 70);
+    assert.deepEqual(cintas, [[TEXTO_AURA[rareza], COLOR_AURA[rareza]]]);
+    assert.ok(!el.clases.has("is-barrido"));
+  });
+}
+
+test("the Aura wave restarts when the class was already there", () => {
+  const { run } = efectos();
+  const el = carta();
+  const pasos = [];
+  el.classList.add = (c) => { pasos.push(`+${c}`); el.clases.add(c); };
+  el.classList.remove = (c) => { pasos.push(`-${c}`); el.clases.delete(c); };
+  el.clases.add("is-onda");
+  run("comun", el, "aura");
+  assert.deepEqual(pasos.slice(0, 2), ["-is-onda", "+is-onda"]);
+});
+
+test("with reduced motion Aura throws no burst but still shows its ribbon and wave class", () => {
+  const { run, emitidas, cintas } = efectos({ reduced: true });
+  const el = carta();
+  run("epica", el, "aura");
+  assert.ok(!emitidas.some(([, , , opciones]) => opciones.colores.includes(COLOR_AURA.epica)));
+  assert.deepEqual(cintas, [["¡Épica Aura!", COLOR_AURA.epica]]);
+  assert.ok(el.clases.has("is-onda"));
+});
+
+test("non-Aura reveals are unchanged: no wave, plain rarity ribbon only for epica and legendaria", () => {
+  for (const variante of [undefined, "base", "holo"]) {
+    for (const [rareza, cintasEsperadas] of [["comun", []], ["rara", []], ["epica", [["¡Épica!", "#c8aefc"]]], ["legendaria", [["¡Legendaria!", "#ffd27a"]]]]) {
+      const { run, cintas } = efectos();
+      const el = carta();
+      run(rareza, el, variante);
+      assert.ok(!el.clases.has("is-onda"), `${variante} ${rareza}`);
+      assert.deepEqual(cintas, cintasEsperadas, `${variante} ${rareza}`);
+    }
+  }
+});
+
+test("a Gold reveal still gets its own ribbon and no Aura wave", () => {
+  const { run, cintas } = efectos();
+  const el = carta();
+  run("legendaria", el, "gold");
+  assert.ok(el.clases.has("is-barrido"));
+  assert.ok(!el.clases.has("is-onda"));
+  assert.deepEqual(cintas, [["¡Legendaria Gold!", "#f3cd6b"]]);
+});
+
+test("both reveal callers pass the variant and Aura cards sway through the shared predicate", () => {
+  assert.equal(sobreSource.match(/efectosRareza\(datos\.rareza, btn, datos\.variante\)/g).length, 2);
+  assert.doesNotMatch(sobreSource, /datos\.variante === "gold"\)/);
+  const cartaSource = leer("../js/carta.js");
+  const ventana = {};
+  const linea = cartaSource.indexOf("const esEspecial");
+  runInNewContext(`${cartaSource.slice(linea, cartaSource.indexOf("\n", linea))}\nglobalThis.f = esEspecial;`, ventana);
+  assert.equal(ventana.f({ variante: "aura" }), true);
+  assert.equal(ventana.f({ variante: "base" }), false);
+});
+
+test("album grid cards are flat and do not sway, so Aura rests still there", () => {
+  const album = leer("../js/album.js");
+  assert.match(album, /function cartaObtenida\(datos, opciones = \{ plana: true \}\)/);
+  assert.match(album, /grid\.append\(obtenidas\(datos\.id\) > 0 \? cartaObtenida\(datos\) : cartaBloqueada\(datos\)\)/);
+});
+
+test("the Aura wave is switched off by the reduced-motion rule", () => {
+  assert.match(leer("../css/sobre.css"), /\.card\.is-onda \.aura__onda \{ animation: aura-onda/);
+  assert.match(leer("../css/sobre.css"), /prefers-reduced-motion: reduce\) \{[^@]*\.aura__onda \{ display: none !important; \}/);
+});
