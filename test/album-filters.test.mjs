@@ -85,12 +85,12 @@ test("collections list puts normales first and derives variants from the data", 
   assert.deepEqual(JSON.parse(JSON.stringify(filter.colecciones([]))), [{ id: "normales", nombre: "Normales" }]);
 });
 
-test("real catalog yields normales, holo and gold collections", () => {
+test("real catalog yields normales, holo, gold and aura collections", () => {
   const catalogContext = {};
   runInNewContext(catalogSource, catalogContext);
   const lista = filters().colecciones(catalogContext.SOBRE_CATALOGO);
 
-  assert.deepEqual(Array.from(lista, (c) => c.id), ["normales", "holo", "gold"]);
+  assert.deepEqual(Array.from(lista, (c) => c.id), ["normales", "holo", "gold", "aura"]);
 });
 
 test("collection resolution falls back to normales for unknown or missing ids", () => {

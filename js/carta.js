@@ -31,6 +31,20 @@
     <span class="card__oro-patron"><i class="card__prisma"></i></span>
   `;
 
+  /* Aura: energía que sale de la carta. Solo se mueve en cartas vivas (.is-viva).
+     Las brasas suben desde abajo; cada una lleva su retraso (--d) y su deriva (--x) */
+  const CAPAS_AURA_ATRAS = `
+    <i class="aura__halo"></i>
+    <span class="aura__humo aura__humo--1"><i></i></span>
+    <span class="aura__humo aura__humo--2"><i></i></span>
+    <span class="aura__anillo"><span><i></i></span></span>
+    <i class="aura__onda"></i>
+  `;
+  const BRASAS_AURA = [-4, 104, 18, 88, -2, 102, 8, 96, 44, 70, -6, 106];
+  const CAPAS_AURA_FRENTE = BRASAS_AURA
+    .map((x, i) => `<i class="aura__chispa" style="left:${x}%;--d:${(i * 0.43).toFixed(2)}s;--x:${(x < 50 ? -1 : 1) * (6 + (i % 3) * 8)}px"></i>`)
+    .join("");
+
   /* Variante distinta de la base (Holo, Gold…): la carta se mece sola */
   const esEspecial = (datos) => Boolean(datos?.variante) && datos.variante !== "base";
 
@@ -56,6 +70,7 @@
             <span class="card__num">#${numero}</span>
           </span>
           <span class="card__ventana">
+            ${datos.variante === "aura" ? '<i class="aura-fondo" aria-hidden="true"></i>' : ""}
             <img class="card__arte" src="${datos.src}" alt="${datos.alt}"${carga} draggable="false" />
             ${holo ? CAPAS_HOLO : ""}
             ${gold ? CAPAS_GOLD : ""}
@@ -92,13 +107,17 @@
     btn.dataset.variante = datos.variante || "base";
     if (datos.nombre.length > 16) btn.dataset.largo = "2";
     else if (datos.nombre.length > 13) btn.dataset.largo = "1";
+    /* Las capas de Aura van fuera de .card__incl: dentro de su espacio 3D, la cara
+       cruzaría el plano del aura durante el giro y las llamas la taparían */
     btn.innerHTML = `
+      ${datos.variante === "aura" ? `<span class="card__aura" aria-hidden="true">${CAPAS_AURA_ATRAS}</span>` : ""}
       <span class="card__incl">
         <span class="card__inner">
           ${soloFrente ? "" : '<span class="card__face card__face--back"></span>'}
           ${htmlFrente(datos, soloFrente)}
         </span>
       </span>
+      ${datos.variante === "aura" ? `<span class="aura__frente" aria-hidden="true">${CAPAS_AURA_FRENTE}</span>` : ""}
     `;
     conectar(btn, { mece });
     return btn;

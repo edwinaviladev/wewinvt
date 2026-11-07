@@ -2,9 +2,9 @@
  * Catálogo de cartas del prototipo "Sobre coleccionable".
  * Cada entrada base: id, tipo (emote|fanart), src, nombre (en carta), alt, artista y rareza.
  * `conjunto` opcional tiene forma { id, nombre }; si falta, pertenece a Serie 1.
- * Al final, cada carta se expande en una versión base (88) y una Holo (10), y todas las
- * versiones Gold (2) van después de esas entradas, en el mismo orden, para que el número
- * de carta (posición en el catálogo) de las existentes no cambie nunca.
+ * Al final, cada carta se expande en una versión base (84) y una Holo (10); después van
+ * todas las Gold (2) y, por último, todas las Aura (4), cada grupo en el mismo orden, para
+ * que el número de carta (posición en el catálogo) de las existentes no cambie nunca.
  * Rarezas: comun | rara | epica | legendaria (misma paleta del sitio).
  */
 const CONJUNTO_SERIE_1 = { id: "serie-1", nombre: "Serie 1" };
@@ -59,7 +59,7 @@ const CARTAS_BASE_Y_HOLO = CARTAS_BASE.flatMap((carta) => {
   const grupoId = carta.id;
   const conjunto = carta.conjunto || CONJUNTO_SERIE_1;
   return [
-    { ...carta, grupoId, conjunto, variante: "base", pesoVariante: 88 },
+    { ...carta, grupoId, conjunto, variante: "base", pesoVariante: 84 },
     {
       ...carta,
       id: `${grupoId}-holo`,
@@ -83,4 +83,15 @@ const CARTAS_GOLD = CARTAS_BASE.map((carta) => ({
   pesoVariante: 2,
 }));
 
-globalThis.SOBRE_CATALOGO = [...CARTAS_BASE_Y_HOLO, ...CARTAS_GOLD];
+/* Las Aura van después de las Gold, por la misma razón */
+const CARTAS_AURA = CARTAS_BASE.map((carta) => ({
+  ...carta,
+  id: `${carta.id}-aura`,
+  grupoId: carta.id,
+  conjunto: carta.conjunto || CONJUNTO_SERIE_1,
+  variante: "aura",
+  nombreVariante: "Aura",
+  pesoVariante: 4,
+}));
+
+globalThis.SOBRE_CATALOGO = [...CARTAS_BASE_Y_HOLO, ...CARTAS_GOLD, ...CARTAS_AURA];

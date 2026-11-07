@@ -495,9 +495,11 @@
   }
 
   /* Efectos por rareza (compartidos entre modos), justo cuando la carta da la cara */
-  function efectosRareza(rareza, el, gold = false) {
+  function efectosRareza(rareza, el, variante) {
     const c = rectoEnEscena(el);
     const color = RAREZAS[rareza].color;
+    /* Gold y Aura traen su propia cinta: reemplaza a la de la rareza, no salen dos */
+    const cintaPropia = variante === "gold" || variante === "aura";
 
     if (rareza === "comun") {
       Chispas.emitir(c.x, c.y, 16, { colores: [color, "#fff"], vel: 170, grav: 120, vida: 0.7, grosor: 1.3 });
@@ -505,10 +507,10 @@
       Chispas.emitir(c.x, c.y, 46, { colores: [color, "#d9fff4", "#fff"], vel: 340, grav: 240, vida: 0.9 });
     } else if (rareza === "epica") {
       Chispas.emitir(c.x, c.y, 90, { colores: [color, "#ff9b4b", "#fff"], vel: 520, grav: 260, vida: 1.1, grosor: 2.4 });
-      if (!gold) mostrarSplash(`¡${RAREZAS[rareza].nombre}!`, color);
+      if (!cintaPropia) mostrarSplash(`¡${RAREZAS[rareza].nombre}!`, color);
     } else {
       Chispas.emitir(c.x, c.y, 190, { colores: [color, "#ff8d3c", "#fff4d2"], vel: 760, grav: 380, vida: 1.5, grosor: 2.8 });
-      if (!gold) mostrarSplash(`¡${RAREZAS[rareza].nombre}!`, color);
+      if (!cintaPropia) mostrarSplash(`¡${RAREZAS[rareza].nombre}!`, color);
       /* Lluvia de brasas desde arriba */
       if (!REDUCED) {
         for (let i = 0; i < 6; i++) {
@@ -521,7 +523,8 @@
       }
     }
 
-    if (gold) efectosGold(rareza, el, c);
+    if (variante === "gold") efectosGold(rareza, el, c);
+    else if (variante === "aura") efectosAura(rareza, el, c);
 
     setTimeout(() => {
       el.classList.remove("is-lenta", "is-al-frente");
@@ -542,6 +545,30 @@
     }
     const conRareza = rareza === "epica" || rareza === "legendaria";
     mostrarSplash(conRareza ? `¡${RAREZAS[rareza].nombre} Gold!` : "¡Gold!", ORO_GOLD);
+  }
+
+  /* Aura: onda desde la carta, un estallido de partículas y una cinta con el color de su
+     rareza. En épica y legendaria la cinta nombra la rareza y reemplaza a la común */
+  const COLORES_AURA = {
+    comun: { color: "#bcdcff", nucleo: "#fff" },
+    rara: { color: "#34e6c0", nucleo: "#dcfff6" },
+    epica: { color: "#a764ff", nucleo: "#f1e4ff" },
+    legendaria: { color: "#ff8a2c", nucleo: "#fff0b8" },
+  };
+  function efectosAura(rareza, el, c) {
+    const { color, nucleo } = COLORES_AURA[rareza];
+    /* Reiniciar la clase para que la onda vuelva a correr si la carta se revela otra vez */
+    el.classList.remove("is-onda");
+    void el.offsetWidth;
+    el.classList.add("is-onda");
+    if (!REDUCED) {
+      Chispas.emitir(c.x, c.y, 70, {
+        colores: [color, nucleo, "#fff"],
+        vel: 440, grav: 220, vida: 1.2, grosor: 2.2,
+      });
+    }
+    const conRareza = rareza === "epica" || rareza === "legendaria";
+    mostrarSplash(conRareza ? `¡${RAREZAS[rareza].nombre} Aura!` : "¡Aura!", color);
   }
 
   /* Cinta con el nombre de la rareza (épica / legendaria) */
@@ -676,7 +703,7 @@
     if (nueva) btn.classList.add("is-new");
     btn.setAttribute("aria-label", Carta.etiquetaCarta(datos, nueva));
     AudioFX.sting(datos.rareza);
-    efectosRareza(datos.rareza, btn, datos.variante === "gold");
+    efectosRareza(datos.rareza, btn, datos.variante);
     if (Carta.esEspecial(datos)) Carta.meciendo(btn, true);
 
     reveladas++;
@@ -810,7 +837,7 @@
     btn.classList.add("is-revealed");
     if (nueva) btn.classList.add("is-new");
     AudioFX.sting(datos.rareza);
-    efectosRareza(datos.rareza, btn, datos.variante === "gold");
+    efectosRareza(datos.rareza, btn, datos.variante);
     if (Carta.esEspecial(datos)) Carta.meciendo(btn, true);
 
     /* Se muestra un momento y sale de pantalla */

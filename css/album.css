@@ -283,10 +283,24 @@ body.sin-scroll { overflow: hidden !important; }
   --sombra-carta: 0 10px 20px rgb(0 0 0 / 40%), 0 0 calc(var(--cw) * 0.1) rgb(255 196 84 / 30%);
 }
 
+/* Aura saca su resplandor de sus propias capas: aquí solo conserva la sombra oscura */
+.album-seccion .card[data-variante="aura"] {
+  --sombra-carta: 0 10px 20px rgb(0 0 0 / 40%);
+}
+
 /* El catálogo fuera de pantalla no se pinta */
 #catalogo-cartas .album-seccion {
   content-visibility: auto;
   contain-intrinsic-size: auto 1100px;
+}
+
+/* content-visibility recorta al borde de la sección: con Aura la sección crece
+   lo que sale la energía, sin mover las cartas. Sin márgenes inferiores negativos,
+   porque el relleno taparía los enlaces de abajo */
+body.album-page #catalogo-cartas .album-seccion:has(.card[data-variante="aura"]) {
+  --aura-margen: calc(var(--album-card-size) * 0.42);
+  margin: 1rem calc(var(--aura-margen) * -1) 0;
+  padding: 1.5rem var(--aura-margen) var(--aura-margen);
 }
 
 /* Cartas aún sin descubrir: el reverso apagado, plano y sin brillo */
@@ -468,6 +482,10 @@ body.album-page {
   background: var(--album-bg);
   color: var(--album-text);
 }
+
+/* La energía de las cartas Aura sobresale de la cuadrícula. Aquí y no en body: junto a
+   su overflow-y: auto, clip se volvería hidden y la página se podría desplazar de lado */
+body.album-page #album-contenido { overflow-x: clip; }
 
 body.album-page .album-shell {
   max-width: var(--content-width);
